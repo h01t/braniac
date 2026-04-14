@@ -1,0 +1,2 @@
+# TriviaQA Dataset
+TriviaQA is a question-answering dataset designed for AI models to handle trivia-based queries. Examples from [[sources/deepseek-llm.md]] include trivia questions about entities such as [[entities/kansas.md]], [[entities/tim-bergling.md]], and [[entities/lesley-hornby.md]], as illustrated in Table 39.
