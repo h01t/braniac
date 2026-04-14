@@ -1,0 +1,13 @@
+# Agent Harness
+- **Definition**: A framework that combines complex skills, memory, and external modules to enhance AI agents' adaptability to diverse and heterogeneous environments.
+- **Components**:
+  - **Skills**: Complex functionalities, often exceeding 2,000 tokens each.
+  - **Memory**: Short-term and persistent memory for tracking progress and feedback.
+  - **Self-Feedback and Optimization**: Modules for self-criticism and iterative improvement.
+- **Use Cases**:
+  - **Research Agent Harness**: Used internally at MiniMax for machine learning experiments, involving data pipelines, training environments, and cross-team collaboration.
+  - **Agent Teams**: Multi-agent collaboration where models maintain role identities, engage in adversarial reasoning, and adhere to protocols.
+  - **Entertainment**: Applied in systems like [[entities/openroom-demo.md]] for interactive experiences.
+- **Capabilities of M2.7**: Handles over 40 complex skills with 97% adherence rate and participates in self-evolution cycles.
+- **Related Entities**: [[entities/minimax-m27-model.md]], [[entities/benchmarks-overview.md]]
+- **Source**: [[sources/minimax-m27-announcement.md]]
