@@ -1,0 +1,2 @@
+# RACE Dataset
+RACE is a reading comprehension dataset used in AI for evaluating machine understanding of passages. An example from [[sources/deepseek-llm.md]] includes a question about choosing the best title for a passage, as shown in Table 38.
