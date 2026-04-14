@@ -1,2 +1,0 @@
-# Perplexity in AI
-Perplexity is a metric used in language models to measure the uncertainty of predictions. In the context of [[concepts/wino-grande-dataset.md]], it is applied to select completions with the lowest perplexity, as referenced in [[sources/deepseek-llm.md]].

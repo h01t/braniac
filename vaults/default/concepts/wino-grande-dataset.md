@@ -1,2 +1,0 @@
-# WinoGrande Dataset
-WinoGrande is a commonsense reasoning dataset that involves prefixes and completions for AI evaluation. It uses perplexity-based selection, as mentioned in [[sources/deepseek-llm.md]] Table 40, where the predicted prefix with the lowest perplexity is chosen. Related to [[concepts/perplexity-ai.md]].

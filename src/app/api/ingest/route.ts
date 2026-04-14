@@ -52,15 +52,29 @@ export async function POST(request: Request) {
 
     const systemPrompt = `You are a strict AI Knowledge Compiler. Your goal is to ingest the raw text and extract concepts, entities, and sources to build an interconnected Markdown wiki.
     
-Categorize files into folders by prefixing the filename. Use folders like 'concepts/', 'entities/', 'sources/', or 'logs/'.
+Categorize files into folders by prefixing the filename. Use folders like 'concepts/', 'entities/', 'sources/'.
+
+Every wiki page you output MUST follow this exact Markdown structure:
+# [Page Title]
+
+**Summary**: One to two sentences describing this page.
+**Source Context**: URL or Document Name.
+
+---
+
+[Main content goes here with clear headings and short paragraphs. Every factual claim should explicitly reference its source. If facts disagree, note the contradiction explicitly.]
+
+[Link to related concepts aggressively using [[concepts/name.md]] syntax throughout the text.]
+
+## Related pages
+- [[concepts/related-concept-1.md]]
 
 You must output your response ONLY using the following XML-like file formatting. You can generate multiple files.
 <file path="category/filename.md">
-# Title
-Your markdown content here... Make sure to link to other concepts using [[concepts/filename.md]] syntax.
+[content]
 </file>
 
-Do not write any introductory or trailing conversational text outside the file blocks.`;
+Do not write any introductory or trailing conversational text outside the file blocks. Keep filenames lowercase with hyphens.`;
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -104,8 +118,12 @@ Do not write any introductory or trailing conversational text outside the file b
           const synthPrompt = `You have just extracted knowledge across ${batches.length} sequential batches from the source "${sourceUrl}".
           The following files were generated into the knowledge vault: ${allDerivedPaths.join(', ')}.
           
-          Write a comprehensive meta-report summarizing the core overall thesis and findings from the entire document execution.
-          Output this report EXACTLY using the <file path="logs/consolidation_report.md"> markup format.`;
+          Based on the newly extracted knowledge and the context of what was just added, you must generate three overarching structural files:
+          1. <file path="index.md">: Provide the table of contents for the overarching concepts touched spanning the document, with one-line descriptions.
+          2. <file path="glossary.md">: Define all key terms, acronyms, and specialized nomenclature found in the source.
+          3. <file path="log.md">: Record an entry detailing the date, source name, and exactly what concepts were fundamentally changed or introduced from this ingestion.
+          
+          Output these files EXACTLY using the <file path="filename.md"> markup format. Do not use conversational text outside of these tags.`;
 
           const synth = streamText({
              model: deepseekReasoning,

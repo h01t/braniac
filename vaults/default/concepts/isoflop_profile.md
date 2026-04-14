@@ -1,2 +1,0 @@
-# IsoFLOP Profile
-The IsoFLOP profile approach, from Chinchilla (Hoffmann et al., 2022), fits scaling curves by holding compute budget constant and varying model and data scales. It reduces experimental costs and helps determine optimal model/data allocation in [[concepts/scaling_laws.md]].

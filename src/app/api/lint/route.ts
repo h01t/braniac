@@ -27,16 +27,16 @@ export async function POST(request: Request) {
       }
     }
 
-    const systemPrompt = `You are a rigorous QA Linter for a Markdown-based Knowledge Vault.
-Analyze all the provided files as a cohesive graph database.
+    const systemPrompt = `You are the Knowledge Vault Linter for an LLM-Wiki. Your job is to analyze the structural health of the entire git-backed markdown vault.
+  
+You must evaluate the files and graph connections to:
+1. Check for contradictions between pages or claims.
+2. Find orphan pages (pages with absolutely no inbound links from other pages).
+3. Identify concepts mentioned in pages that lack their own dedicated page.
+4. Flag claims that may be outdated or missing citations.
+5. Check that all pages follow the standard format: '# Title', '**Summary**', '**Source Context**', '---', and '## Related pages'.
 
-Enforce these strict linting rules:
-1. **Contradictions**: Find claims in one file that contradict facts in another file.
-2. **Orphans**: Find files that nobody links to and don't link to anything.
-3. **Ghosts**: Find any [[links]] pointing to files that do not exist in the provided dataset.
-4. **Staleness**: Flag things that seem outdated or missing a timestamp/verifiability.
-
-Output a beautifully structured Markdown report using standard headers, lists, and bold text. Break down the findings by Rule category. Summarize the overall health of the Knowledge Base.`;
+You must output a comprehensive markdown report listing your findings. Report your findings as a numbered list with suggested fixes. Do not output anything other than the markdown report.`;
 
     const { text: resultText } = await generateText({
       model: deepseekReasoning,
