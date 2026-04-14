@@ -1,12 +1,6 @@
 # Self-Evolution
-A process by which an AI model iteratively improves itself, its workflows, and the systems around it with minimal human intervention. This involves the model building complex agent harnesses, analyzing failures, optimizing its own processes, and participating in its own development cycle. This concept is central to the advancement of [[concepts/agentic-capabilities.md]] and represents a move toward full autonomy in AI development.
+A process where a model, starting from a base model, autonomously improves its reasoning capabilities through [[concepts/reinforcement_learning.md]] without a preceding supervised fine-tuning stage. This allows for clear observation of the model's intrinsic development, particularly in handling complex reasoning tasks.
 
-## Key Mechanisms
-*   **Feedback Loop:** The model analyzes its performance, plans changes, implements them, evaluates results, and decides on further actions.
-*   **Harness Optimization:** The model can modify its own agent scaffolding, including workflow guidelines and loop detection.
-*   **Autonomous Experimentation:** In low-resource scenarios, the model can run iterative cycles to improve performance on tasks like machine learning competitions.
+Key behaviors emerge spontaneously as test-time computation increases, such as **reflection** (revisiting and reevaluating previous steps) and the exploration of alternative problem-solving approaches.
 
-## Related Concepts
-*   [[concepts/agent-harness.md]]
-*   [[concepts/agent-teams.md]]
-*   [[entities/MiniMax M2.7.md]]
+This concept is central to the development of [[entities/DeepSeek-R1-Zero.md]].
