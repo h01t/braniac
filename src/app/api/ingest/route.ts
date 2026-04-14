@@ -125,6 +125,15 @@ Do not write any introductory or trailing conversational text outside the file b
               await writeMarkdownAndCommit(vaultId, match[1], match[2].trim(), `Generated Consolidation Report for ${sourceUrl}`);
           }
         }
+        
+        // Asynchronous qmd background refresh to update vector embeddings.
+        if (allDerivedPaths.length > 0) {
+           const { exec } = require('child_process');
+           exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd embed', { cwd: process.cwd() }, (err: any) => {
+              if (err) console.error("qmd background embed failed", err);
+              else console.log("qmd background embed finished successfully");
+           });
+        }
 
         sendChunk(`\n\n[Ingestion Complete]`);
         controller.close();

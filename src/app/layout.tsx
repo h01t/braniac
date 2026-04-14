@@ -3,6 +3,7 @@ import './globals.css';
 import styles from './layout.module.css';
 import Linter from '@/components/Linter';
 import FileTree from '@/components/FileTree';
+import SearchBar from '@/components/SearchBar';
 
 export const metadata: Metadata = {
   title: 'AI Knowledge Compiler',
@@ -28,6 +29,7 @@ export default function RootLayout({
               <a href="/evalops" className={styles.navLink}>EvalOps (Diffs)</a>
             </nav>
             <div className={styles.sidebarContent} style={{display: 'flex', flexDirection: 'column'}}>
+              <SearchBar />
               <div style={{color: 'var(--text-muted)', marginBottom: '16px', fontWeight: 'bold'}}>VAULT: default</div>
               <FileTree vaultId="default" />
               <div style={{ marginTop: '16px' }}>
