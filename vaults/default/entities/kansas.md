@@ -1,0 +1,2 @@
+# Kansas
+Kansas, also known as the Jayhawk State, is a U.S. state historically associated with anti-slavery militant bands called Jayhawkers. Mentioned in [[concepts/triviaqa-dataset.md]] from [[sources/deepseek-llm.md]].
