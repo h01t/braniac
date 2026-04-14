@@ -1,0 +1,2 @@
+# DeepSeek LLM PDF Source
+This PDF contains examples from various AI datasets and benchmarks, including [[concepts/race-dataset.md]], [[concepts/triviaqa-dataset.md]], and [[concepts/wino-grande-dataset.md]]. It is referenced in Batch 7 of 7, with tables showcasing dataset formats and question-answer pairs.
