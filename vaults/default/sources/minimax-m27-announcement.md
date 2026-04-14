@@ -1,24 +1,30 @@
-# Source: MiniMax M2.7 Announcement
-Primary source article announcing the release and capabilities of the [[entities/MiniMax M2.7.md]] model.
+# MiniMax M2.7 Announcement
 
-## Metadata
-*   **URL:** https://www.minimax.io/news/minimax-m27-en
-*   **Publication Date:** 2026-03-18
-*   **Title:** MiniMax M2.7: Early Echoes of Self-Evolution
-*   **Publisher:** [[entities/MiniMax.md]]
+**Summary**: The official announcement article from MiniMax detailing the release, capabilities, and technical philosophy behind their M2.7 large language model.
+**Source Context**: https://www.minimax.io/news/minimax-m27-en
 
-## Key Points Summarized
-1.  Introduces [[entities/MiniMax M2.7.md]] as a model capable of [[concepts/self-evolution.md]].
-2.  Details the use of an internal [[concepts/agent-harness.md]] for research and model improvement.
-3.  Highlights superior software engineering capabilities, citing benchmarks (SWE-Pro, VIBE-Pro, Terminal Bench 2).
-4.  Describes enhanced professional office skills (Word, Excel, PPT) and performance on GDPval-AA.
-5.  Explains advanced [[concepts/agentic-capabilities.md]], including skill adherence and [[concepts/agent-teams.md]].
-6.  Mentions improved character consistency enabling projects like [[entities/OpenRoom.md]].
-7.  Notes contribution to the [[entities/OpenClaw.md]] ecosystem.
-8.  Provides access information for [[entities/MiniMax Agent.md]] and the [[entities/MiniMax API Platform.md]].
+---
 
-## Related Entities & Concepts
-*   [[entities/MiniMax M2.7.md]]
-*   [[concepts/self-evolution.md]]
-*   [[concepts/agent-harness.md]]
-*   [[concepts/agent-teams.md]]
+## Document Overview
+This is the primary source document for information about the [[entities/minimax-m27.md|MiniMax M2.7]] model. Published on March 18, 2026, on the MiniMax company news site, it serves as a technical announcement and vision statement.
+
+## Key Themes
+The article articulates several interconnected concepts central to MiniMax's strategy:
+1.  **Self-Evolution**: Introduces the idea of the model participating in its own development cycle, marking a step toward [[concepts/self-evolution-in-ai.md|AI self-evolution]] (Source).
+2.  **Agent-Centric Design**: Heavily focuses on the model's capabilities within complex [[concepts/agent-harness.md|agent harnesses]] and [[concepts/agent-teams.md|Agent Teams]] for real-world task completion (Source).
+3.  **Benchmark Performance**: Provides specific quantitative results across software engineering (SWE-Pro, VIBE-Pro), professional work (GDPval-AA), and tool use (Toolathon) benchmarks (Source).
+4.  **Organizational Impact**: Positions the model as a catalyst for MiniMax's own transformation into an [[concepts/ai-native-organization.md|AI-native organization]] (Source).
+5.  **New Interaction Paradigms**: Highlights improvements in [[concepts/character-consistency.md|character consistency]] and introduces the OpenRoom demo for interactive entertainment (Source).
+
+## Artifacts & Links
+The source includes:
+- Performance charts and diagrams illustrating benchmark results and harness architecture.
+- Links to downloadable demo files (e.g., a financial model for TSMC).
+- Links to the open-sourced OpenRoom project repository and live demo.
+- Links to product access points: MiniMax Agent and the API platform.
+
+## Related pages
+- [[entities/minimax-m27.md]]
+- [[concepts/self-evolution-in-ai.md]]
+- [[concepts/agent-harness.md]]
+- [[entities/minimax-company.md]]
