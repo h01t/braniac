@@ -1,12 +1,10 @@
-# Alignment in Large Language Models
-Alignment refers to techniques that make LLMs better follow user intentions and instructions. In [[entities/deepseek_llm.md]], this involves:
+# Alignment
+**Description:** The process of ensuring that a language model's behavior aligns with human values, intentions, or specific guidelines, often through techniques like reinforcement learning from human feedback (RLHF) or direct preference optimization (DPO).
 
-**Supervised Fine-Tuning (SFT):**
-- Collected over 1 million instances from diverse sources.
-- Aims to improve conversational capabilities and instruction following.
+## Related Sources
+- [[sources/ouyang-et-al-2022-training-language-models-to-follow-instructions-with-human-feedback.md]]
+- [[sources/rafailov-et-al-2023-direct-preference-optimization.md]]
+- [[sources/liu-et-al-2023-alignbench.md]]
 
-**Direct Preference Optimization (DPO):**
-- Applied after SFT to enhance conversational performance.
-- Based on the method described in [[sources/rafailov_et_al_2023.md]].
-
-These steps transform base models into chat models, such as DeepSeek LLM 67B Chat, which excels in open-ended evaluations. For evaluation details, refer to [[concepts/evaluation.md]].
+## Related Entities
+- [[entities/direct-preference-optimization-dpo.md]]
