@@ -1,0 +1,2 @@
+# John Thomas Scopes
+John Thomas Scopes was involved in the 1925 court case The State of Tennessee v. John Thomas Scopes, where he was found guilty of teaching the survival of species. Mentioned in [[concepts/triviaqa-dataset.md]] from [[sources/deepseek-llm.md]].
