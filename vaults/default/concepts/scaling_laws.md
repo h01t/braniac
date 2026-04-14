@@ -1,9 +1,6 @@
-# Scaling Laws in Large Language Models
-Scaling laws describe how the performance of large language models (LLMs) scales with factors like model size, data size, and computational budget. Previous literature, such as [[sources/hoffmann_et_al_2022.md]] and [[sources/kaplan_et_al_2020.md]], presents varying conclusions, which DeepSeek LLM investigates to guide efficient scaling.
+# Scaling Laws
+Scaling laws suggest that model performance can be predictably improved with increases in compute budget \( C \), model scale \( N \), and data scale \( D \). The compute budget is approximated as \( C = 6 N D \), but a more precise representation uses non-embedding FLOPs/token \( M \), where \( C = M D \). Key aspects include optimal allocation between model and data scales, hyperparameter scaling, and the impact of data quality. Findings show that higher data quality favors allocating more compute budget to model scaling.
 
-Key findings from the DeepSeek study include:
-- Trends for batch size and learning rate with model size.
-- Optimal allocation strategies for model and data scaling.
-- Significant differences in scaling laws across datasets, indicating caution in generalization.
+Related concepts: [[concepts/hyperparameter_scaling.md]], [[concepts/isoflop_profile.md]], [[concepts/data_quality_impact.md]].
 
-These insights were applied to train models like [[entities/deepseek_llm.md]] in 7B and 67B configurations. For more on model training, see [[concepts/pre_training.md]].
+Sources: Based on research from Henighan et al., 2020; Hoffmann et al., 2022; Kaplan et al., 2020.
