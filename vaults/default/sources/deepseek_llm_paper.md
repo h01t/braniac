@@ -1,10 +1,13 @@
-# Source: DeepSeek LLM Paper
-This source is the academic paper detailing the DeepSeek LLM project.
+# DeepSeek LLM Technical Report
+The primary source document detailing the training, methodology, and evaluation of the **[[entities/deepseek_llm.md]]** series.
 
-**Citation:** arXiv:2401.02954v1 [cs.CL] 5 Jan 2024.  
-**Title:** "DeepSeek LLM Scaling Open-Source Language Models with Longtermism".  
-**Authors:** Xiao Bi, Deli Chen, Guanting Chen, et al. (alphabetically ordered).  
-**Abstract:** Discusses scaling laws, pre-training, alignment, and evaluation of DeepSeek LLM models.  
-**Link:** Provided as deepseek-llm.pdf.
+**Key Sections Covered:**
+*   Data collection and preparation.
+*   Model architecture and training hyperparameters.
+*   **[[concepts/scaling_laws.md|Scaling laws]]** analysis and calibration.
+*   Comprehensive evaluation on standard benchmarks and held-out tasks.
+*   **[[concepts/safety_evaluation.md|Safety evaluation]]** methodology and results.
+*   Discussion of findings: **[[concepts/staged_fine_tuning.md]]**, **[[concepts/multi_choice_question_training.md]]**, impact of **[[concepts/system_prompt_impact.md|system prompts]]**.
+*   Limitations and future work.
 
-References within the paper point to related works like [[sources/vaswani_et_al_2017.md]] for Transformers. For entity details, see [[entities/deepseek_llm.md]].
+This document is the source for the extracted concepts and entities in this knowledge base.
