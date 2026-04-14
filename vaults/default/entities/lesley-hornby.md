@@ -1,0 +1,2 @@
+# Lesley Hornby
+Lesley Hornby, an English model known for her short-haired androgynous look, was discovered in 1966 and became "The Face of '66". Mentioned in [[concepts/triviaqa-dataset.md]] from [[sources/deepseek-llm.md]].
