@@ -1,19 +1,15 @@
 # BLOOM
 
-**Summary**: A 176-billion parameter, open-source, causal decoder-only language model trained on the ROOTS corpus, notable for its architectural tweaks like ALiBi positional embeddings.
+**Summary**: A 176B parameter, open-access multilingual LLM developed by BigScience, using an additional layer normalization for stability and preferring ALiBi positional encoding.
 **Source Context**: Comprehensive Overview of LLMs.pdf
 
 ---
 
-**Architecture & Purpose**: BLOOM (BigScience Large Open-science Open-access Multilingual Language Model) was created as an open-source initiative to replicate and study large-scale language models. It is a causal decoder-only model.
+BLOOM is a 176B parameter decoder-only LLM. For [[concepts/training-instability.md]], it utilizes an additional layer normalization before the embedding layer to stabilize training, though this can negatively impact zero-shot generalization [Source: Comprehensive Overview of LLMs.pdf].
 
-**Key Architectural Features**:
-*   **ALiBi (Attention with Linear Biases)**: Used instead of traditional positional embeddings. ALiBi allows the model to extrapolate to sequence lengths longer than those seen during training.
-*   **Embedding Layer Normalization**: An additional normalization layer is applied after the initial token embedding layer, a modification suggested by the `bitsandbytes` library to stabilize training.
-*   These changes were found to improve training stability and downstream task performance.
-
-**Training Data**: It was trained on the ROOTS corpus, a large-scale multilingual dataset. The model was designed to be transparent and accessible to the research community.
+Regarding [[concepts/positional-encoding-in-llms.md]], BLOOM finds that the ALiBi encoding outperforms learned and rotary positional encodings [Source: Comprehensive Overview of LLMs.pdf]. For training, it uses 3D parallelism combined with the ZeRO optimizer to shard optimizer states [Source: Comprehensive Overview of LLMs.pdf].
 
 ## Related pages
-- [[concepts/decoder-only-architectures.md]]
-- [[concepts/positional-embeddings.md]]
+- [[concepts/layer-normalization-in-llms.md]]
+- [[concepts/positional-encoding-in-llms.md]]
+- [[concepts/training-parallelism.md]]
