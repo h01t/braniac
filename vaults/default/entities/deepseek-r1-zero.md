@@ -1,30 +1,22 @@
 # DeepSeek-R1-Zero
 
-**Summary**: A reasoning model trained by applying reinforcement learning directly to the base model DeepSeek-V3-Base without any supervised fine-tuning data, demonstrating emergent reasoning behaviors but suffering from readability issues.
+**Summary**: A reasoning model trained solely via reinforcement learning from a base model, without an initial supervised fine-tuning stage, demonstrating autonomous self-evolution of reasoning capabilities.
 **Source Context**: DeepSeek_R1.pdf
 
 ---
 
-## Overview
-DeepSeek-R1-Zero is the first-generation reasoning model from DeepSeek-AI, developed to explore whether LLMs can develop reasoning capabilities purely through [[concepts/reinforcement-learning.md]] without supervised fine-tuning (SFT). It uses [[entities/deepseek-v3-base.md]] as the base model and is trained with the [[entities/grpo.md]] algorithm.
+## Training Approach
+DeepSeek-R1-Zero is created by applying large-scale [[concepts/reasoning-oriented-reinforcement-learning.md]] directly to the [[entities/deepseek-v3-base.md]]. This zero-shot RL approach allows researchers to observe the model's intrinsic development without the influence of a supervised fine-tuning stage (Source: DeepSeek_R1.pdf).
 
-## Training Methodology
-The model was trained using a straightforward template (see Table 1 in the paper) that instructs the model to generate a reasoning process within `<think>` tags and an answer within `<answer>` tags. The reward system is rule-based, consisting of:
-- **Accuracy rewards**: For deterministic tasks (e.g., math, coding), correctness is verified via rules or compilers.
-- **Format rewards**: Enforce adherence to the specified output structure.
+## Key Characteristics and Phenomena
+The model naturally learns to solve increasingly complex tasks by generating longer reasoning chains ("thinking time"). During training, sophisticated behaviors like **reflection** and exploration of alternative approaches emerge spontaneously (Source: DeepSeek_R1.pdf).
 
-No neural reward models were used to avoid reward hacking and simplify the pipeline.
+A notable observed phenomenon is the [[concepts/aha-moment-ai-reasoning.md]], where an intermediate version of the model learns to pause and reevaluate its problem-solving strategy (Source: DeepSeek_R1.pdf).
 
-## Performance
-According to the paper, DeepSeek-R1-Zero showed steady improvement during RL training. On the AIME 2024 benchmark, its pass@1 score increased from 15.6% to 71.0%. With majority voting (consensus over 64 samples), performance reached 86.7%, matching OpenAI-o1-0912. It also achieved high scores on other reasoning benchmarks like MATH-500 (95.9% pass@1) and LiveCodeBench (73.3% pass@1).
-
-## Emergent Behaviors and Limitations
-During RL, the model naturally developed powerful reasoning behaviors such as self-verification, reflection, and generating long chain-of-thoughts ([[concepts/chain-of-thought.md]]). However, it also exhibited challenges including poor readability, language mixing, and sometimes generating overly verbose or unstructured outputs.
-
-## Significance
-DeepSeek-R1-Zero is presented as a milestone that validates the feasibility of incentivizing reasoning capabilities purely through RL without SFT. It serves as a foundation for the improved DeepSeek-R1 model and provides insights into model [[concepts/self-evolution.md]].
+## Drawbacks
+Despite strong reasoning capabilities, DeepSeek-R1-Zero suffers from issues like poor readability and language mixing in its outputs, which motivated the development of the more user-friendly [[entities/deepseek-r1.md]] (Source: DeepSeek_R1.pdf).
 
 ## Related pages
+- [[concepts/self-evolution-rl.md]]
+- [[entities/deepseek-v3-base.md]]
 - [[entities/deepseek-r1.md]]
-- [[concepts/reinforcement-learning.md]]
-- [[sources/deepseek-r1-paper.md]]
