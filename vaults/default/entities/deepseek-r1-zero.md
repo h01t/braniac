@@ -1,22 +1,17 @@
 # DeepSeek-R1-Zero
 
-**Summary**: A reasoning model trained solely via reinforcement learning from a base model, without an initial supervised fine-tuning stage, demonstrating autonomous self-evolution of reasoning capabilities.
-**Source Context**: DeepSeek_R1.pdf
+**Summary**: A variant of the DeepSeek-R1 model trained using a pure reinforcement learning approach without relying on any cold-start or demonstration data.
+**Source Context**: DeepSeek_R1.pdf (Section 3, 5).
 
 ---
 
-## Training Approach
-DeepSeek-R1-Zero is created by applying large-scale [[concepts/reasoning-oriented-reinforcement-learning.md]] directly to the [[entities/deepseek-v3-base.md]]. This zero-shot RL approach allows researchers to observe the model's intrinsic development without the influence of a supervised fine-tuning stage (Source: DeepSeek_R1.pdf).
+## Training Methodology
+[[entities/deepseek-r1-zero.md]] is highlighted as representing a "pure RL approach" within the DeepSeek-R1 project. It was trained using large-scale [[concepts/reinforcement-learning.md]] exclusively, without the initial supervised fine-tuning on demonstration data that its counterpart ([[entities/deepseek-r1.md]]) used.
 
-## Key Characteristics and Phenomena
-The model naturally learns to solve increasingly complex tasks by generating longer reasoning chains ("thinking time"). During training, sophisticated behaviors like **reflection** and exploration of alternative approaches emerge spontaneously (Source: DeepSeek_R1.pdf).
-
-A notable observed phenomenon is the [[concepts/aha-moment-ai-reasoning.md]], where an intermediate version of the model learns to pause and reevaluate its problem-solving strategy (Source: DeepSeek_R1.pdf).
-
-## Drawbacks
-Despite strong reasoning capabilities, DeepSeek-R1-Zero suffers from issues like poor readability and language mixing in its outputs, which motivated the development of the more user-friendly [[entities/deepseek-r1.md]] (Source: DeepSeek_R1.pdf).
+## Performance Context
+The paper notes that DeepSeek-R1-Zero achieves strong performance across various tasks. However, the more detailed comparisons in Section 4.1 involve a specific instantiation, [[entities/deepseek-r1-zero-qwen-32b.md]], which was created by applying this RL methodology to a Qwen-32B-Base model. This model's performance was found to be inferior to a distilled model of the same size, highlighting a key finding about the efficiency of different training approaches.
 
 ## Related pages
-- [[concepts/self-evolution-rl.md]]
-- [[entities/deepseek-v3-base.md]]
+- [[concepts/reinforcement-learning.md]]
 - [[entities/deepseek-r1.md]]
+- [[entities/deepseek-r1-zero-qwen-32b.md]]
