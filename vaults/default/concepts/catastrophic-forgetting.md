@@ -1,26 +1,18 @@
 # Catastrophic Forgetting
 
-**Summary**: A phenomenon in machine learning where a model rapidly loses previously learned information when trained on new tasks or data, a significant challenge in continual learning.
-**Source Context**: Comprehensive Overview of LLMs.pdf.
+**Summary**: The phenomenon where a neural network loses previously learned information or capabilities when trained on new data or tasks.
+**Source Context**: Comprehensive Overview of LLMs.pdf, Sections mentioning XuanYuan 2.0 and Continued Pre-Training.
 
 ---
 
-## Definition
-[[concepts/catastrophic-forgetting.md]], also known as catastrophic interference, occurs when an artificial neural network that is sequentially trained on multiple tasks loses performance on earlier tasks after learning new ones. The model's parameters are overwritten to optimize for the new task, effectively "forgetting" how to perform the old ones. This is a central problem in the field of continual or lifelong learning (Source: Comprehensive Overview of LLMs.pdf).
+In the context of LLM fine-tuning, catastrophic forgetting refers to the degradation of a model's general knowledge and abilities acquired during pre-training when it is fine-tuned on a specific downstream task or dataset.
 
-## Relevance to Large Language Models
-In the context of LLMs, catastrophic forgetting is a concern during:
-*   **Fine-tuning**: When a base pre-trained model is adapted for a specific downstream task, there is a risk it will lose its general capabilities.
-*   **Continual Pre-training**: When a model is updated with new data over time.
-*   **Multi-Task Learning**: When training on a mixture of objectives sequentially.
-
-## Mitigation Strategies in LLMs
-The source highlights architectural and training strategies designed to mitigate forgetting:
-*   **Sparse Architectures**: The **PanGu-Σ** model's [[concepts/random-routed-experts.md]] (RRE) architecture is noted for reducing catastrophic forgetting effects, which is essential for continual learning. The sparsity allows different parts of the network to specialize.
-*   **Combined Training Stages**: The **Xuan Yuan 2.0** model combined its pre-training and fine-tuning stages to avoid catastrophic forgetting.
-*   **Parameter-Efficient Fine-Tuning (PEFT)**: Methods like adapters or prompt tuning, which update only a small subset of parameters, inherently protect the majority of the pre-trained knowledge (Source: Comprehensive Overview of LLMs.pdf).
+## Mitigation Strategies
+The literature proposes methods to avoid this issue during instruction tuning or task adaptation:
+*   **Combining Pre-training and Fine-tuning**: As noted in **XuanYuan 2.0**, combining stages in a single training run can help avoid forgetting.
+*   **Continued Pre-Training with Original Data**: A common and effective technique is to concatenate the new fine-tuning data with a small number of randomly sampled batches from the original pre-training corpus in each iteration. This reminds the model of its foundational knowledge.
+*   **Prompt-based Continued Pre-training (PCP)**: This method first continues pre-training the model on task-related text and instructions before the final instruction-tuning step for downstream tasks.
 
 ## Related pages
-- [[concepts/random-routed-experts.md]]
 - [[concepts/fine-tuning.md]]
-- [[concepts/continual-learning.md]]
+- [[concepts/instruction-tuning.md]]
