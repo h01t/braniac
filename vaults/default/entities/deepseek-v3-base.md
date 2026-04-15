@@ -1,24 +1,21 @@
 # DeepSeek-V3-Base
 
-**Summary**: The base large language model developed by DeepSeek-AI, used as the foundation for training the reasoning models DeepSeek-R1-Zero and DeepSeek-R1.
+**Summary**: The base language model architecture used as the foundation for training both DeepSeek-R1-Zero and DeepSeek-R1.
 **Source Context**: DeepSeek_R1.pdf
 
 ---
 
-## Role in DeepSeek-R1 Research
-DeepSeek-V3-Base is the pre-trained model upon which the reasoning capabilities are built via post-training. According to the paper, both [[entities/deepseek-r1-zero.md]] and [[entities/deepseek-r1.md]] start from this base model. It is described as a powerful base that, when combined with reinforcement learning ([[concepts/reinforcement-learning.md]]), can develop advanced reasoning without supervised fine-tuning.
+## Role in Training
+DeepSeek-V3-Base serves as the starting point for the [[concepts/self-evolution-rl.md]] of [[entities/deepseek-r1-zero.md]]. For [[entities/deepseek-r1.md]], it is first fine-tuned on [[concepts/cold-start-rl-reasoning.md]] data before undergoing reinforcement learning (Source: DeepSeek_R1.pdf).
 
-## Characteristics
-The paper does not provide detailed specifications of DeepSeek-V3-Base (e.g., size, architecture) but implies it is a capable model that benefits from further tuning. It serves as the initial policy model for the RL process using [[entities/grpo.md]].
+In the distillation phase, the SFT dataset curated from DeepSeek-R1 is used to fine-tune other base models, not necessarily DeepSeek-V3-Base itself (Source: DeepSeek_R1.pdf).
 
-## Usage in Training
-- For DeepSeek-R1-Zero, RL is applied directly to DeepSeek-V3-Base without any intermediate SFT.
-- For DeepSeek-R1, the base model is first fine-tuned with cold-start data (thousands of CoT examples) before RL.
+## Architecture
+The paper notes that DeepSeek-V3 (and by extension, DeepSeek-R1) is a Mixture of Experts (MoE) model. The evaluated DeepSeek-R1 has 671B total parameters with 37B activated parameters per token (Source: DeepSeek_R1.pdf).
 
 ## Performance Baseline
-The paper notes that before RL, the base model achieves 15.6% pass@1 on AIME 2024. After RL (in DeepSeek-R1-Zero), this jumps to 71.0%, indicating the base model's latent potential for reasoning when properly incentivized.
+As a baseline in evaluations, DeepSeek-V3 is outperformed by DeepSeek-R1 on most reasoning and knowledge benchmarks, highlighting the gains achieved through the specialized RL training pipeline (Source: DeepSeek_R1.pdf).
 
 ## Related pages
 - [[entities/deepseek-r1-zero.md]]
 - [[entities/deepseek-r1.md]]
-- [[sources/deepseek-r1-paper.md]]
