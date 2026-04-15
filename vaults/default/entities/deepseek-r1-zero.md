@@ -1,24 +1,30 @@
 # DeepSeek-R1-Zero
 
-**Summary**: A reasoning model developed by DeepSeek that undergoes a self-evolution process via reinforcement learning (RL) starting directly from a base model, without supervised fine-tuning.
+**Summary**: A model developed by DeepSeek using a pure reinforcement learning approach without any initial cold-start demonstration data.
 **Source Context**: DeepSeek_R1.pdf
 
 ---
 
-## Overview
-DeepSeek-R1-Zero is a model trained using a reinforcement learning (RL) process initiated directly from a base model, bypassing a supervised fine-tuning stage (Source: DeepSeek_R1.pdf). This approach allows researchers to observe the model's autonomous evolution in reasoning capabilities without external influences from labeled data.
+## Model Overview
+**DeepSeek-R1-Zero** represents one of the two primary model families discussed in the DeepSeek-R1 paper. It embodies the "pure RL" approach to building reasoning models.
 
-## Self-Evolution Process
-The model's "self-evolution" is characterized by its ability to autonomously improve its reasoning over the course of RL training (Source: DeepSeek_R1.pdf). A key metric of this evolution is the consistent increase in average thinking time, as the model learns to allocate more computational tokens (ranging from hundreds to thousands) to solve complex problems (Source: DeepSeek_R1.pdf). Sophisticated behaviors like [[concepts/reflection-reasoning.md]] and exploring alternative problem-solving approaches emerge spontaneously from the RL process, rather than being explicitly programmed (Source: DeepSeek_R1.pdf).
+## Development Methodology
+The defining characteristic of DeepSeek-R1-Zero is its training methodology:
+*   **Pure Reinforcement Learning**: It is trained using large-scale [[concepts/reinforcement-learning-rl-for-reasoning.md]] **from scratch**, without relying on any pre-existing "cold-start" or demonstration data to initialize the model's behavior.
+*   **Training Scale**: The paper mentions training for **over 10,000 steps** on datasets focused on math, code, and STEM subjects (Source: DeepSeek_R1.pdf).
 
-## The "Aha Moment"
-An intermediate version of DeepSeek-R1-Zero exhibited an "aha moment," where it learned to allocate more thinking time to a problem by [[concepts/reflection-reasoning.md|reevaluating its initial approach]] (Source: DeepSeek_R1.pdf). This moment, documented in Table 3 of the source, highlights how RL incentives can lead to the autonomous development of advanced problem-solving strategies (Source: DeepSeek_R1.pdf).
+This approach is contrasted with the methodology used for the more powerful [[entities/deepseek-r1.md]], which does use cold-start data.
 
-## Limitations
-Despite its strong reasoning capabilities, DeepSeek-R1-Zero suffers from issues like poor readability and language mixing in its outputs (Source: DeepSeek_R1.pdf). These drawbacks motivated the development of [[entities/deepseek-r1.md]], which incorporates human-friendly data.
+## Experimental Variant: DeepSeek-R1-Zero-Qwen-32B
+The paper details a specific experiment to test the limits of this pure RL approach on a smaller model. Researchers applied large-scale RL to the **Qwen-32B-Base** model, creating **DeepSeek-R1-Zero-Qwen-32B** (Source: DeepSeek_R1.pdf).
+
+The results of this experiment were pivotal:
+*   This RL-trained 32B model achieved performance roughly on par with [[entities/qwq-32b-preview.md]] (Source: DeepSeek_R1.pdf, Table 6).
+*   However, it was **significantly outperformed by a distilled 32B model** ([[entities/deepseek-r1-distill-qwen-32b.md]]) that learned from the larger DeepSeek-R1 teacher (Source: DeepSeek_R1.pdf).
+*   This finding underscored the conclusion that [[concepts/knowledge-distillation.md]] is a more effective and economical path to creating capable smaller reasoning models than training them with large-scale RL from scratch.
 
 ## Related pages
-- [[concepts/reinforcement-learning-reasoning.md]]
-- [[concepts/self-evolution.md]]
 - [[entities/deepseek-r1.md]]
-- [[concepts/reflection-reasoning.md]]
+- [[concepts/reinforcement-learning-rl-for-reasoning.md]]
+- [[entities/deepseek-r1-distill-qwen-32b.md]]
+- [[entities/qwq-32b-preview.md]]
