@@ -1,18 +1,21 @@
-# Scaling Laws in LLMs
+# Scaling Laws
 
-**Summary**: Studies on how model performance scales with parameters, dataset size, and computational resources, following power-law relationships.
-**Source Context**: Comprehensive Overview of LLMs.pdf, Batch 2 of 15.
+**Summary**: Empirical relationships that describe how the performance of a language model changes as key factors like model size, dataset size, and compute budget are scaled.
+**Source Context**: Comprehensive Overview of LLMs.pdf
 
 ---
 
-Scaling laws investigate the optimal combination of model parameters, dataset size, and compute to predict performance improvements. Key insights include:
+## Definition
+Scaling laws are predictive equations derived from experimental data that model the performance of neural language models as a function of variables such as the number of model parameters (N), the size of the training dataset (D), and the amount of compute used for training (C). They help guide efficient allocation of resources when training larger models.
 
-- Loss scales according to a power-law with model size, dataset size, and compute resources, suggesting larger models are more important than big data for better performance [Source: Comprehensive Overview of LLMs.pdf].
-
-- Another variant indicates that model size and the number of training tokens should be scaled equally for compute-optimal training [Source: Comprehensive Overview of LLMs.pdf].
-
-These laws guide the development of models like [[entities/gpt-3.md]] and [[entities/chinchilla.md]].
+## Key Findings from Different Models
+The document highlights several important scaling insights from various models:
+*   **Chinchilla's Law**: Found that model size and the number of training tokens should be scaled proportionally; for each doubling of model size, the number of training tokens should also be doubled for optimal performance.
+*   **DeepSeek's Formulation**: Conducted a detailed study to derive optimal equations for model size \(M\), data \(D\), batch size \(B\), and learning rate \(η\) given a compute budget \(C\). For example, \( B_{opt} \propto C^{0.3271} \) and \( η_{opt} \propto C^{-0.1250} \).
+*   **Jurassic-1 Insight**: Found that model performance is highly related to network size, and that for runtime performance, increasing parallel operations (width) is more effective than increasing sequential operations (depth).
+*   **PaLM Observation**: Noted that performance had not saturated even at the 540B scale, suggesting larger models would likely perform better.
 
 ## Related pages
-- [[concepts/training-objectives.md]]
-- [[entities/gpt-3.md]]
+- [[entities/deepseek.md]]
+- [[entities/chinchilla.md]]
+- [[entities/palm.md]]
