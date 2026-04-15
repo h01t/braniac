@@ -1,35 +1,20 @@
-# DeepSeek-R1 Research Paper
+# DeepSeek-R1 Paper
 
-**Summary**: The research paper "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning" introduces two reasoning models, DeepSeek-R1-Zero and DeepSeek-R1, trained via large-scale reinforcement learning to enhance reasoning in LLMs without relying on supervised fine-tuning.
+**Summary**: The research paper detailing the development, methodology, and evaluation of the DeepSeek-R1 and DeepSeek-R1-Zero reasoning models.
 **Source Context**: DeepSeek_R1.pdf
 
 ---
 
-## Paper Overview
+## Content Overview
+This document is the primary source for information on the [[entities/deepseek-r1-zero.md]] and [[entities/deepseek-r1.md]] models. It describes the [[concepts/self-evolution.md]] process, the [[concepts/cold-start-rl.md]] methodology, the multi-stage [[concepts/reinforcement-learning-reasoning.md]] pipeline, and the [[concepts/distillation-reasoning.md]] technique (Source: DeepSeek_R1.pdf).
 
-This paper presents a novel approach to enhancing reasoning capabilities in large language models (LLMs) through reinforcement learning (RL). The authors introduce **DeepSeek-R1-Zero**, a model trained purely via RL without any supervised fine-tuning (SFT), and **DeepSeek-R1**, which incorporates a small amount of cold-start data and multi-stage training. The work demonstrates that RL can incentivize the emergence of complex reasoning behaviors like chain-of-thought, self-verification, and reflection.
+## Key Figures and Tables
+- **Figure 3**: Illustrates the increase in average response length (thinking time) of DeepSeek-R1-Zero during RL training (Source: DeepSeek_R1.pdf).
+- **Table 3**: Documents the "aha moment" of an intermediate DeepSeek-R1-Zero model, showcasing [[concepts/reflection-reasoning.md]] (Source: DeepSeek_R1.pdf).
+- **Table 4**: Provides a comprehensive benchmark comparison between DeepSeek-R1, DeepSeek-V3, Claude-3.5-Sonnet, GPT-4o, and OpenAI's o1 models across mathematics, coding, knowledge, and language tasks (Source: DeepSeek_R1.pdf).
 
-## Key Contributions
-
-The paper makes several key contributions:
-1. **Post-Training via RL**: It validates that reasoning capabilities can be incentivized purely through RL without SFT, as shown by DeepSeek-R1-Zero.
-2. **Pipeline for Enhanced Reasoning**: It introduces a multi-stage pipeline for DeepSeek-R1 that combines cold-start data, RL, and SFT to achieve performance comparable to OpenAI's o1-1217 model.
-3. **Distillation to Smaller Models**: It shows that reasoning patterns from large models can be effectively distilled into smaller dense models (1.5B to 70B parameters), which then achieve state-of-the-art performance on reasoning benchmarks.
-
-## Evaluation Results
-
-The models are evaluated on a wide range of tasks:
-- **Reasoning**: DeepSeek-R1 achieves 79.8% Pass@1 on AIME 2024 and 97.3% on MATH-500, matching OpenAI-o1-1217.
-- **Knowledge**: It scores 90.8% on MMLU and 71.5% on GPQA Diamond, outperforming DeepSeek-V3.
-- **Others**: It excels in creative writing, long-context understanding, and coding (achieving a 2029 Elo rating on Codeforces).
-
-## Approach Details
-
-The paper details the RL algorithm ([[concepts/group-relative-policy-optimization.md]]), reward modeling ([[concepts/reward-modeling.md]]), and training templates used. It also discusses the self-evolution process of DeepSeek-R1-Zero and the challenges like poor readability that led to the development of DeepSeek-R1.
-
-## Related Concepts and Entities
-
-This paper is central to understanding the development of [[entities/deepseek-r1-zero.md]] and [[entities/deepseek-r1.md]], and it explores concepts like [[concepts/reinforcement-learning-reasoning.md]], [[concepts/chain-of-thought.md]], and [[concepts/distillation-reasoning.md]].
+## Experimental Benchmarks
+The paper evaluates models on a wide array of benchmarks including MMLU, MMLU-Pro, GPQA Diamond, AIME 2024, Codeforces, LiveCodeBench, AlpacaEval 2.0, and ArenaHard, among others (Source: DeepSeek_R1.pdf). The evaluation setup uses pass@k sampling with temperature to mitigate repetition issues from greedy decoding (Source: DeepSeek_R1.pdf).
 
 ## Related pages
 - [[entities/deepseek-r1-zero.md]]
