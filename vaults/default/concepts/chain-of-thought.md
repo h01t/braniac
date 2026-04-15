@@ -1,14 +1,14 @@
-# Chain-of-Thought
+# Chain-of-Thought (CoT) Reasoning
 
-**Summary**: A prompting technique that encourages a language model to generate a step-by-step reasoning process before producing a final answer, significantly improving its performance on complex reasoning tasks.
-**Source Context**: Comprehensive Overview of LLMs.pdf
+**Summary**: A prompting technique that encourages language models to generate a step-by-step reasoning process before delivering a final answer, significantly improving performance on complex reasoning tasks.
+**Source Context**: Wei et al., "Chain-of-thought prompting elicits reasoning in large language models" (2022).
 
 ---
 
-Chain-of-Thought (CoT) prompting is a foundational method for eliciting reasoning from LLMs. By providing examples that break down a problem into intermediate steps, or simply instructing the model to "think step by step," CoT unlocks the model's ability to solve arithmetic, commonsense, and symbolic reasoning problems that standard prompting often fails at.
+## Technique
+Standard prompting asks a model for a direct answer. Chain-of-Thought prompting includes examples in the prompt where the reasoning steps are shown (e.g., "Show your work"). When the model is then given a new problem, it is more likely to generate intermediate reasoning tokens, mimicking a logical thought process. This "reasoning via prompting" unlocks capabilities in arithmetic, commonsense, and symbolic reasoning that are poor with standard prompting [Source: [103]].
 
-## Role in LLM-Powered Agents
-CoT reasoning is central to the planning and decision-making modules of [[concepts/llm-powered-agents.md]]. Agents use CoT and its extensions (like Tree-of-Thoughts and Self-Consistency) to logically outline action plans, evaluate different paths, and reason about task completion (Source: Comprehensive Overview of LLMs.pdf).
-
-## Related pages
-- [[concepts/llm-powered-agents.md]]
+## Extensions and Improvements
+*   **Self-Consistency**: Improves CoT by sampling multiple reasoning paths and taking the majority answer, acting as a form of ensemble [Source: [104]].
+*   **Tree of Thoughts (ToT)**: Generalizes CoT by exploring a tree of potential reasoning steps, allowing for planning and lookahead [Source: [105]].
+*   **Fine-tuning for CoT**: Models can be specifically fine-tuned on chain-of-thought data to instill stronger reasoning abilities, as seen in the "CoT Collection" [Source: [101]].
