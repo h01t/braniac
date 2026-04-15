@@ -1,24 +1,25 @@
 # DeepSeek-R1
 
-**Summary**: A reasoning model trained using a four-stage pipeline that incorporates a human-friendly cold-start phase, reasoning-oriented RL, curated SFT, and a final RL alignment stage.
-**Source Context**: DeepSeek_R1.pdf
+**Summary**: A family of language models developed by DeepSeek, with strong reasoning abilities achieved through reinforcement learning and distillation.
+**Source Context**: DeepSeek_R1.pdf (Title, Abstract, Throughout).
 
 ---
 
-## Training Pipeline
-DeepSeek-R1 is developed to address the readability issues of [[entities/deepseek-r1-zero.md]]. Its training involves four key stages (Source: DeepSeek_R1.pdf):
+## Model Description
+[[entities/deepseek-r1.md]] is the primary model series discussed in the paper. It represents the outcome of research into enhancing [[concepts/reasoning-ability.md]] through [[concepts/reinforcement-learning.md]].
 
-1.  **[[concepts/cold-start-rl-reasoning.md]]**: The [[entities/deepseek-v3-base.md]] is fine-tuned on thousands of high-quality, readable chain-of-thought examples.
-2.  **[[concepts/reasoning-oriented-reinforcement-learning.md]]**: RL is applied to the fine-tuned model to boost reasoning performance on tasks like math and coding, using a reward that combines accuracy and language consistency.
-3.  **[[concepts/rejection-sampling-sft-reasoning.md]]**: High-quality reasoning and general-purpose data (~800k samples) are curated via rejection sampling from the RL checkpoint and used for supervised fine-tuning.
-4.  **Reinforcement Learning for All Scenarios**: A final RL stage aligns the model with human preferences for helpfulness and harmlessness across both reasoning and general tasks.
+## Key Variants
+The paper discusses several key variants:
+*   **DeepSeek-R1**: The flagship model, which leverages cold-start (demonstration) data alongside iterative RL fine-tuning. It achieves performance comparable to OpenAI's o1-1217 model on a range of tasks.
+*   **DeepSeek-R1-Zero**: A variant trained with a pure RL approach, without any cold-start data.
+*   **DeepSeek-R1-Distill-***: A series of smaller models (e.g., [[entities/deepseek-r1-distill-qwen-7b.md]], [[entities/deepseek-r1-distill-qwen-32b.md]]) created by distilling knowledge from the larger DeepSeek-R1 teacher model.
 
-## Architecture and Performance
-DeepSeek-R1 is a Mixture of Experts (MoE) model with 671B total parameters and 37B activated parameters. It demonstrates state-of-the-art performance on numerous [[concepts/evaluation-benchmarks-reasoning-models.md]], showing particular strength in mathematics and coding, with results competitive with OpenAI's o1 series (Source: DeepSeek_R1.pdf).
-
-The model's curated training data is also used for [[concepts/distillation-reasoning-capabilities.md]] to smaller models like Qwen and Llama (Source: DeepSeek_R1.pdf).
+## Role in Research
+DeepSeek-R1 served two critical roles:
+1.  As the end product of the RL research.
+2.  As the powerful "teacher" model for the successful [[concepts/knowledge-distillation.md]] experiments, demonstrating that its reasoning capability could be effectively transferred.
 
 ## Related pages
-- [[entities/deepseek-v3-base.md]]
+- [[concepts/reinforcement-learning.md]]
+- [[concepts/knowledge-distillation.md]]
 - [[entities/deepseek-r1-zero.md]]
-- [[concepts/cold-start-rl-reasoning.md]]
