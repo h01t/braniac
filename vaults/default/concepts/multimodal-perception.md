@@ -1,27 +1,31 @@
 # Multimodal Perception
 
-**Summary**: The capability of an LLM agent to process and integrate information from multiple sources, primarily text and visual inputs (images, videos), which is crucial for operating in real-world or GUI environments.
-**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf.
+**Summary**: The process by which LLM-based agents interpret and understand data from multiple modalities, such as text and images, often enhanced by specific prompting and annotation techniques.
+**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
 
 ---
 
-## Definition and Importance
-Multimodal perception allows an agent to understand and reason about the world through more than just text. For agents functioning in graphical user interfaces (GUIs) or real-world settings, this capability is essential, as critical information is often conveyed visually [[sources/fundamentals-of-building-autonomous-llm-agents.md]].
+Multimodal perception enables LLM agents to process and integrate information from diverse data types like text, images, and audio. This is crucial for tasks involving real-world environments or graphical user interfaces (GUIs) where visual understanding is required [[concepts/llm-agent-perception.md]].
 
-## Key Technology: MM-LLMs
-This capability is largely enabled by **Multimodal Large Language Models (MM-LLMs)**. Unlike earlier Vision-Language Models (VLMs) that primarily align visual and linguistic representations, MM-LLMs leverage a powerful, off-the-shelf LLM as their central reasoning engine. This allows them to perform complex reasoning, planning, and generation across multimodal tasks [[sources/fundamentals-of-building-autonomous-llm-agents.md]].
+A key advancement in this area is the use of techniques like **Set-of-Mark (SoM)** and **VCoder**. These methods enhance an agent's object-level perception by providing targeted visual annotations. According to the source, MM-LLMs adapted with these techniques "significantly outperform baseline models on object-level perception tasks, demonstrating improved counting accuracy and reduced hallucination" [Source: Fundamentals of Building Autonomous LLM Agents.pdf].
 
-## Architecture of MM-LLMs
-The general architecture for understanding and generation tasks typically involves a structured pipeline:
-1.  **Modality Encoder (ME)**: Encodes inputs from various modalities (e.g., images, video) into feature embeddings. For vision, encoders like Vision Transformers (ViT) are commonly used.
-2.  **Input Projector**: A critical bridge that aligns the encoded non-textual features (like visual embeddings) with the text feature space of the LLM backbone, making them comprehensible to the LLM.
-3.  **LLM Backbone**: The core LLM processes the aligned multimodal representations to perform reasoning and generate responses.
-4.  **Output Projector & Modality Generator**: For generation tasks, these components map the LLM's output into features for another modality (e.g., generating an image via a diffusion model) [[sources/fundamentals-of-building-autonomous-llm-agents.md]].
+## How It Works
+The process typically involves a vision-language model (VLM) or a multimodal LLM. For example, in a GUI automation task, an agent might capture a screenshot and then apply a Set-of-Mark operation. A visual encoder draws bounding boxes around interactive elements and generates a structured list describing each element's properties (e.g., text, description, coordinates) [Source: Fundamentals of Building Autonomous LLM Agents.pdf]. This output, combined with other data like an [[concepts/structured-data-perception|Accessibility Tree]], creates a rich, actionable model of the environment.
 
-## Challenges and Enhancements
-Despite advances, MM-LLMs can still struggle with precise spatial relationships, accurate object counting, and hallucination. A practical method to enhance their visual perception is to employ external **visual encoders**. These specialized models extract detailed information from images, such as segmentation maps or depth data, which is then fed to the MM-LLM to improve interpretation. Techniques like [[concepts/set-of-mark-som.md]] also provide a structured way to guide the model's attention [[sources/fundamentals-of-building-autonomous-llm-agents.md]].
+## Strengths and Limitations
+**Strengths**:
+*   Processes diverse data types, making it suitable for real-world tasks and GUIs.
+*   Leverages advanced pre-trained vision-language models.
+
+**Limitations**:
+*   High computational cost for training and inference.
+*   Can struggle with precise spatial reasoning tasks.
+*   Requires large volumes of high-quality, annotated training data, which is costly to collect [Source: Fundamentals of Building Autonomous LLM Agents.pdf].
+*   Remains prone to **hallucination**, where the model generates non-existent objects or misinterprets cues [Source: Fundamentals of Building Autonomous LLM Agents.pdf].
 
 ## Related pages
-- [[concepts/perception-system.md]]
-- [[concepts/visual-encoder-vcoder.md]]
-- [[concepts/set-of-mark-som.md]]
+- [[concepts/llm-agent-perception.md]]
+- [[concepts/structured-data-perception.md]]
+- [[concepts/tool-augmented-perception.md]]
+- [[entities/set-of-mark.md]]
+- [[entities/vcoder.md]]
