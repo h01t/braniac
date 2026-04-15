@@ -1,30 +1,18 @@
 # Reinforcement Learning
 
-**Summary**: A machine learning paradigm where an agent learns to make decisions by optimizing cumulative rewards, used in DeepSeek-R1 to incentivize reasoning capabilities without supervised fine-tuning.
-**Source Context**: DeepSeek_R1.pdf
+**Summary**: A training paradigm where a model learns by interacting with an environment and receiving rewards, used in DeepSeek-R1 to enhance reasoning abilities through iterative fine-tuning.
+**Source Context**: DeepSeek_R1.pdf (Throughout, especially Section 3, 4.1).
 
 ---
 
-## Role in DeepSeek-R1
-The DeepSeek-R1 paper emphasizes using large-scale reinforcement learning (RL) as a core method to enhance reasoning in LLMs. Specifically, the models [[entities/deepseek-r1-zero.md]] and [[entities/deepseek-r1.md]] are trained via RL algorithms, demonstrating that reasoning can emerge through reward-driven optimization.
+## Application in Model Development
+The DeepSeek-R1 project utilized large-scale [[concepts/reinforcement-learning.md]] as a core methodology. Two key variants were developed:
+*   **DeepSeek-R1-Zero**: A pure RL approach trained without any cold-start (pre-existing) demonstration data.
+*   **DeepSeek-R1**: A more powerful model that leveraged cold-start data alongside iterative RL fine-tuning.
 
-## Algorithm: GRPO
-The paper adopts Group Relative Policy Optimization ([[entities/grpo.md]]) as the RL algorithm. GRPO foregoes a critic model and instead estimates a baseline from group scores, reducing training costs. The objective function (Equation 1 in the paper) maximizes expected advantage while controlling policy deviation via a KL penalty.
-
-## Reward Design
-For RL training, the paper uses a rule-based reward system comprising:
-- **Accuracy rewards**: For tasks with deterministic answers (e.g., math, coding), correctness is verified via rules or compilers.
-- **Format rewards**: Enforce structural constraints, such as requiring the model to output reasoning within `<think>` tags.
-The paper avoids neural reward models to prevent reward hacking and simplify the pipeline.
-
-## Impact on Reasoning
-RL enables the model to explore and solidify effective [[concepts/chain-of-thought.md]] patterns. The paper notes that through RL, models naturally develop behaviors like self-verification and reflection, leading to significant benchmark improvements (e.g., AIME score increase from 15.6% to 71.0% for DeepSeek-R1-Zero).
-
-## Comparison to Other Methods
-The paper contrasts RL with other approaches like process-based reward models and search algorithms, positioning RL as a key enabler for achieving performance comparable to OpenAI's o1 series.
+## Comparison with Distillation
+A key finding was the relative efficiency of RL. While RL was essential for creating the top-tier teacher model ([[entities/deepseek-r1.md]]), applying the same large-scale RL process directly to a smaller base model ([[entities/deepseek-r1-zero-qwen-32b.md]]) yielded performance inferior to simply distilling knowledge from the larger model. This positioned RL as a powerful but computationally intensive method, potentially more suited for advancing the frontier with large base models rather than efficiently creating competent smaller models (Source: DeepSeek_R1.pdf, Section 4.1).
 
 ## Related pages
-- [[entities/grpo.md]]
-- [[concepts/chain-of-thought.md]]
-- [[concepts/reward-modeling.md]]
-- [[sources/deepseek-r1-paper.md]]
+- [[concepts/distillation-vs-reinforcement-learning.md]]
+- [[entities/deepseek-r1-zero.md]]
