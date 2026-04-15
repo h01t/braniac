@@ -1,20 +1,16 @@
-# mT5 (Multilingual T5)
+# mT5
 
-**Summary**: mT5 is a massively multilingual variant of the T5 model, pre-trained on a dataset spanning over 100 languages, designed to handle a wide variety of NLP tasks across multiple languages.
-**Source Context**: Comprehensive Overview of LLMs.pdf.
+**Summary**: A multilingual variant of the T5 model, pre-trained on text from 101 languages in the mC4 corpus.
+**Source Context**: Comprehensive Overview of LLMs.pdf
 
 ---
 
-## Relationship to T5
-mT5 directly extends the [[entities/t5.md]] framework to a multilingual setting. It uses the same [[concepts/transformer-architectures.md|encoder-decoder architecture]] and "text-to-text" training paradigm but is trained on the mC4 dataset, which contains text in 101 languages (Source: Comprehensive Overview of LLMs.pdf, referencing [11]).
+**Architecture & Data**: mT5 (multilingual T5) extends the [[entities/t5.md]] architecture to support many languages. It is trained on the mC4 dataset, which is derived from Common Crawl and covers 101 languages. To accommodate this linguistic diversity, mT5 uses a very large vocabulary of 250,000 tokens.
 
-## Purpose
-The goal of mT5 is to create a single model capable of performing well on tasks in many languages, promoting cross-lingual transfer and reducing the need for separate models per language.
+**Training Strategy**: To prevent the model from overfitting to high-resource languages or underfitting low-resource ones, mT5 employs a tailored data sampling procedure. This procedure ensures examples are drawn from all languages according to a balanced strategy.
 
-## Historical Context
-Alongside T5, mT5 is mentioned as an early example of a large-scale pre-trained language model that utilized transfer learning via fine-tuning. These models paved the way for later [[concepts/large-language-models.md]] that demonstrated strong zero-shot capabilities (Source: Comprehensive Overview of LLMs.pdf, Introduction).
+**Fine-Tuning Insight**: The paper suggests that when fine-tuning for a task where English data is available, including a small amount of pre-training data from *all* languages can help the model generate correct outputs in non-English languages as well.
 
 ## Related pages
 - [[entities/t5.md]]
-- [[concepts/large-language-models.md]]
-- [[concepts/transformer-architectures.md]]
+- [[concepts/multilingual-models.md]]
