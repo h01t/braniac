@@ -1,31 +1,24 @@
 # Reinforcement Learning for Reasoning
 
-**Summary**: A training paradigm that uses reinforcement learning to enhance the reasoning capabilities of large language models, enabling them to develop complex problem-solving strategies without supervised fine-tuning.
+**Summary**: The application of reinforcement learning (RL) techniques to train large language models specifically for enhancing their reasoning capabilities on complex tasks.
 **Source Context**: DeepSeek_R1.pdf
 
 ---
 
-## Overview
+## Core Application
+Both [[entities/deepseek-r1-zero.md]] and [[entities/deepseek-r1.md]] utilize large-scale reinforcement learning as a core training methodology to boost performance on reasoning-intensive tasks like mathematics, coding, and logic (Source: DeepSeek_R1.pdf).
 
-Reinforcement learning (RL) is applied directly to base large language models to incentivize and improve their reasoning abilities. This approach, as demonstrated in the DeepSeek-R1 paper, allows models to self-evolve and discover effective reasoning patterns such as [[concepts/chain-of-thought.md]], self-verification, and reflection without any initial supervised fine-tuning data.
+## Process in DeepSeek-R1-Zero
+DeepSeek-R1-Zero initiates RL directly from a base model. The model is rewarded based on the correctness of its solutions, which drives a [[concepts/self-evolution.md]] process where it autonomously learns to allocate more computational effort (thinking time) to solve problems (Source: DeepSeek_R1.pdf).
 
-## Method in DeepSeek-R1
+## Process in DeepSeek-R1
+DeepSeek-R1 employs RL in two stages: 1) **Reasoning-oriented RL**: Applied after a [[concepts/cold-start-rl.md]], using a combined reward of task accuracy and a language consistency reward to improve readability (Source: DeepSeek_R1.pdf). 2) **RL for all Scenarios**: A final alignment stage using a mix of rule-based rewards (for reasoning) and reward models (for general tasks) to optimize for helpfulness and harmlessness (Source: DeepSeek_R1.pdf).
 
-The DeepSeek-R1 models use [[concepts/group-relative-policy-optimization.md]] (GRPO) as the RL algorithm. This method samples a group of outputs for each question and optimizes the policy model by maximizing a surrogate objective with a KL penalty, using advantages computed from group rewards. This eliminates the need for a separate critic model, reducing training costs.
-
-## Reward Design
-
-The reward system for RL consists of two main components:
-1. **Accuracy Rewards**: Rule-based verification of the final answer's correctness (e.g., for math problems) or using compilers/test cases for coding problems.
-2. **Format Rewards**: Enforcing a specific output structure where reasoning is enclosed in `<think>` tags and the final answer in `<answer>` tags.
-
-This combination guides the model towards both correct solutions and a structured reasoning process.
-
-## Results and Implications
-
-The paper shows that RL leads to steady improvement on reasoning benchmarks. For [[entities/deepseek-r1-zero.md]], the pass@1 score on AIME 2024 increased from 15.6% to 71.0% through RL training. With majority voting, it reached 86.7%, matching the performance of [[entities/openai-o1-series.md]]. This demonstrates that RL alone can unlock advanced reasoning capabilities in LLMs.
+## Outcome
+This RL-focused approach is credited with significant performance gains on STEM and reasoning benchmarks, as seen in the evaluation of DeepSeek-R1 (Source: DeepSeek_R1.pdf).
 
 ## Related pages
-- [[concepts/group-relative-policy-optimization.md]]
-- [[concepts/reward-modeling.md]]
 - [[entities/deepseek-r1-zero.md]]
+- [[entities/deepseek-r1.md]]
+- [[concepts/self-evolution.md]]
+- [[concepts/cold-start-rl.md]]
