@@ -1,22 +1,18 @@
 # Retrieval-Augmented Generation (RAG)
 
-**Summary**: A framework where large language models are augmented with an external retrieval system to access and incorporate relevant information from large knowledge corpora, improving factuality and reducing hallucination.
-**Source Context**: Comprehensive Overview of LLMs.pdf (citations 193, 198, 202-215)
+**Summary**: A technique that enhances LLM responses by first retrieving relevant documents from an external knowledge base and then using that information to generate more accurate and grounded answers.
+**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
 
 ---
 
-[[concepts/retrieval-augmented-generation-rag.md]] enhances [[concepts/large-language-models.md]] by grounding their generation in retrieved evidence. This addresses knowledge cutoffs and hallucination.
+Retrieval-Augmented Generation (RAG) is a key technique for implementing **[[concepts/long-term-memory.md]]** in LLM agents. It operates in two main phases to overcome the limitations of an LLM's static, pre-trained knowledge.
 
-**Retrieval-Augmented Pre-training and Fine-tuning**: Models can be trained with retrieval from the start. Guu et al. (2020) pioneer retrieval-augmented language model pre-training [[sources/guu-et-al-retrieval-augmented-pretraining-2020.md]]. Borgeaud et al. (2022) scale this up, retrieving from trillions of tokens [[sources/borgeaud-et-al-improving-lms-with-retrieval-2022.md]]. Wang et al. (2023) study whether to pre-train autoregressive LMs with retrieval [[sources/wang-et-al-pretrain-with-retrieval-2023.md]].
+**How RAG Works:**
+1.  **Retrieval**: Given a user query, a retriever component (often using vector embeddings) searches an external knowledge base—which could contain company files, personal documents, or updated information—to find the most relevant documents or passages.
+2.  **Augmentation**: The retrieved text is added to the LLM's input context alongside the original query. The LLM is then prompted to generate a response based on this augmented information.
 
-**In-Context Retrieval and Prompt Selection**: For inference, retrieving the right examples for in-context learning is critical. Liu et al. (2021) investigate what makes good in-context examples for GPT-3 [[sources/liu-et-al-good-in-context-examples-2021.md]]. Wang et al. (2023) and Rubin et al. (2021) focus on learning to retrieve in-context examples or prompts [[sources/wang-et-al-learning-to-retrieve-in-context-2023.md]][[sources/rubin-et-al-learning-to-retrieve-prompts-2021.md]].
-
-**Active and Iterative Retrieval**: Advanced RAG involves iterative interaction with the retrieval system. Jiang et al. (2023) propose Active Retrieval Augmented Generation, where the model decides when and what to retrieve [[sources/jiang-et-al-active-rag-2023.md]]. RepoCoder (Zhang et al., 2023) uses iterative retrieval for repository-level code completion [[sources/zhang-et-al-repocoder-2023.md]].
-
-**Architectural and Efficiency Advances**: Hofstätter et al. (2023) introduce FiD-Light for efficient retrieval-augmented text generation [[sources/hofstatter-et-al-fid-light-2023.md]]. Rubin & Berant (2023) explore long-range language modeling with self-retrieval [[sources/rubin-berant-self-retrieval-lm-2023.md]].
+This process grounds the LLM's responses in specific, verifiable sources, which significantly reduces the likelihood of "hallucinations" (generating plausible but incorrect information). RAG is therefore crucial for applications requiring precision and access to up-to-date or proprietary data. Its effectiveness depends on having an efficient and well-indexed retrieval system.
 
 ## Related pages
-- [[concepts/long-context-memory.md]]
-- [[concepts/knowledge-grounding.md]]
-- [[sources/guu-et-al-retrieval-augmented-pretraining-2020.md]]
-- [[sources/jiang-et-al-active-rag-2023.md]]
+- [[concepts/long-term-memory.md]]
+- [[concepts/memory-system.md]]
