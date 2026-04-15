@@ -1,16 +1,17 @@
 # Scaling Laws
 
-**Summary**: Empirical relationships that predict LLM performance improvements based on the scale of model parameters, dataset size, and computational resources.
-**Source Context**: Comprehensive Overview of LLMs.pdf
+**Summary**: Empirical relationships that describe how the performance (loss) of neural language models improves predictably as key factors like model size, dataset size, and compute are increased.
+**Source Context**: Derived from sources including Kaplan et al. (2020) and Hoffmann et al. (2022).
 
 ---
 
-Scaling laws are a crucial area of research for efficiently developing LLMs. They help predict how performance (measured as loss) improves as key factors are increased.
+## Description
+Scaling laws are power-law relationships discovered through experimentation that quantify the improvement in a language model's loss (and thus its capability) as resources are scaled up. The primary variables are:
+-   **Model Parameters (N)**: The number of non-embedding parameters in the model.
+-   **Dataset Size (D)**: The number of tokens in the training dataset.
+-   **Compute (C)**: The total floating-point operations used for training.
 
-The source cites foundational work (Kaplan et al., 2020) showing that loss scales as a power-law with model size (parameters), dataset size, and compute budget. One finding from this study suggests that **increasing model size is more important than increasing dataset size** for better performance within a given compute budget.
+The key finding is that performance improves smoothly and predictably with each factor, enabling forward planning for model development [[sources/kaplan-et-al-scaling-laws-2020.md]].
 
-A subsequent variant of the scaling law (Hoffmann et al., 2022, known as the "Chinchilla laws") suggests a different optimal balance. It proposes that **model size and the number of training tokens should be scaled equally**. This implies that under a fixed compute budget, training a somewhat smaller model on significantly more data can lead to better performance than training a very large model on less data. These two perspectives represent a key consideration in LLM development strategy.
-
-## Related pages
-- [[concepts/pre-training.md]]
-- [[entities/chinchilla.md]]
+## The Compute-Optimal Frontier
+Later work, such as by Hoffmann et al. (2022), built upon these laws to define a "compute-optimal" scaling strategy [[concepts/compute-optimal-training.md]]. This research suggests that for a given compute budget (C), there is an optimal combination of model size (N) and number of training tokens (D) to minimize final loss. This challenged earlier trends of primarily scaling up model parameters [Source: [96]].
