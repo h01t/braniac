@@ -144,12 +144,14 @@ Do not write any introductory or trailing conversational text outside the file b
           }
         }
         
-        // Asynchronous qmd background refresh to update vector embeddings.
+        // Full re-index after ingestion: `qmd update` re-scans the collection,
+        // removes stale entries for deleted/moved files, and embeds new ones.
+        // `qmd embed` alone only adds — it never removes stale index entries.
         if (allDerivedPaths.length > 0) {
            const { exec } = require('child_process');
-           exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd embed', { cwd: process.cwd() }, (err: any) => {
-              if (err) console.error("qmd background embed failed", err);
-              else console.log("qmd background embed finished successfully");
+           exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: any) => {
+              if (err) console.error("qmd background update failed", err);
+              else console.log("qmd background update + embed finished");
            });
         }
 
