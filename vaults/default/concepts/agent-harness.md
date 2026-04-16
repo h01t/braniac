@@ -21,3 +21,4 @@ Key components include short-term memory, self-feedback, and self-optimization m
 ## Related pages
 - [[concepts/self-evolution.md]]
 - [[entities/minimax-m27.md]]
+- [[sources/minimax-m27-blog-post.md]]
