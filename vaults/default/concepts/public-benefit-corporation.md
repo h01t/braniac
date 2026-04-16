@@ -1,16 +1,18 @@
-# Public Benefit Corporation (PBC)
+# Public Benefit Corporation
 
-**Summary**: A type of for-profit corporate entity legally obligated to consider its impact on society and the environment, in addition to generating profit for shareholders.
+**Summary**: A corporate legal structure that allows a for-profit company to pursue a public benefit purpose alongside profit, used by OpenAI in its 2025 restructuring.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-A **Public Benefit Corporation (PBC)** is a legal structure for a business that explicitly incorporates public benefit into its corporate goals. In October 2025, [[entities/openai.md]] restructured, forming the **OpenAI Group PBC**, a for-profit public benefit corporation. This entity is controlled by the non-profit **OpenAI Foundation**, which holds 26% of the equity but retains full governance rights, including board appointment (source: https://grokipedia.com/page/OpenAI).
+## OpenAI's Restructuring
+In October 2025, OpenAI restructured its for-profit entity into the [[entities/openai-group.md]] public benefit corporation (PBC) under the nonprofit [[entities/openai-foundation.md]] [[sources/ref-20.md]].
+This transition removed a previous profit cap to raise more capital for [[concepts/artificial-general-intelligence.md]] (AGI) development [[sources/ref-20.md]].
 
-This structure replaced OpenAI's previous [[concepts/capped-profit-structure.md]]. The shift was made to better attract capital for scaling AI infrastructure and research by offering conventional equity, while the controlling non-profit foundation is intended to ensure the company's actions remain aligned with its mission to develop safe [[concepts/artificial-general-intelligence.md]] (AGI) for humanity's benefit (source: https://grokipedia.com/page/OpenAI).
-
-As a PBC, OpenAI Group has a fiduciary duty to balance the interests of shareholders with its stated public benefit purpose, which is anchored in its charter to advance AGI safely.
+## Governance Implications
+The PBC structure supports commercial activities while aligning with the non-profit's mission. The [[entities/openai-foundation.md]] retains governance control via its board [[sources/ref-20.md]].
 
 ## Related pages
 - [[entities/openai.md]]
-- [[concepts/capped-profit-structure.md]]
+- [[entities/openai-group.md]]
+- [[entities/openai-foundation.md]]
