@@ -44,3 +44,4 @@ On MLE Bench Lite, M2.7 achieved an average medal rate of 66.6% in autonomous op
 - [[entities/minimax-m27.md]]
 - [[concepts/software-engineering.md]]
 - [[concepts/professional-work.md]]
+- [[sources/minimax-m27-blog-post.md]]
