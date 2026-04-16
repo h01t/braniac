@@ -116,3 +116,88 @@ export async function getDiff(vaultId: string, hash: string) {
     return '';
   }
 }
+
+// ── Lint Cache ───────────────────────────────────────────────────────────────
+
+export interface LintCache {
+  version: number;
+  timestamp: string;
+  commitHash: string;
+  fileStatuses: Record<string, { healthy: boolean; issues: string[]; lastChecked: string }>;
+}
+
+const LINT_CACHE_FILE = '.lint-cache.json';
+
+export async function readLintCache(vaultId: string): Promise<LintCache | null> {
+  const filePath = path.join(VAULTS_ROOT, vaultId, LINT_CACHE_FILE);
+  try {
+    const raw = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(raw) as LintCache;
+  } catch {
+    return null;
+  }
+}
+
+export async function writeLintCache(vaultId: string, cache: LintCache): Promise<void> {
+  const filePath = path.join(VAULTS_ROOT, vaultId, LINT_CACHE_FILE);
+  await fs.writeFile(filePath, JSON.stringify(cache, null, 2), 'utf-8');
+}
+
+export async function getCurrentCommitHash(vaultId: string): Promise<string> {
+  const vaultPath = path.join(VAULTS_ROOT, vaultId);
+  try {
+    const git: SimpleGit = simpleGit(vaultPath);
+    const log = await git.log({ maxCount: 1 });
+    return log.latest?.hash ?? '';
+  } catch {
+    return '';
+  }
+}
+
+export async function getChangedFilesSince(vaultId: string, commitHash: string): Promise<string[]> {
+  const vaultPath = path.join(VAULTS_ROOT, vaultId);
+  try {
+    const git: SimpleGit = simpleGit(vaultPath);
+    const result = await git.diff([`${commitHash}..HEAD`, '--name-only']);
+    return result.trim().split('\n').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+// ── File deletion ────────────────────────────────────────────────────────────
+
+export async function deleteFileAndCommit(vaultId: string, filename: string, commitMessage: string) {
+  const vaultPath = path.join(VAULTS_ROOT, vaultId);
+  const filePath = path.join(vaultPath, filename);
+  await fs.unlink(filePath);
+  const git: SimpleGit = simpleGit(vaultPath);
+  await git.rm([filename]);
+  await git.commit(commitMessage);
+  return { success: true };
+}
+
+// ── Diff generation ──────────────────────────────────────────────────────────
+
+export async function generateUnifiedDiff(before: string, after: string): Promise<string> {
+  if (before === after) return '';
+  const os = await import('os');
+  const { exec } = await import('child_process');
+  const { promisify } = await import('util');
+  const execAsync = promisify(exec);
+  const ts = Date.now();
+  const beforePath = path.join(os.tmpdir(), `lint-before-${ts}.md`);
+  const afterPath  = path.join(os.tmpdir(), `lint-after-${ts}.md`);
+  await fs.writeFile(beforePath, before, 'utf-8');
+  await fs.writeFile(afterPath,  after,  'utf-8');
+  try {
+    const { stdout } = await execAsync(`diff -u "${beforePath}" "${afterPath}"`);
+    return stdout;
+  } catch (e: any) {
+    // diff exits with code 1 when files differ — that's normal
+    return e.stdout || '';
+  } finally {
+    await fs.unlink(beforePath).catch(() => {});
+    await fs.unlink(afterPath).catch(() => {});
+  }
+}

@@ -205,8 +205,19 @@ export default function GraphView({ vaultId }: { vaultId: string }) {
                 h3: ({ node, ...props }) => <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', marginTop: '16px', marginBottom: '6px' }} {...props} />,
                 p: ({ node, ...props }) => <p style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-muted)', marginBottom: '12px' }} {...props} />,
                 a: ({ node, href, children, ...props }) => {
-                  if (href?.startsWith('wikilink:')) {
-                    const nodeId = href.slice('wikilink:'.length);
+                  const isWikilink = href?.startsWith('wikilink:');
+                  // Also catch relative .md links (e.g. [foo](concepts/foo.md)) —
+                  // these would otherwise navigate the browser away to a blank page
+                  const isRelativeInternal = href
+                    && !href.startsWith('http')
+                    && !href.startsWith('#')
+                    && !href.startsWith('mailto:')
+                    && !href.startsWith('wikilink:');
+
+                  if (isWikilink || isRelativeInternal) {
+                    const nodeId = isWikilink
+                      ? href!.slice('wikilink:'.length)
+                      : href!; // already a relative vault path
                     return (
                       <a
                         href="#"

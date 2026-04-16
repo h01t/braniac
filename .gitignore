@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lint cache (local build artifact, not part of the knowledge graph)
+vaults/**/.lint-cache.json
