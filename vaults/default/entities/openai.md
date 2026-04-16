@@ -1,29 +1,33 @@
 # OpenAI
 
-**Summary**: An artificial intelligence research organization founded in 2015, initially as a non-profit, to advance safe artificial general intelligence (AGI). It has since evolved into a public benefit corporation structure and is known for developing the GPT series, ChatGPT, and other generative AI models.
+**Summary**: An artificial intelligence research laboratory that transitioned into a commercial entity, known for developing advanced AI models like the GPT series and leading large-scale infrastructure projects such as Stargate.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-OpenAI is an artificial intelligence research organization founded on December 8, 2015, by [[entities/sam-altman.md]], [[entities/greg-brockman.md]], [[entities/elon-musk.md]], [[entities/ilya-sutskever.md]], [[entities/wojciech-zaremba.md]], and [[entities/john-schulman.md]]. Its stated mission is to "ensure that artificial general intelligence benefits all of humanity" (source: https://grokipedia.com/page/OpenAI).
+## 2025-2026 Developments
+In May 2025, OpenAI acquired [[entities/io-products.md]] for approximately $6.4 billion to integrate advanced hardware design expertise [[sources/ref-52-53.md]].
+In October 2025, the company restructured its for-profit entity into the [[entities/openai-group.md]] public benefit corporation (PBC) under the nonprofit [[entities/openai-foundation.md]] [[sources/ref-20.md]]. By late 2025, total funding raised exceeded $57 billion [[sources/ref-65.md]].
 
-## Founding and Early Structure
-OpenAI was announced as a non-profit research lab, with founders warning that corporate incentives could lead to unsafe AI development. The initial goal was to conduct open, collaborative, and safety-focused research on the path to [[concepts/artificial-general-intelligence.md]] (AGI). Founders collectively pledged $1 billion, though actual initial funding was more modest (source: https://grokipedia.com/page/OpenAI).
+## Infrastructure and Partnerships
+OpenAI accelerated infrastructure expansion via the [[entities/stargate-project.md]], a joint venture with [[entities/oracle.md]] and [[entities/softbank.md]] targeting up to 10 gigawatts of capacity [[sources/ref-54.md]]. The project announced a $15 billion "Lighthouse" campus in Port Washington, Wisconsin, in September 2025 [[sources/ref-54-55.md]]. OpenAI also partnered with [[entities/oracle.md]] for up to 4.5 gigawatts of U.S.-based capacity, committing $300 billion over five years [[sources/ref-56-57.md]].
+To support this, OpenAI formed hardware partnerships with [[entities/nvidia.md]], [[entities/amd.md]], and [[entities/broadcom.md]] for AI accelerators and GPUs [[sources/ref-58-62.md]].
 
-## Structural Evolution
-In 2019, OpenAI shifted to a hybrid [[concepts/capped-profit-structure.md]], creating a for-profit subsidiary (OpenAI LP) to attract capital while remaining under the control of its non-profit board. This was driven by the immense computational resources needed for large-scale AI research. In October 2025, the structure was reorganized into the **OpenAI Group PBC**, a public benefit corporation controlled by the non-profit OpenAI Foundation, which holds governance rights (source: https://grokipedia.com/page/OpenAI). This new structure eliminated prior return caps to better attract investment.
+## Model Releases
+A series of advanced models were released. On January 31, 2025, it launched o3-mini [[sources/ref-66.md]]. This was followed by o3 and o4-mini on April 16, and o3-pro on June 10 [[sources/ref-67.md]]. [[entities/gpt-5.md]] debuted on August 7, 2025, as a strong coding model [[sources/ref-6.md]]. Later releases included open-weight models gpt-oss-120b and gpt-oss-20b (August 5) [[sources/ref-68.md]], gpt-realtime (August 28) [[sources/ref-69.md]], [[entities/chatgpt-atlas.md]] (October 21) [[sources/ref-70.md]], GPT-5.1 (November 12) [[sources/ref-71.md]], and GPT-5.2 (December 11) [[sources/ref-72.md]].
 
-## Key Products and Technologies
-OpenAI is best known for its [[concepts/gpt-series.md]] of large language models, including [[concepts/gpt-3.md]] (2020), [[concepts/gpt-4.md]] (2023), and [[concepts/gpt-5.md]] (2025). The launch of [[concepts/chatgpt.md]] in November 2022 led to unprecedented user growth, reaching over 900 million weekly active users by March 2026. Other significant products include the image generator [[concepts/dall-e.md]] and the code model [[concepts/codex.md]] (source: https://grokipedia.com/page/OpenAI).
+## Organizational Structure
+The founding team in December 2015 included [[entities/sam-altman.md]], [[entities/greg-brockman.md]], [[entities/ilya-sutskever.md]], [[entities/wojciech-zaremba.md]], and [[entities/elon-musk.md]] [[sources/ref-76.md]].
+[[entities/sam-altman.md]] has served as CEO since 2019, with a brief ouster and reinstatement in November 2023 [[sources/ref-77-78.md]]. [[entities/jakub-pachocki.md]] replaced [[entities/ilya-sutskever.md]] as chief scientist in May 2024 [[sources/ref-80-82.md]]. [[entities/brad-lightcap.md]] serves as chief operating officer [[sources/ref-77.md]].
+In early 2025, [[entities/mira-murati.md]] departed as CTO [[sources/ref-83.md]]. The company has experienced significant talent turnover since 2024, with over 25% of key research staff leaving in 2025 [[sources/ref-76.md]][[sources/ref-88-91.md]].
 
-## Leadership and Controversies
-[[entities/sam-altman.md]] serves as CEO. The organization experienced a significant leadership crisis in November 2023 when Altman was briefly removed by the board for not being "consistently candid," leading to employee protests and his swift reinstatement. Critics, including co-founder Elon Musk, have argued the company's shift towards commercialization represents a drift from its original safety-focused mission (source: https://grokipedia.com/page/OpenAI).
-
-## Financials and Partnerships
-A major financial and infrastructure partner is [[entities/microsoft.md]], which holds a 27% stake. Microsoft has invested billions and provides cloud computing via Azure. OpenAI's valuation reached approximately $850 billion by March 2026 following major funding rounds (source: https://grokipedia.com/page/OpenAI).
+## Financials and Governance
+The October 2025 restructuring into [[entities/openai-group.md]] included [[entities/microsoft.md]] receiving a 27% stake valued at ~$135 billion, with extended IP access until 2032.
+Governance is directed by the board of the nonprofit [[entities/openai-foundation.md]], which maintains ultimate control over the for-profit PBC and owns about 26% of its equity [[sources/ref-20.md]]. The board's authority was evident in the November 2023 ouster of CEO [[entities/sam-altman.md]] [[sources/ref-95.md]].
 
 ## Related pages
-- [[concepts/artificial-general-intelligence.md]]
-- [[concepts/capped-profit-structure.md]]
-- [[concepts/public-benefit-corporation.md]]
 - [[entities/microsoft.md]]
+- [[entities/oracle.md]]
+- [[concepts/artificial-general-intelligence.md]]
+- [[concepts/public-benefit-corporation.md]]
+- [[concepts/infrastructure-scaling.md]]
