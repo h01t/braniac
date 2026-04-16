@@ -16,7 +16,7 @@ The blog post describes how M2.7 builds a research agent harness that supports d
 
 ## Components
 
-Key components include short-term memory, self-feedback, and self-optimization modules, as used in experiments on MLE Bench Lite (Source: https://www.minimax.io/news/minimax-m27-en).
+Key components include short-term memory, self-feedback, and self-optimization modules, as used in experiments on [[concepts/benchmarks.md#mle-bench-lite|MLE Bench Lite]] (Source: https://www.minimax.io/news/minimax-m27-en).
 
 ## Related pages
 - [[concepts/self-evolution.md]]
