@@ -37,3 +37,5 @@ M2.7 is available on [[entities/minimax-agent.md|MiniMax Agent]] and the [[entit
 - [[concepts/agent-harness.md]]
 - [[concepts/benchmarks.md]]
 - [[entities/minimax-company.md]]
+- [[entities/referenced-models.md]]
+- [[sources/minimax-m27-blog-post.md]]
