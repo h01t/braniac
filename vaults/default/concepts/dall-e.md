@@ -1,16 +1,20 @@
 # DALL-E
 
-**Summary**: OpenAI's series of transformer-based models designed for generating images from text descriptions, representing a key component of its multimodal generative AI toolkit.
+**Summary**: A series of multimodal AI models developed by OpenAI that generate images from text descriptions.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-## Overview
-DALL-E is OpenAI's series of text-to-image generative models [Source]. The initial DALL-E model was released on January 5, 2021, and used a 12-billion parameter transformer [Source]. As of March 2026, the production image generation model is DALL·E 3, part of the "gpt-image-1.5 family" of proprietary, closed-source models accessible via the OpenAI API and ChatGPT [Source].
+DALL-E is a core multimodal product from [[entities/openai.md]] that specializes in text-to-image generation. Named as a portmanteau of the artist Salvador Dalí and the Pixar robot WALL-E, it leverages a version of the [[concepts/gpt-models.md]] architecture adapted for image generation.
 
-## Integration and Use
-DALL-E models are integrated into OpenAI's broader ecosystem of multimodal and specialized generative tools, which also includes the [[concepts/sora.md|Sora]] video generation model and real-time audio models [Source].
+## Capabilities and Impact
+DALL-E models can create original, often photorealistic or stylistically coherent images based on detailed textual prompts. Its release, particularly DALL-E 2 in 2022, democratized high-quality AI image generation and had a major impact on creative industries like [[concepts/ai-graphic-design.md]], marketing, and entertainment. It operates as both a standalone tool and via API for developers.
+
+## Relation to Other Models
+DALL-E represents one branch of OpenAI's multimodal efforts, alongside now-discontinued video models like [[concepts/sora.md]]. It shares underlying technological principles with the GPT series but is specialized for a different output modality.
 
 ## Related pages
-- [[concepts/multimodal-ai.md]]
+- [[entities/openai.md]]
+- [[concepts/gpt-models.md]]
 - [[concepts/sora.md]]
+- [[concepts/ai-graphic-design.md]]
