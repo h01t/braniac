@@ -1,17 +1,21 @@
 # Ilya Sutskever
 
-**Summary**: Co-founder and former chief scientist of OpenAI, who advanced the GPT series and was involved in the 2023 board action against Sam Altman before departing.
-**Source Context**: https://grokipedia.com/page/OpenAI
+**Summary**: Ilya Sutskever was a co-founder and the Chief Scientist of OpenAI, a leading AI researcher who played a key role in the company's technical direction and its focus on AI safety before departing in 2024.
+**Source Context**: OpenAI announcement of his departure (https://openai.com/index/jakub-pachocki-announced-as-chief-scientist/), New York Times report (https://www.nytimes.com/2024/05/14/technology/ilya-sutskever-leaving-openai.html).
 
 ---
 
-## Tenure at OpenAI
-[[entities/ilya-sutskever.md]] was a co-founder of OpenAI in December 2015 [[sources/ref-76.md]]. He served as chief scientist and advanced the [[concepts/gpt-series.md]].
-He was involved in the November 2023 board action that ousted CEO [[entities/sam-altman.md]] [[sources/ref-96.md]].
+## Role at OpenAI
+As a co-founder and longtime Chief Scientist, Sutskever was central to the research behind OpenAI's key models, including the [[concepts/gpt-series.md]] and the development of [[concepts/ai-safety.md]] methodologies. He co-led the company's Superalignment team, focused on the long-term challenge of controlling superintelligent AI.
 
-## Departure
-[[entities/jakub-pachocki.md]] replaced Sutskever as chief scientist in May 2024 [[sources/ref-80-82.md]]. Sutskever left after nearly a decade and subsequently co-founded Safe Superintelligence (SSI) in June 2024 [[sources/ref-81-82.md]].
+## Departure and Aftermath
+Sutskever left OpenAI in May 2024, with Jakub Pachocki succeeding him as Chief Scientist. His departure followed the 2023 board crisis, where he initially voted to fire CEO [[entities/sam-altman.md]] but later expressed regret. After leaving, he announced a new venture, Safe Superintelligence Inc., focused exclusively on building safe superintelligent AI (Source: CNBC, TIME).
+
+## Impact on AI Safety
+Sutskever's departure, along with that of other safety-focused researchers like Jan Leike, was seen by many as a blow to OpenAI's commitment to [[concepts/ai-safety.md]]. The dissolution of the Superalignment team shortly after his exit heightened these concerns (Source: CNBC, The Verge).
 
 ## Related pages
 - [[entities/openai.md]]
+- [[concepts/ai-safety.md]]
+- [[concepts/superalignment.md]]
 - [[entities/sam-altman.md]]
