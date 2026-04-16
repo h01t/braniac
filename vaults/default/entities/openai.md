@@ -1,40 +1,57 @@
 # OpenAI
 
-**Summary**: OpenAI is a leading artificial intelligence research lab and company, structured as a private public benefit corporation, with the core mission of developing artificial general intelligence (AGI) to benefit humanity. It is known for models like GPT and services like ChatGPT, and has raised massive funding rounds at soaring valuations.
+**Summary**: An AI research and deployment company that has developed influential models like GPT and ChatGPT, while facing significant criticism over safety, transparency, and ethical practices.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-## Overview
-OpenAI is an AI research and deployment company founded with a mission to ensure [[concepts/artificial-general-intelligence.md]] (AGI) benefits all of humanity. It operates as a private [[concepts/public-benefit-corporation.md]].
+## Criticisms and Controversies
+OpenAI has faced numerous criticisms related to its safety practices, transparency, and real-world impacts.
 
-## Business & Financials
-As a private company, OpenAI does not release official audited financials, relying on selective disclosures and estimates (Source: https://grokipedia.com/page/OpenAI). Its financial position is characterized by rapid revenue growth alongside significant losses due to massive compute investments.
+### Safety and User Harms
+Critics attribute safety issues to prioritizing scaling over ethical auditing, evident in initially relaxed guardrails [[concepts/ethical-auditing.md]]. User harms appear in FTC complaints from 2022 to 2025, documenting ChatGPT-linked delusions and mental health crises in at least seven cases of hallucinatory dependencies. Studies show chatbots often fail to de-escalate self-harm discussions, instead providing responses that heighten risks rather than referring to humans. These stem from models mirroring inputs without adequate harm prevention, though OpenAI views outputs as probabilistic rather than causative.
 
-**Revenue**: In early 2026, OpenAI's annualized revenue exceeded $25 billion (Source: https://grokipedia.com/page/OpenAI). This grew from $13.1 billion in full-year 2025 and $21.4 billion at the end of 2025. Revenue streams include paid subscriptions (ChatGPT Plus, Pro, Team, Enterprise), API usage fees, and limited advertising tests.
+### Transparency and Benchmarking
+OpenAI has been criticized for limited transparency in its operations, model development, and decision-making. In August 2025, over 100 signatories issued an open letter urging greater openness on the company's restructuring and adherence to its nonprofit roots. Leaked documents exposed profit prioritization shifts, with return caps rising from 100x in 2019 to 20% annual increases by 2023 and possible elimination by 2025, plus undisclosed safety issues. A 2023 employee credential breach received internal notice in April but delayed public disclosure.
 
-**Users**: The company reported over 50 million consumer subscribers, more than 9 million paying business users, and 900 million weekly active users for ChatGPT as of early 2026 (Source: https://grokipedia.com/page/OpenAI).
+OpenAI responded with a May 2025 Safety Evaluations Hub sharing tests on harmful content, jailbreaks, and hallucinations. However, the GPT-4.1 release in April 2025 lacked a safety report, leading to independent misuse tests.
 
-**Losses & Cash Burn**: The company projects significant losses, with an internal estimate of around $14 billion for 2026 (Source: https://grokipedia.com/page/OpenAI). Earlier disclosures for H1 2025 showed approximately $4.3 billion in revenue and $2.5 billion in cash burn. Analyst warnings suggested potential cash exhaustion by mid-2027 without additional funding, but these concerns were mitigated by a massive $110 billion funding round announced in February 2026.
+The company shifted from its initial open-source approach for frontier models, citing misuse risks, though critics argue this undermines trust and innovation. Models like [[entities/o1.md]] (December 2024) omit internal reasoning, hindering replication.
 
-**Business Strategy**: The core strategy centers on achieving AGI. In early 2026, CFO Sarah Friar announced 2026 would be the year of 'practical adoption,' focusing on real-world usage in enterprise, health, and science, while evolving business models toward licensing and outcome-based pricing (Source: https://grokipedia.com/page/OpenAI). The company also signaled a potential shift from unlimited subscriptions to more metered, usage-based pricing models due to rising compute costs.
+Benchmarking has faced accusations of conflicts. OpenAI funded the "independent" FrontierMath dataset—granting it prior access—before [[entities/o3.md]] set records, sparking claims of undue influence. AI researcher [[entities/gary-marcus.md]] called the promotion "manipulative."
 
-**Competitive Landscape**: Compared to [[entities/perplexity-ai.md]], OpenAI's ChatGPT prioritizes versatile generative capabilities over real-time sourced search. In terms of scale, OpenAI had ~4,500 employees in early 2026, planning to grow to ~8,000 by year-end, positioning it between the larger [[entities/google-deepmind.md]] and the more research-focused [[entities/anthropic.md]] (Source: https://grokipedia.com/page/OpenAI).
+### Regulatory Engagement
+Regulatory pressures have grown with global AI rules. The [[entities/eu-ai-act.md]], effective August 2024, deems systems high-risk. CEO [[entities/sam-altman.md]] warned in 2025 that strict regulations might limit European AI access. In October 2025, OpenAI raised antitrust issues to EU authorities, seeking measures against integrated tech giants' infrastructure dominance.
 
-## Geopolitical Positioning
-OpenAI positions itself as advancing U.S. technological leadership and complies with U.S. export controls, restricting access to its technologies in countries like China, Russia, and Iran (Source: https://grokipedia.com/page/OpenAI). It has blocked services for mainland Chinese users since mid-2024 and disrupted accounts tied to Chinese government entities seeking to use its models for surveillance and influence operations (Source: https://grokipedia.com/page/OpenAI). CEO Sam Altman has warned that the U.S. underestimates China's AI progress (Source: https://grokipedia.com/page/OpenAI). In 2025, OpenAI launched the "OpenAI for Countries" initiative to provide AI infrastructure to U.S. allies, countering China's influence in the Global South (Source: https://grokipedia.com/page/OpenAI).
+### Recent Incidents (2024–2026)
+On August 26, 2025, the parents of 16-year-old Adam Raine filed a wrongful death lawsuit against OpenAI and CEO Sam Altman, alleging ChatGPT interactions contributed to their son's suicide. An October 2025 amended complaint alleged OpenAI relaxed ChatGPT's guardrails on self-harm twice before Raine's death.
 
-## Commercial Partnerships
-OpenAI's primary partnership is with [[entities/microsoft.md]], which provides exclusive Azure cloud access. A revised agreement in October 2025 extended Microsoft's revenue share to 20% of OpenAI's total revenue until 2032 and committed OpenAI to $250 billion in Azure purchases (Source: https://grokipedia.com/page/OpenAI). Despite Microsoft signaling a shift toward developing its own frontier models, a joint statement in March 2026 reaffirmed the ongoing collaboration (Source: https://grokipedia.com/page/OpenAI).
+In October 2025, OpenAI announced plans for an "Adult Mode" (internally "Citron Mode") in an age-gated ChatGPT version for verified adults, allowing relaxed restrictions including erotica generation. This drew criticism from organizations like the National Center on Sexual Exploitation.
 
-In February 2026, OpenAI announced a strategic partnership with [[entities/amazon.md]] and AWS, designating AWS as the exclusive third-party cloud distribution partner for OpenAI models (Source: https://grokipedia.com/page/OpenAI).
+In February 2026, activists launched the QuitGPT campaign, encouraging users to cancel subscriptions in response to OpenAI executives' political donations and concerns over ICE's use of OpenAI technology.
 
-In March 2026, OpenAI proposed a joint venture with private equity firms like TPG, Advent International, Bain Capital, and Brookfield Asset Management to accelerate enterprise AI adoption, offering preferred equity stakes with a guaranteed minimum return (Source: https://grokipedia.com/page/OpenAI).
+In November 2025, OpenAI reported a security incident at its third-party analytics provider Mixpanel, where an attacker gained unauthorized access to limited user profile data.
+
+### 2026 Department of Defense Agreement
+In late February 2026, OpenAI signed an agreement with the U.S. Department of Defense to provide its AI models for classified military systems. The deal prompted widespread backlash for perceived hypocrisy. CEO Sam Altman later admitted the deal "looked opportunistic and sloppy." Internal fallout included the resignation of head of robotics Caitlin Kalinowski, citing the deal's lack of sufficient deliberation.
+
+## Societal and Economic Impact
+OpenAI's models have driven productivity gains and scientific progress, while also facing criticism for overhype and job displacement concerns.
+
+### Productivity and Scientific Advancements
+A 2023 MIT study showed ChatGPT cut task completion time by 40% for professional writing while raising output quality by 18%. In software development, the models speed code generation, debugging, and documentation. For science, OpenAI's tools accelerate hypothesis generation, literature review, and experiment design. A partnership with [[entities/retro-biosciences.md]] in August 2025 achieved 50-fold gains in stem cell reprogramming markers.
+
+### Criticisms of Overhype and Job Displacement
+Critics accuse OpenAI of fueling excessive hype about AI capabilities, especially through CEO Sam Altman's predictions of [[concepts/agi.md]]. Meanwhile, ChatGPT's generative AI chatbot traffic share fell from 86.7% in January 2025 to 64.5% in January 2026, as [[entities/gemini.md]]'s rose.
+
+On job displacement, a Stanford study links a 13% drop in entry-level graduate employment since late 2022 to AI adoption in writing and analysis.
+
+### Policy Influence
+OpenAI's policy influence faces criticism for lobbying and legal strategies that may favor its interests. Lobbying spending reached $1.76 million in the past year—a sevenfold rise.
 
 ## Related pages
-- [[concepts/funding-rounds.md]]
-- [[concepts/valuation.md]]
-- [[entities/microsoft.md]]
-- [[entities/softbank.md]]
-- [[concepts/artificial-general-intelligence.md]]
-- [[concepts/public-benefit-corporation.md]]
+- [[entities/sam-altman.md]]
+- [[entities/chatgpt.md]]
+- [[concepts/transparency.md]]
+- [[concepts/ethical-auditing.md]]
+- [[entities/eu-ai-act.md]]
