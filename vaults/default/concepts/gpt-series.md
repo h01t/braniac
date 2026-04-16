@@ -1,22 +1,21 @@
 # GPT Series
 
-**Summary**: A series of Generative Pre-trained Transformer (GPT) large language models developed by OpenAI, known for their advanced natural language processing capabilities.
-**Source Context**: https://grokipedia.com/page/OpenAI
+**Summary**: The Generative Pre-trained Transformer (GPT) series is a family of autoregressive language models developed by OpenAI, starting with GPT-1 and progressing to large-scale models like GPT-3, GPT-4, and GPT-5, which power applications like ChatGPT.
+**Source Context**: OpenAI research pages, developer blog (https://openai.com/index/gpt-4-research/), and model documentation (https://platform.openai.com/docs/models).
 
 ---
 
-The **GPT (Generative Pre-trained Transformer) series** is a family of large language models developed by [[entities/openai.md]]. These models are pre-trained on vast datasets and can generate human-like text, perform translation, answer questions, and write code.
+## Model Evolution
+The [[concepts/gpt-series.md]] represents OpenAI's core technological lineage. GPT-3, with 175 billion parameters, demonstrated remarkable few-shot learning capabilities (Source: Nvidia blog). GPT-4 was a multimodal model accepting image and text inputs. GPT-4o introduced faster, more efficient multimodal reasoning. The company later released GPT-5, GPT-5.2, and GPT-5.3-Codex, focusing on enhanced reasoning, coding, and specialized capabilities (Source: OpenAI announcements, TechCrunch).
 
-Key models in the series include:
-*   **GPT-3**: Released in June 2020, it had 175 billion parameters, a massive scale-up from its predecessor, and was made accessible via an API (source: https://grokipedia.com/page/OpenAI).
-*   **GPT-4**: A multimodal model released in 2023 that could process both text and image inputs (source: https://grokipedia.com/page/OpenAI).
-*   **GPT-5**: Released in 2025 (source: https://grokipedia.com/page/OpenAI).
+## Integration and Applications
+The primary application of the GPT models is [[concepts/chatgpt.md]], OpenAI's conversational AI interface. The models are also available via the [[concepts/openai-api.md]] for developers and are integrated into [[entities/microsoft.md]]'s Azure OpenAI Service for enterprise use (Source: Microsoft blog).
 
-The series represents the core technological innovation behind OpenAI's flagship product, [[concepts/chatgpt.md]]. The development of these models required immense computational resources, facilitated by OpenAI's partnership with [[entities/microsoft.md]] and its Azure cloud infrastructure (source: https://grokipedia.com/page/OpenAI).
+## Capabilities and Benchmarks
+Each iteration of GPT has aimed to improve on benchmarks for reasoning, coding, and general knowledge. However, the release of advanced models like the [[concepts/o-series.md]] (o1, o3) marked a shift toward models explicitly optimized for reasoning and problem-solving over pure next-token prediction. The performance claims of some models, like o3, have been subject to external scrutiny and debate over benchmarking methodology (Source: Fortune, Decrypt).
 
 ## Related pages
 - [[entities/openai.md]]
-- [[concepts/gpt-3.md]]
-- [[concepts/gpt-4.md]]
-- [[concepts/gpt-5.md]]
 - [[concepts/chatgpt.md]]
+- [[concepts/openai-api.md]]
+- [[concepts/o-series.md]]
