@@ -1,33 +1,40 @@
 # OpenAI
 
-**Summary**: An artificial intelligence research laboratory that transitioned into a commercial entity, known for developing advanced AI models like the GPT series and leading large-scale infrastructure projects such as Stargate.
+**Summary**: OpenAI is a leading artificial intelligence research lab and company, structured as a private public benefit corporation, with the core mission of developing artificial general intelligence (AGI) to benefit humanity. It is known for models like GPT and services like ChatGPT, and has raised massive funding rounds at soaring valuations.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-## 2025-2026 Developments
-In May 2025, OpenAI acquired [[entities/io-products.md]] for approximately $6.4 billion to integrate advanced hardware design expertise [[sources/ref-52-53.md]].
-In October 2025, the company restructured its for-profit entity into the [[entities/openai-group.md]] public benefit corporation (PBC) under the nonprofit [[entities/openai-foundation.md]] [[sources/ref-20.md]]. By late 2025, total funding raised exceeded $57 billion [[sources/ref-65.md]].
+## Overview
+OpenAI is an AI research and deployment company founded with a mission to ensure [[concepts/artificial-general-intelligence.md]] (AGI) benefits all of humanity. It operates as a private [[concepts/public-benefit-corporation.md]].
 
-## Infrastructure and Partnerships
-OpenAI accelerated infrastructure expansion via the [[entities/stargate-project.md]], a joint venture with [[entities/oracle.md]] and [[entities/softbank.md]] targeting up to 10 gigawatts of capacity [[sources/ref-54.md]]. The project announced a $15 billion "Lighthouse" campus in Port Washington, Wisconsin, in September 2025 [[sources/ref-54-55.md]]. OpenAI also partnered with [[entities/oracle.md]] for up to 4.5 gigawatts of U.S.-based capacity, committing $300 billion over five years [[sources/ref-56-57.md]].
-To support this, OpenAI formed hardware partnerships with [[entities/nvidia.md]], [[entities/amd.md]], and [[entities/broadcom.md]] for AI accelerators and GPUs [[sources/ref-58-62.md]].
+## Business & Financials
+As a private company, OpenAI does not release official audited financials, relying on selective disclosures and estimates (Source: https://grokipedia.com/page/OpenAI). Its financial position is characterized by rapid revenue growth alongside significant losses due to massive compute investments.
 
-## Model Releases
-A series of advanced models were released. On January 31, 2025, it launched o3-mini [[sources/ref-66.md]]. This was followed by o3 and o4-mini on April 16, and o3-pro on June 10 [[sources/ref-67.md]]. [[entities/gpt-5.md]] debuted on August 7, 2025, as a strong coding model [[sources/ref-6.md]]. Later releases included open-weight models gpt-oss-120b and gpt-oss-20b (August 5) [[sources/ref-68.md]], gpt-realtime (August 28) [[sources/ref-69.md]], [[entities/chatgpt-atlas.md]] (October 21) [[sources/ref-70.md]], GPT-5.1 (November 12) [[sources/ref-71.md]], and GPT-5.2 (December 11) [[sources/ref-72.md]].
+**Revenue**: In early 2026, OpenAI's annualized revenue exceeded $25 billion (Source: https://grokipedia.com/page/OpenAI). This grew from $13.1 billion in full-year 2025 and $21.4 billion at the end of 2025. Revenue streams include paid subscriptions (ChatGPT Plus, Pro, Team, Enterprise), API usage fees, and limited advertising tests.
 
-## Organizational Structure
-The founding team in December 2015 included [[entities/sam-altman.md]], [[entities/greg-brockman.md]], [[entities/ilya-sutskever.md]], [[entities/wojciech-zaremba.md]], and [[entities/elon-musk.md]] [[sources/ref-76.md]].
-[[entities/sam-altman.md]] has served as CEO since 2019, with a brief ouster and reinstatement in November 2023 [[sources/ref-77-78.md]]. [[entities/jakub-pachocki.md]] replaced [[entities/ilya-sutskever.md]] as chief scientist in May 2024 [[sources/ref-80-82.md]]. [[entities/brad-lightcap.md]] serves as chief operating officer [[sources/ref-77.md]].
-In early 2025, [[entities/mira-murati.md]] departed as CTO [[sources/ref-83.md]]. The company has experienced significant talent turnover since 2024, with over 25% of key research staff leaving in 2025 [[sources/ref-76.md]][[sources/ref-88-91.md]].
+**Users**: The company reported over 50 million consumer subscribers, more than 9 million paying business users, and 900 million weekly active users for ChatGPT as of early 2026 (Source: https://grokipedia.com/page/OpenAI).
 
-## Financials and Governance
-The October 2025 restructuring into [[entities/openai-group.md]] included [[entities/microsoft.md]] receiving a 27% stake valued at ~$135 billion, with extended IP access until 2032.
-Governance is directed by the board of the nonprofit [[entities/openai-foundation.md]], which maintains ultimate control over the for-profit PBC and owns about 26% of its equity [[sources/ref-20.md]]. The board's authority was evident in the November 2023 ouster of CEO [[entities/sam-altman.md]] [[sources/ref-95.md]].
+**Losses & Cash Burn**: The company projects significant losses, with an internal estimate of around $14 billion for 2026 (Source: https://grokipedia.com/page/OpenAI). Earlier disclosures for H1 2025 showed approximately $4.3 billion in revenue and $2.5 billion in cash burn. Analyst warnings suggested potential cash exhaustion by mid-2027 without additional funding, but these concerns were mitigated by a massive $110 billion funding round announced in February 2026.
+
+**Business Strategy**: The core strategy centers on achieving AGI. In early 2026, CFO Sarah Friar announced 2026 would be the year of 'practical adoption,' focusing on real-world usage in enterprise, health, and science, while evolving business models toward licensing and outcome-based pricing (Source: https://grokipedia.com/page/OpenAI). The company also signaled a potential shift from unlimited subscriptions to more metered, usage-based pricing models due to rising compute costs.
+
+**Competitive Landscape**: Compared to [[entities/perplexity-ai.md]], OpenAI's ChatGPT prioritizes versatile generative capabilities over real-time sourced search. In terms of scale, OpenAI had ~4,500 employees in early 2026, planning to grow to ~8,000 by year-end, positioning it between the larger [[entities/google-deepmind.md]] and the more research-focused [[entities/anthropic.md]] (Source: https://grokipedia.com/page/OpenAI).
+
+## Geopolitical Positioning
+OpenAI positions itself as advancing U.S. technological leadership and complies with U.S. export controls, restricting access to its technologies in countries like China, Russia, and Iran (Source: https://grokipedia.com/page/OpenAI). It has blocked services for mainland Chinese users since mid-2024 and disrupted accounts tied to Chinese government entities seeking to use its models for surveillance and influence operations (Source: https://grokipedia.com/page/OpenAI). CEO Sam Altman has warned that the U.S. underestimates China's AI progress (Source: https://grokipedia.com/page/OpenAI). In 2025, OpenAI launched the "OpenAI for Countries" initiative to provide AI infrastructure to U.S. allies, countering China's influence in the Global South (Source: https://grokipedia.com/page/OpenAI).
+
+## Commercial Partnerships
+OpenAI's primary partnership is with [[entities/microsoft.md]], which provides exclusive Azure cloud access. A revised agreement in October 2025 extended Microsoft's revenue share to 20% of OpenAI's total revenue until 2032 and committed OpenAI to $250 billion in Azure purchases (Source: https://grokipedia.com/page/OpenAI). Despite Microsoft signaling a shift toward developing its own frontier models, a joint statement in March 2026 reaffirmed the ongoing collaboration (Source: https://grokipedia.com/page/OpenAI).
+
+In February 2026, OpenAI announced a strategic partnership with [[entities/amazon.md]] and AWS, designating AWS as the exclusive third-party cloud distribution partner for OpenAI models (Source: https://grokipedia.com/page/OpenAI).
+
+In March 2026, OpenAI proposed a joint venture with private equity firms like TPG, Advent International, Bain Capital, and Brookfield Asset Management to accelerate enterprise AI adoption, offering preferred equity stakes with a guaranteed minimum return (Source: https://grokipedia.com/page/OpenAI).
 
 ## Related pages
+- [[concepts/funding-rounds.md]]
+- [[concepts/valuation.md]]
 - [[entities/microsoft.md]]
-- [[entities/oracle.md]]
+- [[entities/softbank.md]]
 - [[concepts/artificial-general-intelligence.md]]
 - [[concepts/public-benefit-corporation.md]]
-- [[concepts/infrastructure-scaling.md]]
