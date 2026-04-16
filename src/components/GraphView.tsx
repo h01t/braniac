@@ -199,6 +199,7 @@ export default function GraphView({ vaultId }: { vaultId: string }) {
           <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              urlTransform={(url) => url}
               components={{
                 h1: ({ node, ...props }) => <h1 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border)', color: 'var(--text-main)' }} {...props} />,
                 h2: ({ node, ...props }) => <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--accent)', marginTop: '20px', marginBottom: '8px' }} {...props} />,

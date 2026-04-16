@@ -71,6 +71,7 @@ export default function IngestBar({ vaultId }: { vaultId: string }) {
 
       setText('');
       setFile(null);
+      setLoading(false); // Stream completed — clear compiling state
       // Signal graph + file tree to refresh live — no full page reload
       setTimeout(() => window.dispatchEvent(new CustomEvent('vault-updated')), 1500);
     } catch {
