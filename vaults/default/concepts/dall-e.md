@@ -1,13 +1,16 @@
 # DALL-E
 
-**Summary**: An AI system developed by OpenAI that generates images from text descriptions.
+**Summary**: OpenAI's series of transformer-based models designed for generating images from text descriptions, representing a key component of its multimodal generative AI toolkit.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-**DALL-E** is an AI model developed by [[entities/openai.md]] for generating digital images from natural language descriptions, known as "prompts." The first version was announced in January 2021 (source: https://grokipedia.com/page/OpenAI).
+## Overview
+DALL-E is OpenAI's series of text-to-image generative models [Source]. The initial DALL-E model was released on January 5, 2021, and used a 12-billion parameter transformer [Source]. As of March 2026, the production image generation model is DALL·E 3, part of the "gpt-image-1.5 family" of proprietary, closed-source models accessible via the OpenAI API and ChatGPT [Source].
 
-DALL-E demonstrated [[entities/openai.md]]'s expansion into multimodal AI, complementing its text-based [[concepts/gpt-series.md]]. It uses a version of the GPT-3 architecture adapted for image generation. DALL-E and its successors have been applied in creative fields and graphic design (source: https://grokipedia.com/page/OpenAI).
+## Integration and Use
+DALL-E models are integrated into OpenAI's broader ecosystem of multimodal and specialized generative tools, which also includes the [[concepts/sora.md|Sora]] video generation model and real-time audio models [Source].
 
 ## Related pages
-- [[entities/openai.md]]
+- [[concepts/multimodal-ai.md]]
+- [[concepts/sora.md]]
