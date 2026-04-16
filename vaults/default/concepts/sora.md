@@ -1,17 +1,19 @@
 # Sora
 
-**Summary**: OpenAI's proprietary video generation model, capable of creating videos from text prompts, and enhanced through strategic content partnerships.
+**Summary**: An AI model developed by OpenAI for generating video from text prompts, which was reportedly discontinued in 2026.
 **Source Context**: https://grokipedia.com/page/OpenAI
 
 ---
 
-## Overview
-Sora is OpenAI's video generation model [Source]. As of March 2026, it is a proprietary, closed-source model, part of a family that includes "Sora 2 variants," and is accessible via the OpenAI API [Source]. It is categorized alongside [[concepts/dall-e.md|DALL·E 3]] as one of OpenAI's specialized multimodal generative tools [Source].
+Sora was a text-to-video generative model announced by [[entities/openai.md]]. It was capable of creating short, high-definition video clips with complex scenes and multiple characters based on descriptive text prompts.
 
-## Content Partnership
-A major strategic partnership to boost Sora's capabilities was announced with Disney in December 2025. This $1 billion deal licensed over 200 characters from Disney, Marvel, Star Wars, and Pixar for use in Sora video generation [Source].
+## Development and Discontinuation
+When demonstrated, Sora showed impressive capabilities in maintaining visual consistency and following cinematic styles. However, according to the source material, the model was discontinued in 2026. The reasons for discontinuation are not specified but may relate to the extreme computational cost of training and running such models, challenges with content safety and control for dynamic video, or a strategic re-prioritization of resources.
+
+## Context and Legacy
+Sora represented the natural extension of OpenAI's generative capabilities from text ([[concepts/gpt-models.md]]) and images ([[concepts/dall-e.md]]) to the more complex domain of video. Its discontinuation highlights the technical and practical hurdles in scaling cutting-edge AI research into sustainable products, especially for data-rich modalities like video.
 
 ## Related pages
+- [[entities/openai.md]]
 - [[concepts/dall-e.md]]
-- [[concepts/openai-partnerships.md]]
-- [[entities/disney.md]]
+- [[concepts/gpt-models.md]]
