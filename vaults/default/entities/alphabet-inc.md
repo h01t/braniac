@@ -1,23 +1,21 @@
 # Alphabet Inc.
 
-**Summary**: Alphabet Inc. is the publicly traded parent company of Google LLC and several other subsidiaries, created in 2015 to restructure Google's diverse business interests.
-**Source Context**: https://grokipedia.com/page/Google
+**Summary**: Alphabet Inc. is the publicly traded parent company created in 2015 to restructure Google, encompassing Google's core internet businesses as well as other subsidiaries like Waymo and Verily, and the philanthropic arm Google.org.
+**Source Context**: https://grokipedia.com/page/Google (Implied parent entity)
 
 ---
 
-Alphabet Inc. was formed on October 2, 2015, as part of a corporate restructuring of [[entities/google-llc.md|Google]]. The restructuring aimed to separate Google's core internet businesses (like Search, Ads, Android, YouTube) from its more speculative, long-term ventures, providing greater focus and transparency (Source: https://grokipedia.com/page/Google).
+Alphabet Inc. is the corporate conglomerate formed to provide more managerial focus on Google's diverse array of projects and "Other Bets."
 
-## Structure
-Alphabet operates as a conglomerate. Its largest subsidiary is Google LLC. Other subsidiaries, often called "Other Bets," include entities like Verily (life sciences), Waymo (autonomous driving), and [[entities/deepmind.md|DeepMind]] (AI research). This structure allows the core Google business to operate independently while other ventures pursue innovation with separate management and accounting.
-
-## Leadership
-[[entities/larry-page.md]] served as the first CEO of Alphabet from 2015 to 2019, after which [[entities/sundar-pichai.md]] assumed the role while remaining CEO of Google.
+## Structure and Relationship to Google
+Alphabet was created through a restructuring of Google in October 2015. Google, including its search, advertising, Android, and cloud businesses, became the largest subsidiary under the Alphabet umbrella. This structure allows the core, revenue-generating [[entities/google.md|Google]] business to be managed separately from more experimental ventures (e.g., in biotech or self-driving cars).
 
 ## Financial Context
-Alphabet's financial performance is heavily driven by Google's advertising revenue, which comprised 75-80% of its total $350 billion revenue in 2024 (Source: https://grokipedia.com/page/Google).
+The financial performance of Alphabet is heavily driven by Google. For example, the source notes that Alphabet's 2024 revenue was $348.16 billion, primarily from Google's search advertising. The philanthropic activities of [[entities/google-org.md|Google.org]] are funded through Alphabet.
+
+## Role in Broader Narrative
+When discussing Google's market share, revenue, antitrust cases, or philanthropy, the ultimate corporate entity and reporting structure is Alphabet Inc. Legal actions and financial results are typically filed under the Alphabet name.
 
 ## Related pages
-- [[entities/google-llc.md]]
-- [[entities/larry-page.md]]
-- [[entities/sundar-pichai.md]]
-- [[entities/deepmind.md]]
+- [[entities/google.md]]
+- [[entities/google-org.md]]
