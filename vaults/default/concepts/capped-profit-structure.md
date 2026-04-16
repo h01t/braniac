@@ -1,16 +1,21 @@
-# Capped-Profit Structure
+# Capped-profit Structure
 
-**Summary**: A hybrid corporate model used by OpenAI from 2019 to 2025, designed to attract investment capital while limiting investor returns to prevent profit motives from overriding the organization's safety and ethical mission.
-**Source Context**: https://grokipedia.com/page/OpenAI
+**Summary**: OpenAI's capped-profit structure is a hybrid corporate model where a for-profit subsidiary (OpenAI LP) operates under the governance of its original non-profit board, with investor returns capped to balance capital attraction with a mission-focused charter.
+**Source Context**: OpenAI's structure page (https://openai.com/our-structure/) and TechCrunch article on the shift (https://techcrunch.com/2019/03/11/openai-shifts-from-nonprofit-to-capped-profit-to-attract-capital/).
 
 ---
 
-A **capped-profit structure** is a hybrid corporate model that combines elements of for-profit and non-profit organizations. [[entities/openai.md]] adopted this model in March 2019 with the creation of **OpenAI LP**, a for-profit subsidiary controlled by its original non-profit parent, OpenAI Inc. (source: https://grokipedia.com/page/OpenAI).
+## Design and Rationale
+Founded as a non-profit in 2015, OpenAI created the "capped-profit" OpenAI LP in 2019. This was done to attract the billions of dollars in investment required for large-scale AI research while legally binding the for-profit entity to the non-profit's mission of ensuring [[concepts/agi.md]] benefits humanity. Returns for investors in the LP are capped (e.g., early Microsoft returns were capped at 100x), with any excess returns flowing to the non-profit.
 
-The primary purpose of this structure was to enable OpenAI to raise the vast amounts of capital required for large-scale AI research and development, particularly for pursuing [[concepts/artificial-general-intelligence.md]] (AGI), while maintaining its core safety-focused mission. The model limited returns for investors and employees to a maximum of 100 times the invested capital (source: https://grokipedia.com/page/OpenAI).
+## Governance and Control
+The non-profit board of OpenAI Inc. retains ultimate control over the for-profit entity. This structure was intended to prevent a single entity (like a major investor) from controlling the company's direction. However, this governance model was tested during the 2023 crisis when the non-profit board fired CEO [[entities/sam-altman.md]], only to be forced to reinstate him after investor and employee pressure (Source: Axios, Wired).
 
-Excess profits beyond these caps were to be directed back to the non-profit parent to fund safety research, policy advocacy, and other mission-aligned activities. This was intended to create a balance between the competitive pressures of the AI industry and the need for safeguards. The structure was revised in 2025, with the cap increasing by 20% annually, before being replaced entirely by a [[concepts/public-benefit-corporation.md]] model later that year (source: https://grokipedia.com/page/OpenAI).
+## Criticism and Controversy
+The structure has been criticized as contradictory and opaque. Critics, including former board members, argue the pursuit of profit has compromised the original safety and openness mission. Internal documents (the "OpenAI Files") reportedly revealed concerns about this shift (Source: Vox, Tribune PK). The structure also creates complex relationships with major investors like [[entities/microsoft.md]], which provides significant funding but, as of 2026, did not have a board seat (Source: CCN.com).
 
 ## Related pages
 - [[entities/openai.md]]
-- [[concepts/public-benefit-corporation.md]]
+- [[concepts/agi.md]]
+- [[entities/microsoft.md]]
+- [[entities/sam-altman.md]]
