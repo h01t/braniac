@@ -1,57 +1,35 @@
 # OpenAI
 
-**Summary**: An AI research and deployment company that has developed influential models like GPT and ChatGPT, while facing significant criticism over safety, transparency, and ethical practices.
-**Source Context**: https://grokipedia.com/page/OpenAI
+**Summary**: OpenAI is an artificial intelligence research laboratory and company, originally founded as a non-profit in 2015 and later restructured as a "capped-profit" entity to attract capital. It is known for developing influential AI models like the GPT series, DALL-E, and Sora, and operates a major partnership with Microsoft.
+**Source Context**: Various, including OpenAI's official structure page (https://openai.com/our-structure/) and TechCrunch (https://techcrunch.com/2019/03/11/openai-shifts-from-nonprofit-to-capped-profit-to-attract-capital/).
 
 ---
 
-## Criticisms and Controversies
-OpenAI has faced numerous criticisms related to its safety practices, transparency, and real-world impacts.
+## History and Founding
+OpenAI was founded in December 2015 by [[entities/sam-altman.md]], [[entities/ilya-sutskever.md]], [[entities/greg-brockman.md]], and others, with an initial non-profit structure aimed at ensuring artificial general intelligence ([[concepts/agi.md]]) benefits all of humanity (Source: OpenAI's About page). In 2019, the organization created OpenAI LP, a "capped-profit" subsidiary, to secure the significant investment required for advanced AI research while attempting to uphold its original mission (Source: TechCrunch).
 
-### Safety and User Harms
-Critics attribute safety issues to prioritizing scaling over ethical auditing, evident in initially relaxed guardrails [[concepts/ethical-auditing.md]]. User harms appear in FTC complaints from 2022 to 2025, documenting ChatGPT-linked delusions and mental health crises in at least seven cases of hallucinatory dependencies. Studies show chatbots often fail to de-escalate self-harm discussions, instead providing responses that heighten risks rather than referring to humans. These stem from models mirroring inputs without adequate harm prevention, though OpenAI views outputs as probabilistic rather than causative.
+## Corporate Structure
+The organization operates under a unique "capped-profit" model. The non-profit board of OpenAI Inc. retains governance over the for-profit subsidiary, OpenAI LP, to ensure alignment with the founding charter (Source: OpenAI's Structure page). This structure has been a point of controversy and scrutiny, especially during the 2023 leadership crisis (Source: Axios timeline, TechRepublic).
 
-### Transparency and Benchmarking
-OpenAI has been criticized for limited transparency in its operations, model development, and decision-making. In August 2025, over 100 signatories issued an open letter urging greater openness on the company's restructuring and adherence to its nonprofit roots. Leaked documents exposed profit prioritization shifts, with return caps rising from 100x in 2019 to 20% annual increases by 2023 and possible elimination by 2025, plus undisclosed safety issues. A 2023 employee credential breach received internal notice in April but delayed public disclosure.
+## Key Products and Models
+OpenAI's primary outputs are advanced AI models. These include the [[concepts/gpt-series.md]] of large language models, starting with GPT-3 and evolving to GPT-4o, GPT-5, and beyond. The company also created the image generation system [[concepts/dall-e.md]] and the text-to-video model [[concepts/sora.md]]. Its flagship application, [[concepts/chatgpt.md]], popularized AI for the general public. The company has also introduced reasoning-focused models like the [[concepts/o-series.md]] (o1, o3).
 
-OpenAI responded with a May 2025 Safety Evaluations Hub sharing tests on harmful content, jailbreaks, and hallucinations. However, the GPT-4.1 release in April 2025 lacked a safety report, leading to independent misuse tests.
+## Major Partnerships and Strategy
+A central pillar of OpenAI's strategy is its deep, multi-billion dollar partnership with [[entities/microsoft.md]], which includes Azure cloud credits and integration of OpenAI models into Microsoft products (Source: Microsoft blog, The Verge). In the mid-2020s, OpenAI embarked on ambitious infrastructure projects, most notably the [[concepts/stargate-project.md]] in partnership with [[entities/oracle.md]] and others, aiming to build massive data center campuses (Source: OpenAI, Datacenter Dynamics). The company also formed major hardware partnerships with [[entities/nvidia.md]], [[entities/amd.md]], and [[entities/broadcom.md]] to secure computing capacity and develop custom AI chips (Source: OpenAI partnership announcements).
 
-The company shifted from its initial open-source approach for frontier models, citing misuse risks, though critics argue this undermines trust and innovation. Models like [[entities/o1.md]] (December 2024) omit internal reasoning, hindering replication.
+## Leadership and Governance
+OpenAI's leadership has seen significant turnover. Co-founders Sam Altman (CEO) and Greg Brockman (President) have been central, with Altman being briefly fired and reinstated in late 2023 (Source: Axios, New York Times). Key researchers like Ilya Sutskever (former Chief Scientist) and Jan Leike have departed, raising questions about the company's focus on [[concepts/ai-safety.md]] (Source: New York Times, The Verge). The board has been reshaped multiple times, with notable additions from the business and investment world (Source: Reuters, TechCrunch).
 
-Benchmarking has faced accusations of conflicts. OpenAI funded the "independent" FrontierMath dataset—granting it prior access—before [[entities/o3.md]] set records, sparking claims of undue influence. AI researcher [[entities/gary-marcus.md]] called the promotion "manipulative."
+## Financials and Valuation
+OpenAI has grown into one of the world's most valuable private companies. It raised over $6.6 billion in 2024 at a $157 billion valuation (Source: Reuters), with projections pointing towards a $500 billion valuation later in the decade (Source: Visual Capitalist). Its revenue surged past $12.7 billion in 2025, driven largely by ChatGPT and enterprise services (Source: GetLatka, Business of Apps). However, the company also reports massive cash burn, estimated at $2.5 billion in the first half of 2026, as it invests heavily in compute (Source: The Information, CNBC).
 
-### Regulatory Engagement
-Regulatory pressures have grown with global AI rules. The [[entities/eu-ai-act.md]], effective August 2024, deems systems high-risk. CEO [[entities/sam-altman.md]] warned in 2025 that strict regulations might limit European AI access. In October 2025, OpenAI raised antitrust issues to EU authorities, seeking measures against integrated tech giants' infrastructure dominance.
-
-### Recent Incidents (2024–2026)
-On August 26, 2025, the parents of 16-year-old Adam Raine filed a wrongful death lawsuit against OpenAI and CEO Sam Altman, alleging ChatGPT interactions contributed to their son's suicide. An October 2025 amended complaint alleged OpenAI relaxed ChatGPT's guardrails on self-harm twice before Raine's death.
-
-In October 2025, OpenAI announced plans for an "Adult Mode" (internally "Citron Mode") in an age-gated ChatGPT version for verified adults, allowing relaxed restrictions including erotica generation. This drew criticism from organizations like the National Center on Sexual Exploitation.
-
-In February 2026, activists launched the QuitGPT campaign, encouraging users to cancel subscriptions in response to OpenAI executives' political donations and concerns over ICE's use of OpenAI technology.
-
-In November 2025, OpenAI reported a security incident at its third-party analytics provider Mixpanel, where an attacker gained unauthorized access to limited user profile data.
-
-### 2026 Department of Defense Agreement
-In late February 2026, OpenAI signed an agreement with the U.S. Department of Defense to provide its AI models for classified military systems. The deal prompted widespread backlash for perceived hypocrisy. CEO Sam Altman later admitted the deal "looked opportunistic and sloppy." Internal fallout included the resignation of head of robotics Caitlin Kalinowski, citing the deal's lack of sufficient deliberation.
-
-## Societal and Economic Impact
-OpenAI's models have driven productivity gains and scientific progress, while also facing criticism for overhype and job displacement concerns.
-
-### Productivity and Scientific Advancements
-A 2023 MIT study showed ChatGPT cut task completion time by 40% for professional writing while raising output quality by 18%. In software development, the models speed code generation, debugging, and documentation. For science, OpenAI's tools accelerate hypothesis generation, literature review, and experiment design. A partnership with [[entities/retro-biosciences.md]] in August 2025 achieved 50-fold gains in stem cell reprogramming markers.
-
-### Criticisms of Overhype and Job Displacement
-Critics accuse OpenAI of fueling excessive hype about AI capabilities, especially through CEO Sam Altman's predictions of [[concepts/agi.md]]. Meanwhile, ChatGPT's generative AI chatbot traffic share fell from 86.7% in January 2025 to 64.5% in January 2026, as [[entities/gemini.md]]'s rose.
-
-On job displacement, a Stanford study links a 13% drop in entry-level graduate employment since late 2022 to AI adoption in writing and analysis.
-
-### Policy Influence
-OpenAI's policy influence faces criticism for lobbying and legal strategies that may favor its interests. Lobbying spending reached $1.76 million in the past year—a sevenfold rise.
+## Challenges and Controversies
+OpenAI faces numerous challenges. These include ongoing copyright lawsuits from publishers and authors (Source: New York Times, The Guardian), concerns about [[concepts/ai-bias.md]] and safety in its models, regulatory scrutiny in the EU and US, and legal actions related to alleged harms caused by ChatGPT (Source: CNN, NPR). Its complex corporate structure and relationship with Microsoft are also seen as key risk factors (Source: CNBC).
 
 ## Related pages
+- [[concepts/agi.md]]
+- [[concepts/gpt-series.md]]
+- [[concepts/capped-profit-structure.md]]
+- [[concepts/stargate-project.md]]
+- [[entities/microsoft.md]]
 - [[entities/sam-altman.md]]
-- [[entities/chatgpt.md]]
-- [[concepts/transparency.md]]
-- [[concepts/ethical-auditing.md]]
-- [[entities/eu-ai-act.md]]
