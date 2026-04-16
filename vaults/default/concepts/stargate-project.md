@@ -1,30 +1,21 @@
 # Stargate Project
 
-**Summary**: OpenAI's ambitious nationwide AI data center network, launched in 2025, involving massive partnerships for power, land, and hardware to secure independent, large-scale computing infrastructure.
-**Source Context**: https://grokipedia.com/page/OpenAI
+**Summary**: The Stargate project is a multi-year, multi-hundred-billion-dollar initiative led by OpenAI in partnership with Oracle, and later joined by Vantage Data Centers and SB Energy, to build a network of gigawatt-scale AI data center campuses to support future AI infrastructure needs.
+**Source Context**: OpenAI announcements (https://openai.com/index/five-new-stargate-sites/, https://openai.com/index/stargate-advances-with-partnership-with-oracle/), and Datacenter Dynamics reports.
 
 ---
 
-## Overview
-The Stargate project is a nationwide AI data center network launched by OpenAI in 2025 [Source]. The initiative represents a massive infrastructure build-out to secure dedicated compute resources, reducing reliance on third-party cloud providers.
+## Scope and Partners
+Announced in the mid-2020s, Stargate is envisioned as a $400+ billion infrastructure project. The primary partner is [[entities/oracle.md]], which provides cloud and co-location services. Additional partners include Vantage Data Centers for construction and SB Energy for renewable power. The project also involves strategic partnerships with chipmakers like [[entities/nvidia.md]] and [[entities/amd.md]] to supply the necessary hardware (Source: OpenAI, Datacenter Frontier).
 
-## Key Partnerships and Funding
-The project is defined by large-scale partnerships for power and construction.
-*   **Oracle and SoftBank**: Initial partners in a $300 billion power-optimized agreement for up to 4.5 gigawatts of capacity [Source].
-*   **Overall Plan**: Targets 7 gigawatts across $400 billion in facilities [Source].
-*   **Texas as a Hub**: Texas is identified as a key location for these data centers [Source].
-*   **SB Energy**: In January 2026, OpenAI partnered with SoftBank Group and its subsidiary SB Energy, involving a $1 billion investment for multi-gigawatt centers, including a 1.2 gigawatt site in Milam County, Texas [Source].
+## Sites and Scale
+The project plans multiple sites, including locations in Wisconsin and Texas. Each site is designed to consume close to a gigawatt of power, with a total goal of deploying 4.5 GW of capacity in partnership with Oracle alone (Source: WPR, Texas Standard). OpenAI has pledged to fund its own power infrastructure for these sites (Source: Datacenter Dynamics).
 
-## Site Development
-By September 23, 2025, five U.S. sites were announced [Source].
-*   **Wisconsin**: A $15 billion-plus campus developed with Oracle and Vantage Data Centers, approaching 1 gigawatt of capacity [Source].
-
-## Community and Supply Chain Initiatives
-OpenAI introduced complementary programs to support the Stargate project's scale.
-*   **Stargate Community Plan**: Introduced in January 2026 to fund dedicated power resources, aiming to avoid local energy cost hikes in host communities across Texas, Wisconsin, and Michigan [Source].
-*   **Domestic Supply Chain**: Issued a Request for Proposal (RFP) on January 15, 2026, for domestic AI supply chain manufacturing [Source].
+## Strategic Importance
+Stargate represents OpenAI's bet on the immense computational demands of future AI models, particularly toward [[concepts/agi.md]]. It is a key part of the company's strategy to achieve computational independence and scale, reducing reliance on traditional cloud providers like [[entities/microsoft.md]] Azure, though the Microsoft partnership remains active (Source: CNBC analysis).
 
 ## Related pages
-- [[concepts/openai-partnerships.md]]
+- [[entities/openai.md]]
 - [[entities/oracle.md]]
-- [[entities/softbank-group.md]]
+- [[concepts/ai-infrastructure.md]]
+- [[entities/microsoft.md]]
