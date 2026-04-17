@@ -6,12 +6,12 @@
 ---
 
 ## Description
-Long-term memory in [[concepts/autonomous-llm-agent.md|LLM agents]] is designed for persistent knowledge retention, allowing agents to learn from and utilize historical data across multiple interactions. This is distinct from [[concepts/short-term-memory-llm-agents.md|short-term memory]], which is confined to the immediate context window.
+Long-term memory in [[concepts/autonomous-llm-agents.md|LLM agents]] is designed for persistent knowledge retention, allowing agents to learn from and utilize historical data across multiple interactions. This is distinct from [[concepts/short-term-memory-llm-agents.md|short-term memory]], which is confined to the immediate context window.
 
 ## Key Techniques & Approaches
 Several methods are used to implement long-term memory:
 *   **Embodied Memory (Fine-tuning)**: Experiences are ingrained directly into the model's parameters through continuous learning processes like fine-tuning, making knowledge implicit within the model itself [Fundamentals of Building Autonomous LLM Agents.pdf].
-*   **Retrieval-Augmented Generation (RAG)**: This technique enhances an LLM by retrieving relevant documents from an external knowledge base (often using [[concepts/vector-embeddings.md|vector embeddings]]) and augmenting the prompt context, which reduces [[concepts/hallucination-llm.md|hallucinations]] and improves accuracy [31].
+*   **Retrieval-Augmented Generation (RAG)**: This technique enhances an LLM by retrieving relevant documents from an external knowledge base (often using [[concepts/vector-embeddings.md|vector embeddings]]) and augmenting the prompt context, which reduces [[concepts/hallucination-in-llms.md|hallucinations]] and improves accuracy [31].
 *   **SQL Database Integration**: Structured data, such as employee or order details, is stored in SQL databases. LLM agents can access this via [[concepts/text-to-sql.md|text-to-SQL]] query generation [Fundamentals of Building Autonomous LLM Agents.pdf, 72].
 
 ## Advantages and Limitations
