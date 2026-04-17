@@ -1,7 +1,7 @@
 # Multi-Plan Generation and Selection
 
-**Summary**: Multi-Plan Generation and Selection is a reasoning approach that generates multiple alternative plans for a task and then selects the optimal one, addressing the uncertainty and suboptimality of single-plan generation.
-**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
+**Summary**: A reasoning approach that generates multiple alternative plans for a task and then selects the optimal one, addressing the uncertainty and suboptimality of single-plan generation.
+**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf, Section 4.2, Table 2.
 
 ---
 
@@ -14,7 +14,10 @@ Due to the complexity of tasks and LLM uncertainty, generating a single plan may
 
 Plan selection then uses search algorithms (e.g., majority vote, BFS, DFS, MCTS) to choose the optimal plan. This approach allows broader exploration but comes with trade-offs in computational cost.
 
-Multi-Plan Generation and Selection is part of the reasoning system and builds upon [[concepts/task-decomposition.md]].
+Multi-Plan Generation and Selection is a core component of the [[concepts/reasoning-system.md]] and builds upon [[concepts/task-decomposition.md]].
 
 ## Related pages
+- [[concepts/reasoning-system.md]]
 - [[concepts/task-decomposition.md]]
+- [[concepts/tree-of-thought.md]]
+- [[concepts/monte-carlo-tree-search.md]]
