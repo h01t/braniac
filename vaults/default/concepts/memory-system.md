@@ -1,25 +1,27 @@
 # Memory System
 
-**Summary**: The component of an LLM agent that retains knowledge not embedded in the model's weights, including past experiences and external data.
+**Summary**: A system enabling LLM agents to manage information across time scales, with long-term memory for sustained knowledge retention and short-term memory for contextual awareness.
 **Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
 
 ---
 
-## Purpose
+## Overview
+The memory system supports [[concepts/reasoning-system.md]] and [[concepts/multi-agent-systems.md]] by storing past experiences and information, crucial for agent adaptation and learning (Source: Section 5).
 
-The memory system stores information that the LLM can use to enhance response accuracy and maintain context over long interactions.
+## Long-Term Memory
+Retains knowledge over extended periods, implemented via:
+1. **Embodied Memory**: Experiences ingrained directly into model parameters through fine-tuning, adjusting weights to encode new facts (Source: Section 5.1).
+2. **RAG (Retrieval-Augmented Generation)**: Enhances LLMs by retrieving relevant documents from external knowledge bases, reducing hallucinations and improving accuracy (Source: Section 5.1).
+3. **SQL Database**: Stores structured knowledge (e.g., employee data), with text-to-SQL techniques enabling reliable database interaction via transformer models (Source: Section 5.1).
 
-## Types
+## Role in Multi-Agent Systems
+The Memory Management Expert in [[concepts/multi-agent-systems.md]] handles memory to ensure efficient information retrieval and context maintenance (Source: Section 4.5).
 
-The paper distinguishes between:
-
-- **Short-term memory**: Manages the immediate context within the LLM's token limit.
-- **Long-term memory**: Uses external storage mechanisms, such as [[concepts/retrieval-augmented-generation.md]] (RAG) or databases.
-
-## Research Question
-
-RQ4 in the paper investigates how memory mechanisms influence accuracy, robustness to context length limits, and adaptation in long-horizon tasks.
+## Advantages
+- Allows agents to retain knowledge beyond pre-trained data (Source: Section 5.1).
+- Supports sustained interaction and adaptation over time (Source: Section 5.1).
 
 ## Related pages
-- [[concepts/retrieval-augmented-generation.md]]
-- [[sources/fundamentals-of-building-autonomous-llm-agents.md]]
+- [[concepts/reasoning-system.md]]
+- [[concepts/multi-agent-systems.md]]
+- [[concepts/rag.md]]
