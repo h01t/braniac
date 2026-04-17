@@ -108,8 +108,8 @@ export async function POST(request: Request) {
             }
 
             send(`\n✅ Parsed ${parsed.length} file(s) from chunk ${i + 1}\n`);
-          } catch (err: any) {
-            batchError = `Chunk ${i + 1} failed: ${err.message}`;
+          } catch (err: unknown) {
+            batchError = `Chunk ${i + 1} failed: ${err instanceof Error ? err.message : String(err)}`;
             send(`\n❌ ${batchError}\n`);
             break;
           }
@@ -145,8 +145,8 @@ Output EXACTLY using <file path="filename.md"> markup. No conversational text.`;
             for (const f of synthFiles) {
               await writeMarkdownAndCommit(vaultId, f.path, f.content, `Consolidation: ${f.path} for ${sourceUrl}`);
             }
-          } catch (err: any) {
-            send(`\n⚠️ Consolidation failed: ${err.message}\n`);
+          } catch (err: unknown) {
+            send(`\n⚠️ Consolidation failed: ${err instanceof Error ? err.message : String(err)}\n`);
           }
         }
 
@@ -154,18 +154,24 @@ Output EXACTLY using <file path="filename.md"> markup. No conversational text.`;
           send(`\n🔄 Rolling back vault to pre-ingest state (${preIngestHash.slice(0, 8)})...\n`);
           try {
             const { simpleGit } = await import('simple-git');
-            const path = await import('path');
-            const vaultPath = path.join(process.cwd(), 'vaults', vaultId);
+            const pathMod = await import('path');
+            const vaultPath = pathMod.join(process.cwd(), 'vaults', vaultId);
             const git = simpleGit(vaultPath);
-            await git.reset(['--hard', preIngestHash]);
-            send(`✅ Rollback complete.\n`);
-          } catch (rollbackErr: any) {
-            send(`❌ Rollback failed: ${rollbackErr.message}\n`);
+            const log = await git.log({ maxCount: 1 });
+            const currentHash = log.latest?.hash ?? '';
+            if (currentHash === preIngestHash) {
+              send(`✅ No changes to roll back — vault already at pre-ingest state.\n`);
+            } else {
+              await git.reset(['--hard', preIngestHash]);
+              send(`✅ Rollback complete.\n`);
+            }
+          } catch (rollbackErr: unknown) {
+            send(`❌ Rollback failed: ${rollbackErr instanceof Error ? rollbackErr.message : String(rollbackErr)}\n`);
           }
         }
 
         if (allPaths.length > 0 && !batchError) {
-          exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: any) => {
+          exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: Error | null) => {
             if (err) console.error('qmd background update failed', err);
             else console.log('qmd background update finished');
           });
@@ -184,8 +190,8 @@ Output EXACTLY using <file path="filename.md"> markup. No conversational text.`;
         'Connection': 'keep-alive',
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Ingestion Error', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }

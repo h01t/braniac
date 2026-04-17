@@ -81,19 +81,16 @@ export async function readMarkdown(vaultId: string, filename: string) {
 }
 
 export async function writeMarkdownAndCommit(vaultId: string, filename: string, content: string, commitMessage: string) {
-  const vaultPath = path.join(VAULTS_ROOT, vaultId);
-  const filePath = path.join(vaultPath, filename);
-  
-  // Ensure nested directories exist if filename has them
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  
-  await fs.writeFile(filePath, content, 'utf-8');
-  
-  const git: SimpleGit = simpleGit(vaultPath);
-  await git.add(filename);
-  await git.commit(commitMessage);
-  
-  return { success: true };
+  return withVaultLock(vaultId, async () => {
+    const vaultPath = path.join(VAULTS_ROOT, vaultId);
+    const filePath = path.join(vaultPath, filename);
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, content, 'utf-8');
+    const git: SimpleGit = simpleGit(vaultPath);
+    await git.add(filename);
+    await git.commit(commitMessage);
+    return { success: true };
+  });
 }
 
 export async function getHistory(vaultId: string) {

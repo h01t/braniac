@@ -68,12 +68,12 @@ export function parseLintOutput(text: string): { report: string; fixes: LintFix[
   const selfCloseRegex = /<fix\s+path="([^"]+)"\s+action="(delete|update|create)"\s+reason="([^"]*)"\s*\/>/gi;
   let match;
   while ((match = selfCloseRegex.exec(text)) !== null) {
-    fixes.push({ path: match[1], action: match[2] as any, reason: match[3], content: '' });
+    fixes.push({ path: match[1], action: match[2] as LintFix['action'], reason: match[3], content: '' });
   }
 
   const contentRegex = /<fix\s+path="([^"]+)"\s+action="(update|create)"\s+reason="([^"]*)">([\s\S]*?)<\/fix>/gi;
   while ((match = contentRegex.exec(text)) !== null) {
-    fixes.push({ path: match[1], action: match[2] as any, reason: match[3], content: match[4].trim() });
+    fixes.push({ path: match[1], action: match[2] as LintFix['action'], reason: match[3], content: match[4].trim() });
   }
 
   return { report, fixes };

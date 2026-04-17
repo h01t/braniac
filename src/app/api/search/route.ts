@@ -7,7 +7,11 @@ const execAsync = promisify(exec);
 const QMD_TIMEOUT_MS = 10000;
 const QMD_PATH = 'export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd';
 
-function extractJSONArray(text: string): any[] | null {
+interface QmdResult {
+  [key: string]: string | number | boolean | null;
+}
+
+function extractJSONArray(text: string): QmdResult[] | null {
   const start = text.indexOf('[');
   if (start === -1) return null;
 
@@ -26,7 +30,7 @@ function extractJSONArray(text: string): any[] | null {
   return null;
 }
 
-async function runQmdQuery(query: string): Promise<any[]> {
+async function runQmdQuery(query: string): Promise<QmdResult[]> {
   const safeQ = query.replace(/"/g, '\\"');
   const cmd = `${QMD_PATH} query "${safeQ}" --json`;
 
@@ -44,13 +48,14 @@ export async function GET(request: Request) {
   try {
     const results = await runQmdQuery(q);
     return NextResponse.json({ results });
-  } catch (err: any) {
+  } catch {
     try {
       const results = await runQmdQuery(q);
       return NextResponse.json({ results });
-    } catch (retryErr: any) {
-      console.error('QMD Search Error (after retry):', retryErr.message);
-      return NextResponse.json({ error: retryErr.message, results: [] }, { status: 500 });
+    } catch (retryErr: unknown) {
+      const message = retryErr instanceof Error ? retryErr.message : String(retryErr);
+      console.error('QMD Search Error (after retry):', message);
+      return NextResponse.json({ error: message, results: [] }, { status: 500 });
     }
   }
 }

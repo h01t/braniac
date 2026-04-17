@@ -122,10 +122,10 @@ Rules:
       }
       for (const f of files) {
         if (skippedHealthy.includes(f.path) || !f.name.endsWith('.md')) continue;
-        const fileProposals = proposals.filter((p: any) => p.path === f.path);
+        const fileProposals = proposals.filter((p: { path: string }) => p.path === f.path);
         newCache.fileStatuses[f.path] = {
           healthy: fileProposals.length === 0,
-          issues: fileProposals.map((p: any) => p.reason),
+          issues: fileProposals.map((p: { reason: string }) => p.reason),
           lastChecked: now,
         };
       }
@@ -138,8 +138,8 @@ Rules:
         cacheCommitHash: cache?.commitHash, currentCommitHash: currentHash,
       });
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Lint Error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }
