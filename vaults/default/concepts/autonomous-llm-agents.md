@@ -1,34 +1,22 @@
 # Autonomous LLM Agents
 
-**Summary**: Agents powered by large language models that can autonomously interact with their environment, reason, plan, and execute tasks to achieve goals.
-**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
+**Summary**: Systems that utilize large language models (LLMs) as core controllers to perceive, reason, plan, and act autonomously to achieve goals. This field encompasses multi-agent systems, tool use, planning, and memory architectures.
+**Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf (References).
 
 ---
 
-## Definition
+## Core Definition and Scope
+An Autonomous LLM Agent is an AI system where a large language model serves as the central reasoning and decision-making engine. It interacts with external tools, environments, and other agents to perform complex, multi-step tasks without constant human intervention [[concepts/tool-augmented-llms.md]]. The field is rapidly evolving, with research focused on improving their planning, reliability, and specialization for domains like software engineering.
 
-Autonomous LLM agents are systems that leverage large language models as their core reasoning engine, augmented with additional subsystems to perceive, reason, remember, and act in dynamic environments. They are designed to automate complex tasks and bridge the performance gap with human capabilities.
+## Key Research Areas and Challenges
+Current surveys (e.g., Wang et al., 2025; Xi et al., 2023) highlight major research threads: effective **planning and reasoning** (e.g., [[concepts/llm-planning.md]]), robust **tool use and API integration**, developing **long-term memory** mechanisms, and enabling **multi-agent collaboration**. Significant challenges include mitigating [[concepts/hallucination-in-llms.md]], managing context windows, and ensuring reliable task execution in open-ended environments. Benchmarks like [[sources/webarena-zhou-et-al-2024.md]] and [[sources/osworld-benchmark.md]] are critical for evaluation.
 
-## Components
-
-According to the paper, an autonomous LLM agent consists of four core subsystems:
-
-1. [[concepts/perception-system.md]]: Captures and processes data from the environment.
-2. [[concepts/reasoning-system.md]]: Formulates plans and adapts based on feedback.
-3. [[concepts/memory-system.md]]: Stores and retrieves knowledge.
-4. [[concepts/execution-system.md]]: Translates decisions into actions.
-
-## Distinction from Workflows
-
-The paper emphasizes that agents are distinct from [[concepts/workflows-vs-agents.md]]. Workflows follow pre-established, sequential plans and are rigid, while agents generate their own strategies and adapt dynamically.
-
-## Challenges
-
-The paper identifies challenges in building autonomous LLM agents, including difficulties in GUI grounding, repetitive actions, handling unexpected noise, and a significant performance gap with humans.
+## Architectural Components
+A typical agent architecture involves several integrated components: a **planning module** (using techniques like Chain-of-Thought or Tree of Thoughts), an **action module** to call tools or APIs, a **memory module** (e.g., [[sources/agent-workflow-memory-wang-et-al-2024.md]]) for retaining context, and a **learning/refinement module** for iterative improvement (e.g., Self-Refine). The design of these architectures is an active area, with insights drawn from traditional software and cognitive systems engineering [[sources/gidey-et-al-cognitive-bots-2023.md]].
 
 ## Related pages
-- [[concepts/perception-system.md]]
-- [[concepts/reasoning-system.md]]
-- [[concepts/memory-system.md]]
-- [[concepts/execution-system.md]]
-- [[sources/fundamentals-of-building-autonomous-llm-agents.md]]
+- [[concepts/tool-augmented-llms.md]]
+- [[concepts/llm-planning.md]]
+- [[concepts/multimodal-llms.md]]
+- [[concepts/retrieval-augmented-generation.md]]
+- [[entities/habtom-kidane-gidey.md]]
