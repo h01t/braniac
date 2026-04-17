@@ -1,20 +1,19 @@
 # Claude Opus 4.6
 
-**Summary**: The predecessor to Claude Opus 4.7, an earlier version of Anthropic's Opus series large language model.
+**Summary**: The predecessor AI model to Claude Opus 4.7 from Anthropic, with established safety profiles and capabilities that serve as a baseline for comparison.
 **Source Context**: https://www.anthropic.com/news/claude-opus-4-7
 
 ---
 
-## Role as Baseline
-[[entities/claude-opus-4-6.md]] is used throughout the announcement of [[concepts/claude-opus-4-7.md]] as the primary performance baseline. Opus 4.7 is described as a "notable improvement" over it, particularly in advanced software engineering (Source: Anthropic News).
+## Relation to Opus 4.7
+Opus 4.6 is the model that Opus 4.7 directly upgrades. According to the source, Opus 4.7 has a similar safety profile to Opus 4.6, with specific improvements in areas like honesty and resistance to prompt injection (Source: https://www.anthropic.com/news/claude-opus-4-7).
 
-## Performance Comparison
-The new model is reported to show "better results than Opus 4.6 across a range of benchmarks" (Source: Anthropic News). Specific comparisons include:
-*   A 13% lift in resolution on a 93-task coding benchmark (Source: Anthropic News - Quote).
-*   Solving coding tasks that "neither Opus 4.6 nor Sonnet 4.6 could solve" (Source: Anthropic News - Quote).
-*   A jump from 58% to 70% on CursorBench (Source: Anthropic News - Quote).
-*   Improved scores on internal evaluations like Finance Agent and General Finance modules (Source: Anthropic News - Quote).
+## Migration Context
+When migrating to Opus 4.7, changes in tokenizer and token usage from Opus 4.6 need to be considered, as Opus 4.7 can use more tokens in some scenarios (Source: same).
+
+## Evaluations
+Scores for Opus 4.6 on benchmarks like MCP-Atlas and CyberGym have been updated in the source to reflect revised methodologies (Source: same).
 
 ## Related pages
-- [[concepts/claude-opus-4-7.md]]
-- [[entities/claude-sonnet-4-6.md]]
+- [[entities/claude-opus-4-7.md]]
+- [[concepts/tokenizer-updates.md]]
