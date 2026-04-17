@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateText } from 'ai';
-import { deepseekReasoning } from '@/lib/deepseek';
+import { lintModel } from '@/lib/models';
 import {
   listFiles, readMarkdown,
   readLintCache, writeLintCache,
@@ -101,7 +101,7 @@ Rules:
 - Only propose fixes with high confidence. Do not hallucinate paths.`;
 
     const { text: resultText } = await generateText({
-      model: deepseekReasoning,
+      model: lintModel,
       system: systemPrompt,
       prompt: `${cacheNote}Vault files to analyze:\n\n${vaultData.join('\n')}`,
     });

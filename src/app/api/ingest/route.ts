@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { streamText } from 'ai';
-import { deepseekReasoning } from '@/lib/deepseek';
+import { ingestModel } from '@/lib/models';
 import { writeMarkdownAndCommit } from '@/lib/vaultManager';
 import { extractTextFromUrl, extractTextFromPdf } from '@/lib/extractor';
 
@@ -89,7 +89,7 @@ Do not write any introductory or trailing conversational text outside the file b
           }
 
           const result = streamText({
-            model: deepseekReasoning,
+            model: ingestModel,
             system: systemPrompt,
             prompt: `Source: ${sourceUrl}\nBatch ${i+1} of ${batches.length}:\n\n${batches[i]}`
           });
@@ -126,7 +126,7 @@ Do not write any introductory or trailing conversational text outside the file b
           Output these files EXACTLY using the <file path="filename.md"> markup format. Do not use conversational text outside of these tags.`;
 
           const synth = streamText({
-             model: deepseekReasoning,
+             model: ingestModel,
              system: "You are the final Knowledge Consolidation Engine.",
              prompt: synthPrompt
           });
