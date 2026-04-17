@@ -4,40 +4,53 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+const QMD_TIMEOUT_MS = 10000;
+const QMD_PATH = 'export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd';
+
+function extractJSONArray(text: string): any[] | null {
+  const start = text.indexOf('[');
+  if (start === -1) return null;
+
+  let depth = 0;
+  for (let i = start; i < text.length; i++) {
+    if (text[i] === '[') depth++;
+    else if (text[i] === ']') depth--;
+    if (depth === 0) {
+      try {
+        return JSON.parse(text.substring(start, i + 1));
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
+async function runQmdQuery(query: string): Promise<any[]> {
+  const safeQ = query.replace(/"/g, '\\"');
+  const cmd = `${QMD_PATH} query "${safeQ}" --json`;
+
+  const { stdout } = await execAsync(cmd, { timeout: QMD_TIMEOUT_MS });
+  const results = extractJSONArray(stdout);
+  if (!results) throw new Error(`No JSON array found in qmd output`);
+  return results;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = url.searchParams.get('q');
-  
   if (!q) return NextResponse.json({ results: [] });
 
   try {
-    const safeQ = q.replace(/"/g, '\\"');
-    const { stdout } = await execAsync(`export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd query "${safeQ}" --json`);
-    
-    // qmd injects loading spinners and "Expanding query..." into stdout. Isolate the JSON array:
-    const startIndex = stdout.indexOf('[');
-    const endIndex = stdout.lastIndexOf(']');
-    
-    if (startIndex !== -1 && endIndex !== -1) {
-      const jsonStr = stdout.substring(startIndex, endIndex + 1);
-      const parsed = JSON.parse(jsonStr);
-      return NextResponse.json({ results: parsed });
-    } else {
-      console.warn('Could not parse JSON from qmd output:', stdout);
-      return NextResponse.json({ results: [] });
-    }
+    const results = await runQmdQuery(q);
+    return NextResponse.json({ results });
   } catch (err: any) {
-    if (err.stdout) {
-      const s = err.stdout.indexOf('[');
-      const e = err.stdout.lastIndexOf(']');
-      if (s !== -1 && e !== -1) {
-         try {
-            const parsed = JSON.parse(err.stdout.substring(s, e + 1));
-            return NextResponse.json({ results: parsed });
-         } catch(e2) {}
-      }
+    try {
+      const results = await runQmdQuery(q);
+      return NextResponse.json({ results });
+    } catch (retryErr: any) {
+      console.error('QMD Search Error (after retry):', retryErr.message);
+      return NextResponse.json({ error: retryErr.message, results: [] }, { status: 500 });
     }
-    console.error("QMD Search Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
