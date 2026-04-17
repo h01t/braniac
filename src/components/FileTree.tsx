@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState, useCallback } from 'react';
+import { useVaultId } from '@/lib/useVaultId';
 
 const FileIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.6 }}>
@@ -33,7 +34,8 @@ const ShimmerRow = () => (
   }} />
 );
 
-export default function FileTree({ vaultId }: { vaultId: string }) {
+export default function FileTree() {
+  const vaultId = useVaultId();
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});

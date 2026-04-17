@@ -5,6 +5,7 @@ import './globals.css';
 import styles from './layout.module.css';
 import Linter from '@/components/Linter';
 import FileTree from '@/components/FileTree';
+import VaultSelector from '@/components/VaultSelector';
 import SearchBar from '@/components/SearchBar';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -138,7 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <FileTree vaultId="default" />
               <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                <Linter vaultId="default" />
+                <Linter />
               </div>
             </div>
 

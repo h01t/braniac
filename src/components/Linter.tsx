@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useVaultId } from '@/lib/useVaultId';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -214,7 +215,8 @@ const mdComponents: any = {
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function Linter({ vaultId }: { vaultId: string }) {
+export default function Linter() {
+  const vaultId = useVaultId();
   const [phase, setPhase] = useState<Phase>('idle');
   const [result, setResult] = useState<LintResult | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
