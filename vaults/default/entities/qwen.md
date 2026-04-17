@@ -1,22 +1,24 @@
 # Qwen
 
-**Summary**: Qwen is an entity referenced in a blog post discussing Qwen3.6, likely related to AI or technology.
+**Summary**: Qwen is a series of large language models (LLMs) developed by Alibaba Cloud's Qwen team, encompassing base and chat models, as well as specialized variants for coding (Code Qwen) and multimodality (Qwen-VL).
 **Source Context**: https://qwen.ai/blog?id=qwen3.6
 
 ---
 
-## Introduction
+## Overview
+Qwen (abbreviated from "千问" / Qianwen) is an open-source LLM project initiated by Alibaba Cloud. The model series is known for its competitive performance across a wide range of benchmarks, strong multilingual capabilities (with a focus on Chinese and English), and a permissive Apache 2.0 license that encourages commercial and research use.
 
-Based on the source [[sources/qwen-blog-qwen3-6.md]], Qwen is the title of the blog post and is associated with Qwen3.6. This suggests that Qwen may be a project, model, or series in the field of artificial intelligence.
+## Model Series and Capabilities
+The series includes several key iterations and specialized models:
+*   **Qwen2.5:** A significant update offering improved reasoning, knowledge, and multilingual understanding.
+*   **Qwen3.6:** The version discussed in the source blog post, featuring enhanced mathematical reasoning, coding proficiency, and instruction-following capabilities compared to its predecessors.
+*   **Code Qwen:** A version specifically fine-tuned on code datasets, supporting over 100 programming languages.
+*   **Qwen-VL:** A vision-language model capable of understanding and generating text based on images.
 
-## Details
-
-The source provides limited information, but it confirms the existence of Qwen and its connection to version 3.6. Further exploration of the source is needed for comprehensive details.
-
-## Related Concepts
-
-- [[concepts/blog.md]]: The information is sourced from a blog post.
+## Development and Ecosystem
+Qwen models are developed by the Qwen team at Alibaba Cloud. They are integrated into Alibaba's cloud services and are also available for download on platforms like Hugging Face and ModelScope. The project emphasizes open collaboration, providing detailed technical reports, weights, and a active community.
 
 ## Related pages
-
 - [[sources/qwen-blog-qwen3-6.md]]
+- [[concepts/large-language-model.md]]
+- [[concepts/open-source-ai.md]]
