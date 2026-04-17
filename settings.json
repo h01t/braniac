@@ -1,0 +1,6 @@
+{
+  "ingestProvider": "deepseek",
+  "ingestModel": "deepseek-reasoner",
+  "lintProvider": "deepseek",
+  "lintModel": "deepseek-chat"
+}
