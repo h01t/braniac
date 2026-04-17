@@ -1,57 +1,16 @@
 import { NextResponse } from 'next/server';
 import { streamText } from 'ai';
 import { ingestModel } from '@/lib/models';
-import { writeMarkdownAndCommit } from '@/lib/vaultManager';
+import { writeMarkdownAndCommit, getCurrentCommitHash } from '@/lib/vaultManager';
 import { extractTextFromUrl, extractTextFromPdf } from '@/lib/extractor';
+import { chunkText } from '@/lib/chunker';
+import { parseAIOutput } from '@/lib/parser';
+import { exec } from 'child_process';
 
-export const maxDuration = 300; 
+export const maxDuration = 300;
 
-function chunkTextByWords(text: string, maxWords: number = 3000) {
-  const words = text.split(/\s+/);
-  const chunks = [];
-  for (let i = 0; i < words.length; i += maxWords) {
-    chunks.push(words.slice(i, i + maxWords).join(' '));
-  }
-  return chunks;
-}
+const SYSTEM_PROMPT = `You are a strict AI Knowledge Compiler. Your goal is to ingest the raw text and extract concepts, entities, and sources to build an interconnected Markdown wiki.
 
-export async function POST(request: Request) {
-  try {
-    const formData = await request.formData();
-    const vaultId = formData.get('vaultId') as string;
-    const textOrUrl = formData.get('text') as string;
-    const file = formData.get('file') as File | null;
-    
-    if (!vaultId) {
-      return NextResponse.json({ error: 'vaultId is required' }, { status: 400 });
-    }
-
-    let extractedText = textOrUrl || '';
-    let sourceUrl = 'Manual Input';
-
-    if (file) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const pdfText = await extractTextFromPdf(buffer);
-      if (pdfText) {
-        extractedText += `\n[Extracted from PDF: ${file.name}]\n` + pdfText;
-        sourceUrl = file.name;
-      }
-    } else if (textOrUrl && (textOrUrl.startsWith('http://') || textOrUrl.startsWith('https://'))) {
-      const pageText = await extractTextFromUrl(textOrUrl.trim());
-      if (pageText) {
-         extractedText = pageText;
-         sourceUrl = textOrUrl.trim();
-      }
-    }
-
-    if (!extractedText.trim()) {
-      return NextResponse.json({ error: 'No text could be extracted.' }, { status: 400 });
-    }
-
-    const batches = chunkTextByWords(extractedText, 3000);
-
-    const systemPrompt = `You are a strict AI Knowledge Compiler. Your goal is to ingest the raw text and extract concepts, entities, and sources to build an interconnected Markdown wiki.
-    
 Categorize files into folders by prefixing the filename. Use folders like 'concepts/', 'entities/', 'sources/'.
 
 Every wiki page you output MUST follow this exact Markdown structure:
@@ -76,88 +35,145 @@ You must output your response ONLY using the following XML-like file formatting.
 
 Do not write any introductory or trailing conversational text outside the file blocks. Keep filenames lowercase with hyphens.`;
 
+export async function POST(request: Request) {
+  try {
+    const formData = await request.formData();
+    const vaultId = formData.get('vaultId') as string;
+    const textOrUrl = formData.get('text') as string;
+    const file = formData.get('file') as File | null;
+
+    if (!vaultId) {
+      return NextResponse.json({ error: 'vaultId is required' }, { status: 400 });
+    }
+
+    let extractedText = textOrUrl || '';
+    let sourceUrl = 'Manual Input';
+
+    if (file) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const pdfText = await extractTextFromPdf(buffer);
+      if (pdfText) {
+        extractedText += `\n[Extracted from PDF: ${file.name}]\n` + pdfText;
+        sourceUrl = file.name;
+      }
+    } else if (textOrUrl && /^https?:\/\//i.test(textOrUrl)) {
+      const pageText = await extractTextFromUrl(textOrUrl.trim());
+      if (pageText) {
+        extractedText = pageText;
+        sourceUrl = textOrUrl.trim();
+      }
+    }
+
+    if (!extractedText.trim()) {
+      return NextResponse.json({ error: 'No text could be extracted.' }, { status: 400 });
+    }
+
+    const preIngestHash = await getCurrentCommitHash(vaultId);
+    const chunks = chunkText(extractedText, 3000, 200);
+
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
-        const sendChunk = (str: string) => controller.enqueue(encoder.encode(str));
-        
-        const allDerivedPaths: string[] = [];
+        const send = (s: string) => controller.enqueue(encoder.encode(s));
+        const allPaths: string[] = [];
+        let batchError: string | null = null;
 
-        for (let i = 0; i < batches.length; i++) {
-          if (batches.length > 1) {
-            sendChunk(`\n--- Processing Batch ${i+1}/${batches.length} ---\n\n`);
+        for (let i = 0; i < chunks.length; i++) {
+          if (chunks.length > 1) {
+            send(`\n--- Processing Chunk ${i + 1}/${chunks.length} (${chunks[i].wordCount} words) ---\n\n`);
           }
 
-          const result = streamText({
-            model: ingestModel,
-            system: systemPrompt,
-            prompt: `Source: ${sourceUrl}\nBatch ${i+1} of ${batches.length}:\n\n${batches[i]}`
+          try {
+            const result = streamText({
+              model: ingestModel,
+              system: SYSTEM_PROMPT,
+              prompt: `Source: ${sourceUrl}\nChunk ${i + 1} of ${chunks.length}:\n\n${chunks[i].text}`,
+            });
+
+            let fullText = '';
+            for await (const part of result.textStream) {
+              send(part);
+              fullText += part;
+            }
+
+            const parsed = parseAIOutput(fullText);
+            if (parsed.length === 0) {
+              send(`\n⚠️ No valid file blocks found in chunk ${i + 1}. Output may have been malformed.\n`);
+              continue;
+            }
+
+            for (const f of parsed) {
+              if (!allPaths.includes(f.path)) allPaths.push(f.path);
+              await writeMarkdownAndCommit(vaultId, f.path, f.content, `Compiled: ${f.path} from chunk ${i + 1} (${sourceUrl})`);
+            }
+
+            send(`\n✅ Parsed ${parsed.length} file(s) from chunk ${i + 1}\n`);
+          } catch (err: any) {
+            batchError = `Chunk ${i + 1} failed: ${err.message}`;
+            send(`\n❌ ${batchError}\n`);
+            break;
+          }
+        }
+
+        if (chunks.length > 1 && allPaths.length > 0 && !batchError) {
+          send(`\n\n--- Generating Consolidation Report ---\n\n`);
+
+          try {
+            const synthPrompt = `You have just extracted knowledge across ${chunks.length} sequential chunks from "${sourceUrl}".
+Files generated: ${allPaths.join(', ')}.
+
+Generate three structural files:
+1. <file path="index.md">: Table of contents with one-line descriptions.
+2. <file path="glossary.md">: Key terms and acronyms.
+3. <file path="log.md">: Date, source, and changes introduced.
+
+Output EXACTLY using <file path="filename.md"> markup. No conversational text.`;
+
+            const synth = streamText({
+              model: ingestModel,
+              system: 'You are the final Knowledge Consolidation Engine.',
+              prompt: synthPrompt,
+            });
+
+            let synthText = '';
+            for await (const part of synth.textStream) {
+              send(part);
+              synthText += part;
+            }
+
+            const synthFiles = parseAIOutput(synthText);
+            for (const f of synthFiles) {
+              await writeMarkdownAndCommit(vaultId, f.path, f.content, `Consolidation: ${f.path} for ${sourceUrl}`);
+            }
+          } catch (err: any) {
+            send(`\n⚠️ Consolidation failed: ${err.message}\n`);
+          }
+        }
+
+        if (batchError && preIngestHash) {
+          send(`\n🔄 Rolling back vault to pre-ingest state (${preIngestHash.slice(0, 8)})...\n`);
+          try {
+            const { simpleGit } = await import('simple-git');
+            const path = await import('path');
+            const vaultPath = path.join(process.cwd(), 'vaults', vaultId);
+            const git = simpleGit(vaultPath);
+            await git.reset(['--hard', preIngestHash]);
+            send(`✅ Rollback complete.\n`);
+          } catch (rollbackErr: any) {
+            send(`❌ Rollback failed: ${rollbackErr.message}\n`);
+          }
+        }
+
+        if (allPaths.length > 0 && !batchError) {
+          exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: any) => {
+            if (err) console.error('qmd background update failed', err);
+            else console.log('qmd background update finished');
           });
-
-          let batchFullText = "";
-          for await (const chunk of result.textStream) {
-             sendChunk(chunk);
-             batchFullText += chunk;
-          }
-
-          // Force flush of XML blocks mapped out by AI
-          const regex = /<file path="([^"]+)">([\s\S]*?)<\/file>/g;
-          let match;
-          while ((match = regex.exec(batchFullText)) !== null) {
-            const filepath = match[1];
-            const content = match[2].trim();
-            if (!allDerivedPaths.includes(filepath)) allDerivedPaths.push(filepath);
-            await writeMarkdownAndCommit(vaultId, filepath, content, `Compiled: ${filepath} from batch ${i+1} (${sourceUrl})`);
-          }
         }
 
-        // Final consolidation report if multiple batches were used
-        if (batches.length > 1) {
-          sendChunk(`\n\n--- Generating Final Consolidation Report ---\n\n`);
-          
-          const synthPrompt = `You have just extracted knowledge across ${batches.length} sequential batches from the source "${sourceUrl}".
-          The following files were generated into the knowledge vault: ${allDerivedPaths.join(', ')}.
-          
-          Based on the newly extracted knowledge and the context of what was just added, you must generate three overarching structural files:
-          1. <file path="index.md">: Provide the table of contents for the overarching concepts touched spanning the document, with one-line descriptions.
-          2. <file path="glossary.md">: Define all key terms, acronyms, and specialized nomenclature found in the source.
-          3. <file path="log.md">: Record an entry detailing the date, source name, and exactly what concepts were fundamentally changed or introduced from this ingestion.
-          
-          Output these files EXACTLY using the <file path="filename.md"> markup format. Do not use conversational text outside of these tags.`;
-
-          const synth = streamText({
-             model: ingestModel,
-             system: "You are the final Knowledge Consolidation Engine.",
-             prompt: synthPrompt
-          });
-
-          let synthFullText = "";
-          for await (const chunk of synth.textStream) {
-             sendChunk(chunk);
-             synthFullText += chunk;
-          }
-
-          const regex = /<file path="([^"]+)">([\s\S]*?)<\/file>/g;
-          let match;
-          if ((match = regex.exec(synthFullText)) !== null) {
-              await writeMarkdownAndCommit(vaultId, match[1], match[2].trim(), `Generated Consolidation Report for ${sourceUrl}`);
-          }
-        }
-        
-        // Full re-index after ingestion: `qmd update` re-scans the collection,
-        // removes stale entries for deleted/moved files, and embeds new ones.
-        // `qmd embed` alone only adds — it never removes stale index entries.
-        if (allDerivedPaths.length > 0) {
-           const { exec } = require('child_process');
-           exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: any) => {
-              if (err) console.error("qmd background update failed", err);
-              else console.log("qmd background update + embed finished");
-           });
-        }
-
-        sendChunk(`\n\n[Ingestion Complete]`);
+        send(batchError ? `\n\n[Ingestion Failed — Rolled Back]` : `\n\n[Ingestion Complete: ${allPaths.length} files]`);
         controller.close();
-      }
+      },
     });
 
     return new Response(stream, {
@@ -166,10 +182,10 @@ Do not write any introductory or trailing conversational text outside the file b
         'Transfer-Encoding': 'chunked',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-      }
+      },
     });
   } catch (err: any) {
-    console.error("Ingestion Error", err);
+    console.error('Ingestion Error', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
