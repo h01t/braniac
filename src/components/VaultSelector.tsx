@@ -31,7 +31,6 @@ export default function VaultSelector() {
     setActive(id);
     localStorage.setItem(STORAGE_KEY, id);
     window.dispatchEvent(new CustomEvent('vault-changed', { detail: { vaultId: id } }));
-    window.dispatchEvent(new CustomEvent('vault-updated'));
   };
 
   const createVault = async () => {

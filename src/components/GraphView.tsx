@@ -63,6 +63,12 @@ export default function GraphView() {
   const [panelVisible, setPanelVisible] = useState(false);
   const fgRef = useRef<any>(null);
 
+  useEffect(() => {
+    setSelectedNode(null);
+    setMarkdownContent('');
+    setPanelVisible(false);
+  }, [vaultId]);
+
   const fetchGraph = useCallback(() => {
     fetch(`/api/vaults/${vaultId}/graph`)
       .then(res => res.json())
@@ -134,6 +140,7 @@ export default function GraphView() {
       {data.nodes.length === 0 && <EmptyState />}
 
       <ForceGraph2D
+        key={vaultId}
         ref={fgRef}
         graphData={data}
         nodeLabel="name"
