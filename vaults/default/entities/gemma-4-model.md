@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-"Gemma-4" refers to a language model file available via the LM Studio application, a desktop tool for running and experimenting with [[concepts/large-language-model.md]] locally. The source page provides no technical details about the model's architecture, training, or origin, only its availability on the platform.
+"Gemma-4" refers to a language model file available via the LM Studio application, a desktop tool for running and experimenting with [[concepts/large-language-model.md]] locally. The source page provides no technical details about the model's architecture, training, or origin, only its availability on the platform. It is likely a quantized version of a model from the Gemma family, converted into the [[concepts/gguf-format.md]].
 
 ## Key Information
 The model is listed on the LM Studio platform, indicating it has been formatted and optimized for local use with their software. LM Studio simplifies the process of downloading, loading, and interacting with models without requiring extensive technical setup (Source: https://lmstudio.ai/models/gemma-4).
@@ -23,3 +23,4 @@ The model file is hosted and distributed through the LM Studio platform. Users c
 - [[concepts/large-language-model.md]]
 - [[concepts/ai-inference.md]]
 - [[concepts/model-fine-tuning.md]]
+- [[concepts/gguf-format.md]]
