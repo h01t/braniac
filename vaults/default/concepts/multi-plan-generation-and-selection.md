@@ -20,4 +20,5 @@ Multi-Plan Generation and Selection is a core component of the [[concepts/reason
 - [[concepts/reasoning-system.md]]
 - [[concepts/task-decomposition.md]]
 - [[concepts/tree-of-thought.md]]
+- [[concepts/graph-of-thoughts.md]]
 - [[concepts/monte-carlo-tree-search.md]]
