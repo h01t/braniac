@@ -5,33 +5,29 @@ import path from 'path';
 import os from 'os';
 
 const execFileAsync = promisify(execFile);
-const GRAPPER_BIN = '/Users/grmim/Dev/grapper/target/release/grapper';
 
-export async function extractTextFromUrl(url: string) {
+const GRAPPER_BIN = process.env.GRAPPER_PATH || '/Users/grmim/Dev/grapper/target/release/grapper';
+
+export async function extractTextFromUrl(url: string): Promise<string | null> {
   try {
-    const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', url]);
-    return stdout;
+    const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', url], { timeout: 30000 });
+    return stdout.trim() || null;
   } catch (err) {
-    console.error("URL extraction error (grapper)", err);
+    console.error('grapper URL extraction failed:', err);
     return null;
   }
 }
 
-export async function extractTextFromPdf(buffer: Buffer) {
+export async function extractTextFromPdf(buffer: Buffer): Promise<string | null> {
+  const tmpPath = path.join(os.tmpdir(), `grapper-input-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
   try {
-     const uniqueId = Date.now().toString() + Math.random().toString().slice(2);
-     const tmpFilePath = path.join(os.tmpdir(), `ai-knowledge-${uniqueId}.pdf`);
-     await fs.writeFile(tmpFilePath, buffer);
-     
-     // Delegate to Grapper High-Performance Rust engine
-     const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', tmpFilePath]);
-     
-     // Ensure we clean up the tmp PDF
-     await fs.unlink(tmpFilePath).catch(() => {});
-     
-     return stdout;
+    await fs.writeFile(tmpPath, buffer);
+    const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', tmpPath], { timeout: 30000 });
+    return stdout.trim() || null;
   } catch (err) {
-     console.error("PDF Extraction error (grapper)", err);
-     return null;
+    console.error('grapper PDF extraction failed:', err);
+    return null;
+  } finally {
+    await fs.unlink(tmpPath).catch(() => {});
   }
 }
