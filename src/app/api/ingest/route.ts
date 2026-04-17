@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { streamText } from 'ai';
-import { ingestModel } from '@/lib/models';
+import { getIngestModel } from '@/lib/models';
 import { writeMarkdownAndCommit, getCurrentCommitHash } from '@/lib/vaultManager';
 import { extractTextFromUrl, extractTextFromPdf } from '@/lib/extractor';
 import { chunkText } from '@/lib/chunker';
@@ -73,6 +73,7 @@ export async function POST(request: Request) {
 
     const stream = new ReadableStream({
       async start(controller) {
+        const ingestModel = await getIngestModel();
         const encoder = new TextEncoder();
         const send = (s: string) => controller.enqueue(encoder.encode(s));
         const allPaths: string[] = [];

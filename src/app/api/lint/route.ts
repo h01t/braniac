@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateText } from 'ai';
-import { lintModel } from '@/lib/models';
+import { getLintModel } from '@/lib/models';
 import {
   listFiles, readMarkdown,
   readLintCache, writeLintCache,
@@ -20,6 +20,7 @@ export async function POST(request: Request) {
     }
 
     return withVaultLock(vaultId, async () => {
+      const lintModel = await getLintModel();
       const files = await listFiles(vaultId);
       if (!files || files.length === 0) {
         return NextResponse.json({
