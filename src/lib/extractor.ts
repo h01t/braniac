@@ -6,7 +6,7 @@ import os from 'os';
 
 const execFileAsync = promisify(execFile);
 
-const GRAPPER_BIN = process.env.GRAPPER_PATH || '/usr/local/bin/grapper';
+const GRAPPER_BIN = process.env.GRAPPER_PATH || '/Users/grmim/Dev/grapper/target/release/grapper';
 
 export async function extractTextFromUrl(url: string): Promise<string | null> {
   try {
