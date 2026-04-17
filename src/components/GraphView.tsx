@@ -54,7 +54,8 @@ const EmptyState = () => (
   </div>
 );
 
-export default function GraphView({ vaultId }: { vaultId: string }) {
+export default function GraphView() {
+  const vaultId = useVaultId();
   const [data, setData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [markdownContent, setMarkdownContent] = useState('');

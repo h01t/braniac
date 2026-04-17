@@ -24,7 +24,8 @@ const Spinner = () => (
   }} />
 );
 
-export default function IngestBar({ vaultId }: { vaultId: string }) {
+export default function IngestBar() {
+  const vaultId = useVaultId();
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);

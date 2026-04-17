@@ -7,8 +7,8 @@ const GraphView = dynamic(() => import('@/components/GraphView'), { ssr: false }
 export default function Home() {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <GraphView vaultId="default" />
-      <IngestBar vaultId="default" />
+      <GraphView />
+      <IngestBar />
     </div>
   );
 }

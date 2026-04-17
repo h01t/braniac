@@ -49,16 +49,17 @@ function formatDate(dateStr: string) {
 }
 
 export default function EvalOps() {
+  const vaultId = useVaultId();
   const [history, setHistory] = useState<any[]>([]);
   const [selectedCommit, setSelectedCommit] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<string>('');
   const [diff, setDiff] = useState('');
 
   useEffect(() => {
-    fetch('/api/vaults/default/history')
+    fetch(`/api/vaults/${vaultId}/history`)
       .then(res => res.json())
       .then(d => setHistory(d.history || []));
-  }, []);
+  }, [vaultId]);
 
   const loadDiff = (hash: string, message: string) => {
     setSelectedCommit(hash);
