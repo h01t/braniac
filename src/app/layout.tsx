@@ -133,11 +133,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Sidebar content */}
             <div className={styles.sidebarContent}>
               <SearchBar />
-              <div className={styles.vaultLabel}>
-                <span className={styles.vaultDot} />
-                Vault: default
-              </div>
-              <FileTree vaultId="default" />
+              <VaultSelector />
+              <FileTree />
               <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
                 <Linter />
               </div>

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { useVaultId } from '@/lib/useVaultId';
 
 const LightningIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none">
