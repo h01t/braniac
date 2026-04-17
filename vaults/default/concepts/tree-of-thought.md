@@ -1,23 +1,31 @@
 # Tree-of-Thought (ToT)
 
-**Summary**: A reasoning technique that explores multiple reasoning paths in a tree structure, allowing the LLM to consider different possibilities and backtrack if needed.
+**Summary**: A reasoning approach using tree-like structures to generate and evaluate multiple plans or thoughts, often integrated with search algorithms like BFS or DFS for optimal selection.
 **Source Context**: Fundamentals of Building Autonomous LLM Agents.pdf
 
 ---
 
-## Use in Agents
+## Definition
+Tree-of-Thought is a technique for multi-plan generation and selection within [[concepts/reasoning-system.md]], where LLMs explore branching reasoning paths in a tree structure (Source: Section 4.2, Table 2).
 
-ToT is used in the [[concepts/reasoning-system.md]] to handle complex tasks that require exploration and backtracking.
+## Mechanism
+- **Expansion and Selection**: Uses search algorithms like Breadth-First Search (BFS) and Depth-First Search (DFS) to expand thoughts and evaluate multiple actions for optimal choice (Source: Section 4.2).
+- **Graph Extension**: Graph-of-Thoughts (GoT) extends ToT with graph structures for flexible thought aggregation (Source: Table 2).
 
-## Benefits
+## Relation to Other Methods
+- Similar to LLM-MCTS and RAP, which use tree structures with [[concepts/monte-carlo-tree-search.md]] for multi-plan searches (Source: Section 4.2).
+- Part of broader multi-plan selection strategies that include self-consistency (majority vote) (Source: Section 4.2).
 
-ToT can improve the robustness of planning by considering alternative steps and evaluating them.
+## Advantages and Challenges
+**Advantages**:
+- Explores diverse solutions for robust planning (Source: Table 2).
+- Scalable for complex tasks with large search spaces (Source: Table 2).
 
-## Relation to CoT
-
-ToT extends the idea of [[concepts/chain-of-thought.md]] by allowing branching and systematic search.
+**Challenges**:
+- High computational demands (Source: Table 2).
+- Stochastic LLM nature may affect plan consistency (Source: Section 4.2).
 
 ## Related pages
 - [[concepts/reasoning-system.md]]
-- [[concepts/chain-of-thought.md]]
-- [[sources/fundamentals-of-building-autonomous-llm-agents.md]]
+- [[concepts/monte-carlo-tree-search.md]]
+- [[concepts/multi-plan-generation.md]]
