@@ -1,20 +1,18 @@
 # Knowledge Base Index
 
 ## Entities
-* **claude-3-5-opus-4-7.md** - Documentation for the Claude 3.5 Opus 4.7 model release.
-* **anthropic.md** - Core information about the AI safety and research company Anthropic.
+* **claude-opus-4-7.md** - Documentation for the Claude Opus 4.7 model release. (Note: 'Claude 3.5 Opus 4.7' is an alternative name for the same model).
+* **anthropic-pbc.md** - Core information about the AI safety and research company Anthropic.
 * **claude-opus-4-6.md** - Details on the previous model version, Claude Opus 4.6.
 * **claude-mythos-preview.md** - Information about the Claude Mythos model preview.
 * **claude-sonnet-4-6.md** - Details on the Claude Sonnet 4.6 model.
 * **cyber-verification-program.md** - Information on Anthropic's cybersecurity verification initiative.
 * **partner-testimonials.md** - Collected feedback from enterprise partners on Claude's performance.
-* **claude-opus-4-7.md** - Primary entity file for the Claude Opus 4.7 model.
-* **mythos-preview.md** - Alternative entity file for the Mythos model preview.
 * **claude-code.md** - Information about Claude's specialized coding capabilities.
 * **claude-platform-api.md** - Documentation for the Claude API and platform features.
 * **claude-design.md** - Information on Claude's core design principles and architecture.
 * **anthropic-long-term-benefit-trust.md** - Details on Anthropic's unique governance structure.
-* **anthropic-pbc.md** - Information on Anthropic's status as a Public Benefit Corporation.
+* **mythos-preview.md** - Alternate entity file for the Mythos model preview.
 
 ## Concepts
 * **enterprise-ai-assistant.md** - Core concept of Claude as an enterprise-grade AI assistant.
@@ -38,9 +36,7 @@
 
 ## Sources
 * **anthropic-news-claude-opus-4-7.md** - Primary source article from Anthropic's news page.
-* **anthropic-claude-opus-4-7-chunk-2.md** - Second sequential chunk of extracted source content.
 * **anthropic-news-claude-opus-4-7-announcement.md** - Announcement documentation for the 4.7 release.
 * **claude-opus-4-7-system-card.md** - Technical system documentation for the Opus 4.7 model.
 * **claude-opus-4-7-announcement.md** - Alternate announcement source for the model release.
 * **migration-guide.md** - Guidance for users migrating to the new Claude Opus 4.7 model.
-</file path="index.md">
