@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { simpleGit, SimpleGit } from 'simple-git';
+import { withVaultLock } from './lock';
 
 const VAULTS_ROOT = path.join(process.cwd(), 'vaults');
 
@@ -168,13 +169,15 @@ export async function getChangedFilesSince(vaultId: string, commitHash: string):
 // ── File deletion ────────────────────────────────────────────────────────────
 
 export async function deleteFileAndCommit(vaultId: string, filename: string, commitMessage: string) {
-  const vaultPath = path.join(VAULTS_ROOT, vaultId);
-  const filePath = path.join(vaultPath, filename);
-  await fs.unlink(filePath);
-  const git: SimpleGit = simpleGit(vaultPath);
-  await git.rm([filename]);
-  await git.commit(commitMessage);
-  return { success: true };
+  return withVaultLock(vaultId, async () => {
+    const vaultPath = path.join(VAULTS_ROOT, vaultId);
+    const filePath = path.join(vaultPath, filename);
+    await fs.unlink(filePath);
+    const git: SimpleGit = simpleGit(vaultPath);
+    await git.rm([filename]);
+    await git.commit(commitMessage);
+    return { success: true };
+  });
 }
 
 // ── Diff generation ──────────────────────────────────────────────────────────
