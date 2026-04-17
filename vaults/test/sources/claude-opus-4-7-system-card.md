@@ -1,16 +1,16 @@
 # Claude Opus 4.7 System Card
 
-**Summary**: A detailed safety and alignment assessment document published by Anthropic alongside the Claude Opus 4.7 model release.
-**Source Context**: https://www.anthropic.com/news/claude-opus-4-7
+**Summary**: A detailed document from Anthropic discussing the safety evaluations and alignment assessments for Claude Opus 4.7, including rates of misaligned behavior and resistance to attacks.
+**Source Context**: Referenced in https://www.anthropic.com/news/claude-opus-4-7, likely available at https://anthropic.com/claude-opus-4-7-system-card
 
 ---
 
 ## Description
-The Claude Opus 4.7 System Card is a companion document to the main announcement. It provides an in-depth discussion of Anthropic's safety evaluations for the [[concepts/claude-opus-4-7.md]] model.
+The System Card provides in-depth analysis of Claude Opus 4.7's behavior, covering automated behavioral audits, metrics like deception and sycophancy, and improvements in areas such as prompt injection resistance. It is cited in the announcement for full safety discussions (Source: https://www.anthropic.com/news/claude-opus-4-7).
 
-## Content Referenced in Announcement
-The main news article states that "our safety evaluations are discussed in full in the Claude Opus 4.7 System Card" (Source: Anthropic News). It summarizes findings from this card, noting that Opus 4.7 has a similar safety profile to Opus 4.6, with improvements in honesty and prompt injection resistance, but is "modestly weaker" in areas like harm-reduction advice for controlled substances (Source: Anthropic News). The card also presumably contains the full "alignment assessment" that concluded the model is "largely well-aligned and trustworthy, though not fully ideal in its behavior" (Source: Anthropic News).
+## Relevance
+This source supports claims about Opus 4.7's safety profile and alignment status, serving as a key reference for [[concepts/safety-alignment.md]] and [[entities/claude-opus-4-7.md]].
 
 ## Related pages
-- [[concepts/claude-opus-4-7.md]]
-- [[sources/anthropic-news-claude-opus-4-7-announcement.md]]
+- [[concepts/safety-alignment.md]]
+- [[entities/claude-opus-4-7.md]]
