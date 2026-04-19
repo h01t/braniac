@@ -1,25 +1,23 @@
 # Kimi K2.5
 
-**Summary**: A scalable and general agentic intelligence model from Moonshot AI that unifies language and vision through joint multimodal pre-training and utilizes an Agent Swarm architecture for parallel task execution.
-**Source Context**: 2602.02276v1.pdf
+**Summary**: An advanced AI system capable of complex multimodal understanding, long-context analysis, and tool-augmented reasoning, as described in a technical report.
+**Source Context**: 2602.02276v1.pdf, Chunk 6.
 
 ---
 
-## Model Description
-Kimi K2.5 is a model developed by **[[entities/moonshot-ai.md]]** (Source: 2602.02276v1.pdf). It is presented as a demonstration that scalable and general agentic intelligence can be achieved through the joint optimization of text and vision together with parallel agent execution (Source: 2602.02276v1.pdf).
+## Capabilities and Architecture
+**Kimi K2.5** is a system demonstrating proficiency in several advanced AI domains:
+- **Long-Form Multimodal Understanding**: Can analyze extensive, continuous multimodal data, such as a 24-hour video playthrough, using a [[concepts/multi-agent-visual-analysis.md]].
+- **Tool-Augmented Reasoning**: Effectively utilizes a suite of external tools including search, browsing, code execution, and sub-agent delegation (see [[concepts/tool-augmented-reasoning.md]]).
+- **Visual Reasoning**: Solves complex visual problems like maze navigation, chart analysis, and difference detection by decomposing them into executable code steps (see [[concepts/visual-reasoning.md]]).
 
-## Core Architectural Features
-1.  **Multimodal Foundation**: The model unifies language and vision across pre-training and reinforcement learning to achieve strong **[[concepts/cross-modal-alignment.md]]** and **[[concepts/vision-text-reasoning.md]]** (Source: 2602.02276v1.pdf).
-2.  **Agent Swarm**: It employs the **[[concepts/agent-swarm.md]]** architecture to enable concurrent execution of heterogeneous sub-tasks, reducing inference latency while improving performance on complex agentic workloads (Source: 2602.02276v1.pdf).
+## Demonstrated Performance
+The report includes qualitative examples (Figures 11 & 12) showcasing these capabilities. It also cites an external evaluation metric, the **GDPVal-AA** score from Artificial Analysis, reported on a leaderboard as of January 28, 2026 (see [[sources/gdpval-aa-evaluation.md]]).
 
-## Performance and Release
-The model is reported to demonstrate strong performance on benchmarks and real-world tasks (Source: 2602.02276v1.pdf). Moonshot AI has open-sourced the post-trained checkpoints with the aim of supporting the open-source community in building scalable agentic systems and accelerating progress toward General Agentic Intelligence (Source: 2602.02276v1.pdf).
-
-## Pre-training Data
-The pre-training corpus includes curated, high-quality text data from Web Text, Code, Mathematics, and Knowledge domains (Source: 2602.02276v1.pdf). Enhanced code intelligence was a focus, with upweighted repository-level code, issues, commit histories, and code-related documents (Source: 2602.02276v1.pdf).
+## Technical Features
+The system's design emphasizes parallel processing and hierarchical coordination to manage scale and complexity, moving beyond pure language modeling to active, tool-using problem-solving.
 
 ## Related pages
-- [[entities/moonshot-ai.md]]
-- [[concepts/agent-swarm.md]]
-- [[concepts/multimodal-pre-training.md]]
-- [[sources/kimi-k2-technical-report.md]]
+- [[concepts/multi-agent-visual-analysis.md]]
+- [[concepts/tool-augmented-reasoning.md]]
+- [[sources/gdpval-aa-evaluation.md]]
