@@ -1,24 +1,26 @@
 # Large Language Model (LLM)
 
-**Summary**: A Large Language Model (LLM) is a type of artificial intelligence model trained on vast amounts of text data to understand, generate, and manipulate human language.
-**Source Context**: General knowledge concept.
+**Summary**: A Large Language Model (LLM) is a type of artificial intelligence model based on deep learning architectures, most commonly the Transformer, that is trained on vast amounts of text data to understand, generate, and manipulate human language.
+**Source Context**: https://intuitionlabs.ai/articles/chinese-open-source-llms-2025
 
 ---
 
-## Core Definition
-A Large Language Model is a deep learning model, typically based on the transformer architecture, that is trained on a massive corpus of text data. This training enables the model to perform a wide range of natural language processing (NLP) tasks, such as text generation, translation, summarization, and question answering.
+## Core Architecture and Training
+LLMs are typically built on the Transformer architecture, which uses self-attention mechanisms. They are pre-trained on massive, diverse text corpora in a self-supervised manner (e.g., predicting the next word). This process allows them to learn grammar, facts, reasoning abilities, and even cultural nuances.
 
-## Key Characteristics
-*   **Scale:** Defined by a large number of parameters (often billions or trillions).
-*   **Generalization:** Capable of performing tasks they were not explicitly trained on via in-context learning (prompting).
-*   **Architecture:** Most modern LLMs are based on the decoder-only or encoder-decoder transformer architecture.
-*   **Training:** Involves pre-training on a broad dataset followed by potential fine-tuning or alignment for specific behaviors or tasks.
+## Capabilities and Applications
+Modern LLMs can perform a wide range of natural language processing tasks, including text generation, translation, summarization, question answering, and coding. They form the foundation for chatbots, AI assistants, and other AI applications. Advanced variants may be **multimodal**, processing and generating not just text but also images, audio, and video.
 
-## Usage Context
-LLMs power AI assistants (like Claude and ChatGPT), are integrated into various software tools, and can be run locally in quantized formats (like GGUF) for private inference. They form the foundation for much of contemporary generative AI.
+## Evolution and Scale
+The field is characterized by rapid scaling in terms of model parameters (from millions to hundreds of billions), training data size, and computational requirements. Innovations like [[concepts/mixture-of-experts.md]] (MoE) architectures aim to improve efficiency by activating only a subset of the model's parameters for a given task.
+
+## Context of the Article
+The article surveys the [[concepts/chinese-open-source-llm-landscape-2025.md]], noting that by mid-2025, China accounted for a large plurality of the world's publicly released LLMs [^1]. These models range from general-purpose foundation models to specialized chatbots and domain experts.
+
+## References
+[^1]: Reuters - China's AI startup Zhipu releases open-source model GLM-4.5 (2025-07-28)
 
 ## Related pages
-- [[concepts/transformer-architecture.md]]
-- [[concepts/model-quantization.md]]
-- [[concepts/ai-inference.md]]
-- [[concepts/gguf-format.md]]
+- [[concepts/chinese-open-source-llm-landscape-2025.md]]
+- [[concepts/mixture-of-experts.md]]
+- [[concepts/open-source-ai.md]]
