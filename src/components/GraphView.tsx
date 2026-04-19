@@ -60,13 +60,22 @@ export default function GraphView() {
   const [data, setData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [markdownContent, setMarkdownContent] = useState('');
+  const [markdownCache, setMarkdownCache] = useState<Record<string, string>>({});
   const [panelVisible, setPanelVisible] = useState(false);
   const fgRef = useRef<any>(null);
+
+  const getCachedMarkdown = useCallback((filePath: string) => {
+    if (markdownCache[filePath]) {
+      return markdownCache[filePath];
+    }
+    return null;
+  }, [markdownCache]);
 
   useEffect(() => {
     setSelectedNode(null);
     setMarkdownContent('');
     setPanelVisible(false);
+    setMarkdownCache({});
   }, [vaultId]);
 
   const fetchGraph = useCallback(() => {
@@ -87,24 +96,32 @@ export default function GraphView() {
   const openNode = useCallback((node: any) => {
     setSelectedNode(node);
     setPanelVisible(false);
-    fetch(`/api/vaults/${vaultId}/content?filename=${node.id}`)
-      .then(res => res.json())
-      .then(d => {
-        const raw = d.content || '*Content missing or node is uncreated.*';
-        // Convert [[wikilinks]] → markdown links with wikilink: scheme for click-through
-        const processed = raw.replace(/\[\[([^\]]+)\]\]/g, (_: string, target: string) => {
-          const id = target.endsWith('.md') ? target : `${target}.md`;
-          const label = id.split('/').pop()?.replace('.md', '') ?? id;
-          return `[${label}](wikilink:${id})`;
+
+    const cached = getCachedMarkdown(node.id);
+    if (cached) {
+      setMarkdownContent(cached);
+      requestAnimationFrame(() => setPanelVisible(true));
+    } else {
+      fetch(`/api/vaults/${vaultId}/content?filename=${node.id}`)
+        .then(res => res.json())
+        .then(d => {
+          const raw = d.content || '*Content missing or node is uncreated.*';
+          // Convert [[wikilinks]] → markdown links with wikilink: scheme for click-through
+          const processed = raw.replace(/\[\[([^\]]+)\]\]/g, (_: string, target: string) => {
+            const id = target.endsWith('.md') ? target : `${target}.md`;
+            const label = id.split('/').pop()?.replace('.md', '') ?? id;
+            return `[${label}](wikilink:${id})`;
+          });
+          setMarkdownContent(processed);
+          setMarkdownCache(prev => ({ ...prev, [node.id]: processed }));
+          requestAnimationFrame(() => setPanelVisible(true));
         });
-        setMarkdownContent(processed);
-        requestAnimationFrame(() => setPanelVisible(true));
-      });
+    }
     if (fgRef.current) {
       fgRef.current.centerAt(node.x, node.y, 800);
       fgRef.current.zoom(2.8, 1000);
     }
-  }, [vaultId]);
+  }, [vaultId, getCachedMarkdown]);
 
   const closePanel = useCallback(() => {
     setPanelVisible(false);
