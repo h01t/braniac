@@ -11,4 +11,4 @@ Specific enhancements include upweighting code-centric data to improve repositor
 
 ## Related pages
 - [[concepts/early-fusion-multimodal-pre-training.md]]
-- [[entities/kimi-k2-5-model.md]]
+- [[entities/kimi-k2-5.md]]
