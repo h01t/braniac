@@ -34,11 +34,23 @@ const ShimmerRow = () => (
   }} />
 );
 
+const VISIBLE_ROW_HEIGHT = 28; // pixels per row
+const VISIBLE_GAP = 8; // pixels between rows
+
 export default function FileTree() {
   const vaultId = useVaultId();
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [scrollTop, setScrollTop] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
+
+  const getVisibleRange = useCallback(() => {
+    const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const startRow = Math.floor(scrollTop / VISIBLE_ROW_HEIGHT);
+    const endRow = startRow + Math.ceil((windowHeight / VISIBLE_ROW_HEIGHT) * 5);
+    return { start: startRow * VISIBLE_ROW_HEIGHT, end: endRow * VISIBLE_ROW_HEIGHT };
+  }, [scrollTop]);
 
   const fetchFiles = useCallback(() => {
     setLoading(true);
@@ -46,7 +58,12 @@ export default function FileTree() {
       .then(res => res.json())
       .then(d => {
         if (d.files) {
-          setFiles(d.files.sort((a: any, b: any) => a.path.localeCompare(b.path)));
+          const filesWithRows = d.files.sort((a: any, b: any) => a.path.localeCompare(b.path)).map((f: any, i: number) => ({
+            ...f,
+            row: i
+          }));
+          setFiles(filesWithRows);
+          setFileCount(d.files.length);
         }
       })
       .catch(err => console.error('Could not fetch file tree', err))
@@ -63,8 +80,24 @@ export default function FileTree() {
     return () => window.removeEventListener('vault-updated', handler);
   }, [fetchFiles]);
 
+  useEffect(() => {
+    const handler = () => {
+      const range = getVisibleRange();
+      setScrollTop(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  const visibleRange = getVisibleRange();
+  const visibleFiles = files.filter(f => {
+    const rowStart = Math.floor(visibleRange.start / VISIBLE_ROW_HEIGHT);
+    return f.row >= rowStart && f.row < visibleRange.end;
+  });
+
   const tree: Record<string, string[]> = {};
-  files.forEach(f => {
+  visibleFiles.forEach(f => {
     const parts = f.path.split('/');
     const dir = parts.length > 1 ? parts.slice(0, -1).join('/') : 'root';
     if (!tree[dir]) tree[dir] = [];
@@ -98,6 +131,11 @@ export default function FileTree() {
 
   return (
     <div style={{ flex: 1, fontSize: '12.5px', color: 'var(--text-muted)', paddingBottom: '8px' }}>
+      {fileCount > 0 && (
+        <div style={{ padding: '4px 8px', marginBottom: '8px', fontSize: '11px', color: 'var(--text-dim)' }}>
+          {fileCount} files
+        </div>
+      )}
       {Object.entries(tree).map(([dir, fnames]) => {
         const isOpen = collapsed[dir] !== true;
         return (
