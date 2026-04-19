@@ -4,7 +4,7 @@ interface Chunk {
   wordCount: number;
 }
 
-export function chunkText(text: string, maxWords: number = 3000, overlapWords: number = 200): Chunk[] {
+export function chunkText(text: string, maxWords: number = 3000, overlapWords: number = 150): Chunk[] {
   const sections = splitBySections(text);
   const chunks: Chunk[] = [];
   let currentParts: string[] = [];
