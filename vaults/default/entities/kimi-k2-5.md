@@ -1,29 +1,25 @@
 # Kimi K2.5
 
-**Summary**: Kimi K2.5 is a multimodal AI model developed by Moonshot AI, excelling in text reasoning, coding, agentic execution, and visual understanding, and employing an innovative Agent Swarm framework for complex tasks.
-**Source Context**: 2602.02276v1.pdf (Kimi K2.5 Technical Report).
+**Summary**: A scalable and general agentic intelligence model from Moonshot AI that unifies language and vision through joint multimodal pre-training and utilizes an Agent Swarm architecture for parallel task execution.
+**Source Context**: 2602.02276v1.pdf
 
 ---
 
-## Model Overview
-Kimi K2.5 is a state-of-the-art multimodal model designed for general agentic intelligence. It integrates strong language, vision, and agentic capabilities into a unified system [[concepts/agent-swarm.md]]. The model is trained using a specialized [[concepts/dep-training-strategy.md]] to efficiently combine visual and textual data.
+## Model Description
+Kimi K2.5 is a model developed by **[[entities/moonshot-ai.md]]** (Source: 2602.02276v1.pdf). It is presented as a demonstration that scalable and general agentic intelligence can be achieved through the joint optimization of text and vision together with parallel agent execution (Source: 2602.02276v1.pdf).
 
-## Key Capabilities
-The model demonstrates leading performance across a comprehensive suite of benchmarks [[concepts/evaluation-benchmarks.md]]:
-*   **Reasoning & General Knowledge**: Achieves high scores on rigorous STEM and knowledge tests like AIME 2025 (96.1%) and GPQA-Diamond (87.6%).
-*   **Coding & Software Engineering**: Excels on realistic coding tasks, scoring 76.8% on SWE-Bench Verified and 85.0% on LiveCodeBench (v6).
-*   **Agentic Execution**: Sets new state-of-the-art on complex search and browsing tasks like BrowseComp (60.6%, rising to 78.4% with Agent Swarm).
-*   **Multimodal Understanding**: Shows strong visual reasoning (e.g., 78.5% on MMMU-Pro) and video comprehension (e.g., 86.6% on VideoMMMU), aided by the [[concepts/moonvit-3d.md]] vision encoder.
-*   **Computer Use**: Competes effectively on real-world GUI interaction benchmarks like OSWorld-Verified (63.3%) and WebArena (58.9%).
+## Core Architectural Features
+1.  **Multimodal Foundation**: The model unifies language and vision across pre-training and reinforcement learning to achieve strong **[[concepts/cross-modal-alignment.md]]** and **[[concepts/vision-text-reasoning.md]]** (Source: 2602.02276v1.pdf).
+2.  **Agent Swarm**: It employs the **[[concepts/agent-swarm.md]]** architecture to enable concurrent execution of heterogeneous sub-tasks, reducing inference latency while improving performance on complex agentic workloads (Source: 2602.02276v1.pdf).
 
-## Architecture and Training
-The model's architecture is optimized for multimodal training. Its efficiency stems from the [[concepts/dep-training-strategy.md]], which decouples the vision encoder and main transformer backbone training phases, achieving 90% of the efficiency of text-only training. For video tasks, it utilizes [[concepts/moonvit-3d.md]] for temporal understanding.
+## Performance and Release
+The model is reported to demonstrate strong performance on benchmarks and real-world tasks (Source: 2602.02276v1.pdf). Moonshot AI has open-sourced the post-trained checkpoints with the aim of supporting the open-source community in building scalable agentic systems and accelerating progress toward General Agentic Intelligence (Source: 2602.02276v1.pdf).
 
-## Agentic Framework
-A defining feature is its [[concepts/agent-swarm.md]] framework, which uses an orchestrator ([[concepts/parl.md]]) to dynamically create and manage multiple sub-agents for parallel task execution, improving both performance and inference speed on complex, long-horizon tasks.
+## Pre-training Data
+The pre-training corpus includes curated, high-quality text data from Web Text, Code, Mathematics, and Knowledge domains (Source: 2602.02276v1.pdf). Enhanced code intelligence was a focus, with upweighted repository-level code, issues, commit histories, and code-related documents (Source: 2602.02276v1.pdf).
 
 ## Related pages
-- [[concepts/dep-training-strategy.md]]
+- [[entities/moonshot-ai.md]]
 - [[concepts/agent-swarm.md]]
-- [[concepts/evaluation-benchmarks.md]]
-- [[concepts/moonvit-3d.md]]
+- [[concepts/multimodal-pre-training.md]]
+- [[sources/kimi-k2-technical-report.md]]
