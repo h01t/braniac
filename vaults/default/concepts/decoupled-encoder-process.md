@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-The Decoupled Encoder Process (DEP) is a training infrastructure technique developed for efficiently training multimodal models like [[entities/kimi-k2.5.md]]. It addresses the load imbalance and memory fluctuations caused by variable-sized visual inputs (e.g., different image counts and resolutions) in standard Pipeline Parallelism (PP) setups (Section 4.5) [2602.02276v1.pdf].
+The Decoupled Encoder Process (DEP) is a training infrastructure technique developed for efficiently training multimodal models like [[entities/kimi-k2-5.md]]. It addresses the load imbalance and memory fluctuations caused by variable-sized visual inputs (e.g., different image counts and resolutions) in standard Pipeline Parallelism (PP) setups (Section 4.5) [2602.02276v1.pdf].
 
 ## The Problem
 In a typical multimodal PP setup, the vision encoder and text embedding are co-located in the first pipeline stage (Stage-0). The variability of visual input size causes drastic fluctuations in this stage's computational load and memory usage, forcing suboptimal manual configuration adjustments and preventing the reuse of optimized text-only parallel strategies.
@@ -34,6 +34,6 @@ Leveraging the visual encoder's unique position in the computation graph, DEP de
 *   **Efficiency**: Kimi K2.5 achieves a multimodal training efficiency of 90% relative to text-only training by seamlessly inheriting Kimi K2's parallel strategy.
 
 ## Related pages
-- [[entities/kimi-k2.5.md]]
+- [[entities/kimi-k2-5.md]]
 - [[concepts/training-infrastructure.md]]
 - [[sources/2602-02276v1-technical-report.md]]
