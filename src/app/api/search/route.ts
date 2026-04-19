@@ -1,3 +1,17 @@
+/**
+ * GET /api/search
+ * 
+ * @description Searches vault content using qmd semantic search.
+ * @param q - Search query string
+ * @returns { results: Array<{path, score, snippet}> } - Search results ranked by relevance
+ * 
+ * Uses qmd CLI for semantic search across all vault files.
+ * 
+ * @example
+ * ```bash
+ * curl "http://localhost:3000/api/search?q=typescript"
+ * ```
+ */
 import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';

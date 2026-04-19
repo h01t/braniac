@@ -1,3 +1,25 @@
+/**
+ * POST /api/lint
+ * 
+ * @description Analyzes markdown vault for structural health issues and proposes fixes.
+ * @param vaultId - Vault identifier
+ * @returns { report: string, proposals: Array<{path, action, reason, before, after, diff}>, fromCache: boolean, skippedCount: number, cacheCommitHash: string, currentCommitHash: string }
+ * 
+ * Analysis includes:
+ * 1. Contradictions between pages
+ * 2. Orphan pages (no inbound [[links]])
+ * 3. Missing concept pages
+ * 4. Claims missing citations
+ * 5. Non-standard page format violations
+ * 6. Near-empty stubs
+ * 
+ * @example
+ * ```bash
+ * curl -X POST http://localhost:3000/api/lint \
+ *   -H "Content-Type: application/json" \
+ *   -d '{"vaultId":"default"}'
+ * ```
+ */
 import { NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { getLintModel } from '@/lib/models';

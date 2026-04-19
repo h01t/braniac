@@ -1,3 +1,25 @@
+/**
+ * POST /api/ingest
+ * 
+ * @description Ingests knowledge from URLs, PDFs, or raw text into structured Markdown vault files.
+ * @param vaultId - Vault identifier (defaults to 'default')
+ * @returns { success: boolean, results: string[] } - Success flag and list of compiled file paths
+ * 
+ * Process:
+ * 1. Extracts text from URL/PDF/using grapper
+ * 2. Splits text into chunks using section-aware chunking strategy
+ * 3. Streams AI compilation through `streamText`
+ * 4. Parses AI output using robust 3-tier XML parser
+ * 5. Writes markdown files to vault with auto-commit
+ * 6. On failure, rolls back to pre-ingest git state
+ * 
+ * @example
+ * ```bash
+ * curl -X POST http://localhost:3000/api/ingest \
+ *   -F "vaultId=default" \
+ *   -F "text=Your knowledge here..."
+ * ```
+ */
 import { NextResponse } from 'next/server';
 import { streamText } from 'ai';
 import { getIngestModel } from '@/lib/models';
