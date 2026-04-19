@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-The performance of [[entities/kimi-k2.5.md]] is evaluated on a wide range of benchmarks, organized along several capability axes as outlined in Section 5.1.1 of the report [2602.02276v1.pdf].
+The performance of [[entities/kimi-k2-5.md]] is evaluated on a wide range of benchmarks, organized along several capability axes as outlined in Section 5.1.1 of the report [2602.02276v1.pdf].
 
 ## Benchmark Taxonomy
 The benchmarks are categorized as follows:
@@ -36,5 +36,5 @@ The benchmarks are categorized as follows:
 This comprehensive evaluation suite is designed to measure the model's proficiency across the full spectrum of capabilities it is designed for, from foundational reasoning and knowledge to advanced multimodal interaction and parallel agentic problem-solving.
 
 ## Related pages
-- [[entities/kimi-k2.5.md]]
+- [[entities/kimi-k2-5.md]]
 - [[sources/2602-02276v1-technical-report.md]]
