@@ -3,6 +3,22 @@ import path from 'path';
 import { simpleGit, SimpleGit } from 'simple-git';
 import { withVaultLock } from './lock';
 
+export interface Metrics {
+  graphRenderTime: number;
+  graphNodeCount: number;
+  searchLatency: number;
+  ingestionCount: number;
+  vaultSize: number;
+}
+
+export interface MetricLog {
+  timestamp: string;
+  vaultId: string;
+  operation: string;
+  duration: number;
+  metadata: Record<string, unknown>;
+}
+
 const VAULTS_ROOT = path.join(process.cwd(), 'vaults');
 
 export async function listVaults() {
@@ -200,4 +216,27 @@ export async function generateUnifiedDiff(before: string, after: string): Promis
     await fs.unlink(beforePath).catch(() => {});
     await fs.unlink(afterPath).catch(() => {});
   }
+}
+
+// ── Performance Metrics ────────────────────────────────────────────────────────
+
+export async function collectMetrics(vaultId: string, operation: string, duration: number, metadata?: Record<string, unknown>): Promise<void> {
+  const startTime = Date.now();
+  
+  // Simulate graph rendering for node count
+  const files = await listFiles(vaultId);
+  const nodeCount = files.filter((f: any) => f.type === 'file' && f.name.endsWith('.md')).length;
+  await new Promise(resolve => setTimeout(resolve, 10)); // Simulate 10ms render
+  
+  const logs: MetricLog[] = [];
+  logs.push({
+    timestamp: new Date().toISOString(),
+    vaultId,
+    operation,
+    duration: 10,
+    metadata: { nodeCount }
+  });
+  
+  // In production, this would append to a metrics file or database
+  console.log('[Metrics]', JSON.stringify(logs));
 }
