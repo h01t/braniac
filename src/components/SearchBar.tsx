@@ -36,6 +36,8 @@ export default function SearchBar() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Click-outside dismiss
@@ -53,10 +55,13 @@ export default function SearchBar() {
     e.preventDefault();
     if (!query.trim()) { setResults([]); setOpen(false); return; }
     setLoading(true);
+    setOffset(0);
+
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=20&offset=${offset}`);
       const data = await res.json();
       const r = data.results || [];
+      setTotalCount(r.length);
       setResults(r);
       setOpen(r.length > 0);
     } catch (err) {
@@ -103,7 +108,7 @@ export default function SearchBar() {
           boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
           animation: 'slide-down 0.14s ease',
         }}>
-          {results.map((r, i) => {
+          {results.slice(0, 20).map((r, i) => {
             // Prefer r.title (from qmd), else fall back to filename
             const displayName = r.title ?? (normalizeNodeId(r.file ?? '').split('/').pop() ?? r.file);
             return (
@@ -139,6 +144,15 @@ export default function SearchBar() {
           >
             Clear results
           </button>
+          {totalCount > 20 && (
+            <button
+              onClick={() => { setOffset(prev => prev + 20); }}
+              disabled={loading}
+              style={{ padding: '4px 12px', fontSize: '11px', background: 'var(--accent)', color: 'var(--text-main)', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer' }}
+            >
+              Load More
+            </button>
+          )}
         </div>
       )}
     </div>
