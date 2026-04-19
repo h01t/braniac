@@ -28,3 +28,4 @@ These academic and specialized models enrich the [[concepts/chinese-open-source-
 ## Related pages
 - [[concepts/chinese-open-source-llm-landscape-2025.md]]
 - [[entities/zhipu-ai.md]]
+- [[sources/intuitionlabs-chinese-open-source-llms-2025.md]]
