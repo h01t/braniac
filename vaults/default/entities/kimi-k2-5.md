@@ -1,24 +1,29 @@
 # Kimi K2.5
 
-**Summary**: Kimi K2.5 is an open-source multimodal agentic model developed by the Kimi Team, designed to advance general agentic intelligence through joint optimization of text and vision and a novel parallel agent orchestration framework called Agent Swarm.
-**Source Context**: 2602.02276v1.pdf
+**Summary**: Kimi K2.5 is a multimodal AI model developed by Moonshot AI, excelling in text reasoning, coding, agentic execution, and visual understanding, and employing an innovative Agent Swarm framework for complex tasks.
+**Source Context**: 2602.02276v1.pdf (Kimi K2.5 Technical Report).
 
 ---
 
-## Overview
-Kimi K2.5 is a state-of-the-art multimodal [[concepts/agentic-intelligence.md]] model built upon the [[entities/kimi-k2.md]] base. It emphasizes the [[concepts/joint-optimization-text-vision.md]] to enhance both linguistic and visual capabilities. A key innovation is the introduction of [[concepts/agent-swarm.md]], a self-directed parallel agent orchestration framework that dynamically decomposes complex tasks for concurrent execution, significantly reducing latency.
+## Model Overview
+Kimi K2.5 is a state-of-the-art multimodal model designed for general agentic intelligence. It integrates strong language, vision, and agentic capabilities into a unified system [[concepts/agent-swarm.md]]. The model is trained using a specialized [[concepts/dep-training-strategy.md]] to efficiently combine visual and textual data.
 
-## Core Innovations
-The model integrates several key techniques:
-1.  **Native Multimodal Foundation**: It is built via large-scale joint pre-training on approximately 15 trillion mixed visual and text tokens, adopting an early fusion strategy with a constant, moderate vision-to-text ratio throughout training. This approach contrasts with conventional late-stage vision injection methods.
-2.  **Training Pipeline**: The training methodology includes [[concepts/native-multimodal-pretraining.md]], [[concepts/zero-vision-sft.md]], and [[concepts/joint-multimodal-rl.md]]. A notable finding is that visual reinforcement learning improves performance on textual benchmarks, indicating strong cross-modal alignment.
-3.  **Architecture**: For vision processing, Kimi K2.5 employs the [[entities/moonvit-3d.md]] encoder, which incorporates the [[entities/navit-packing-strategy.md]] for variable-resolution image inputs and includes a lightweight 3D compression mechanism for video understanding.
+## Key Capabilities
+The model demonstrates leading performance across a comprehensive suite of benchmarks [[concepts/evaluation-benchmarks.md]]:
+*   **Reasoning & General Knowledge**: Achieves high scores on rigorous STEM and knowledge tests like AIME 2025 (96.1%) and GPQA-Diamond (87.6%).
+*   **Coding & Software Engineering**: Excels on realistic coding tasks, scoring 76.8% on SWE-Bench Verified and 85.0% on LiveCodeBench (v6).
+*   **Agentic Execution**: Sets new state-of-the-art on complex search and browsing tasks like BrowseComp (60.6%, rising to 78.4% with Agent Swarm).
+*   **Multimodal Understanding**: Shows strong visual reasoning (e.g., 78.5% on MMMU-Pro) and video comprehension (e.g., 86.6% on VideoMMMU), aided by the [[concepts/moonvit-3d.md]] vision encoder.
+*   **Computer Use**: Competes effectively on real-world GUI interaction benchmarks like OSWorld-Verified (63.3%) and WebArena (58.9%).
 
-## Performance and Release
-Extensive evaluations show Kimi K2.5 achieves state-of-the-art results across domains like coding, vision, reasoning, and agentic tasks. Agent Swarm reduces inference latency by up to 4.5x over single-agent baselines in wide-search scenarios while improving accuracy. The post-trained model checkpoint has been released open-source to facilitate research and applications in agentic intelligence.
+## Architecture and Training
+The model's architecture is optimized for multimodal training. Its efficiency stems from the [[concepts/dep-training-strategy.md]], which decouples the vision encoder and main transformer backbone training phases, achieving 90% of the efficiency of text-only training. For video tasks, it utilizes [[concepts/moonvit-3d.md]] for temporal understanding.
+
+## Agentic Framework
+A defining feature is its [[concepts/agent-swarm.md]] framework, which uses an orchestrator ([[concepts/parl.md]]) to dynamically create and manage multiple sub-agents for parallel task execution, improving both performance and inference speed on complex, long-horizon tasks.
 
 ## Related pages
-- [[concepts/joint-optimization-text-vision.md]]
+- [[concepts/dep-training-strategy.md]]
 - [[concepts/agent-swarm.md]]
-- [[concepts/agentic-intelligence.md]]
-- [[entities/kimi-k2.md]]
+- [[concepts/evaluation-benchmarks.md]]
+- [[concepts/moonvit-3d.md]]
