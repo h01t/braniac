@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-The multimodal architecture of [[entities/kimi-k2.5.md]] consists of three interconnected components, following design principles established in earlier models like Kimi-VL (Section 4.2) [2602.02276v1.pdf].
+The multimodal architecture of [[entities/kimi-k2-5.md]] consists of three interconnected components, following design principles established in earlier models like Kimi-VL (Section 4.2) [2602.02276v1.pdf].
 
 ## Components
 1.  **MoonViT-3D Vision Encoder**: A three-dimensional native-resolution encoder that processes images and videos in a unified way. See [[concepts/moonvit-3d.md]] for details.
@@ -20,7 +20,7 @@ Visual inputs (images or videos) are first encoded by MoonViT-3D. The resulting 
 A key innovation is the unified design of MoonViT-3D, which allows a single parameter space to handle both modalities (image and video), promoting strong knowledge transfer and eliminating the need for separate, specialized architectures [2602.02276v1.pdf].
 
 ## Related pages
-- [[entities/kimi-k2.5.md]]
+- [[entities/kimi-k2-5.md]]
 - [[concepts/moonvit-3d.md]]
 - [[entities/kimi-k2-base-model.md]]
 - [[sources/2602-02276v1-technical-report.md]]
