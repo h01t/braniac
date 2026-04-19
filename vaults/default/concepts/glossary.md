@@ -1,39 +1,25 @@
-# Glossary of Key Terms and Acronyms
+# Glossary
 
-## Terms
-- **Autonomous LLM Agents**: AI systems that use large language models to operate independently, performing tasks without continuous human intervention.
-- **Perception System**: The component of an agent that processes input data from various modalities, such as text, images, and structured data.
-- **Reasoning System**: The part responsible for logical thinking, planning, and decision-making, enabling agents to solve problems.
-- **Memory System**: Mechanism for storing and retrieving past experiences, knowledge, and context to inform future actions.
-- **Execution System**: Module that carries out actions based on the outputs of perception and reasoning systems.
-- **Multimodal Perception**: Integration of multiple types of input data, like vision, language, and audio, for comprehensive understanding.
-- **Vision-Language Models (VLMs)**: Models capable of understanding and generating both visual and textual information.
-- **Multimodal Large Language Models (MLLMs)**: Large language models extended to handle and process multimodal data.
-- **Chain of Thought (CoT)**: A reasoning approach where models generate step-by-step explanations to arrive at an answer.
-- **Tree of Thoughts (ToT)**: An extension of CoT that explores multiple reasoning paths in a tree structure.
-- **Retrieval-Augmented Generation (RAG)**: A technique that enhances LLMs by retrieving relevant information from external knowledge sources.
-- **Transformer Architecture**: A neural network design based on self-attention mechanisms, foundational for modern LLMs.
-- **Attention Mechanism**: A component that allows models to focus on relevant parts of the input sequence.
-- **Hallucination**: The generation of incorrect or fabricated information by LLMs, often confidently stated.
-- **Tool-Augmented LLMs**: LLMs that are enhanced with the ability to use external tools and APIs.
-- **Reflection**: The process where agents self-evaluate and improve their outputs based on feedback or internal critique.
-- **Multi-Agent Systems**: Systems composed of multiple interacting agents that collaborate or compete to achieve goals.
-- **Monte Carlo Tree Search (MCTS)**: A search algorithm used for decision-making in complex environments.
-- **Agent Workflow Memory (AWM)**: A memory system designed to manage workflows in autonomous agents.
-- **Experience Learning**: Learning from past experiences to improve future performance in LLMs.
-- **Decision Process Planning Model (DPPM)**: A model for planning and decision-making in agent systems.
+## Acronyms & Initialisms
+*   **RL**: Reinforcement Learning
+*   **SFT**: Supervised Fine-Tuning
+*   **RLHF**: Reinforcement Learning from Human Feedback
+*   **DEP**: Decoupled Encoder Process (a training strategy)
+*   **PARL**: (Context: Likely refers to a parallel agent framework or method from the papers)
+*   **NaViT**: Neural Vision Transformer (a packing strategy)
+*   **GDPval**: (A specific benchmark name)
 
-## Acronyms
-- **LLM**: Large Language Model
-- **RAG**: Retrieval-Augmented Generation
-- **CoT**: Chain of Thought
-- **ToT**: Tree of Thoughts
-- **VLM**: Vision-Language Model
-- **MLLM**: Multimodal Large Language Model
-- **MCTS**: Monte Carlo Tree Search
-- **AWM**: Agent Workflow Memory
-- **DPPM**: Decision Process Planning Model
-- **HTML**: HyperText Markup Language
-- **API**: Application Programming Interface
-- **AI**: Artificial Intelligence
+## Key Terms
+*   **Agent Swarm**: A configuration of multiple AI agents working in parallel, often with specialized roles.
+*   **Agentic Intelligence**: The capability of an AI system to act autonomously as an agent to achieve goals.
+*   **Early Fusion**: A multimodal architecture approach where different data modalities (e.g., image, text) are combined at an early processing stage.
+*   **Multimodal Model**: An AI model capable of processing and understanding multiple types of data (e.g., text and images).
+*   **Native Multimodal Pre-training**: Pre-training a model from scratch on multimodal data, as opposed to grafting a vision module onto a language model.
+*   **Generative Reward Model (GRM)**: A type of reward model used in RL that generates feedback or scores, potentially offering richer guidance than a scalar score.
+*   **Sub-agent**: A component or specialized agent within a larger multi-agent or swarm system.
+*   **Visual Reasoning**: The cognitive process of understanding and drawing conclusions from visual information.
+*   **Tool-Augmented Reasoning**: Enhancing a model's problem-solving by allowing it to call upon external tools, APIs, or functions.
+*   **Parallel Agent RL**: Reinforcement Learning applied to or involving multiple agents operating in parallel.
+*   **Toggle Training**: A heuristic that involves alternating between different training modes, data types, or objectives.
+*   **Decoupled Encoder**: An architecture or process where the feature encoder is trained or operated separately from the downstream task module.
 </file path="glossary.md">
