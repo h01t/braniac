@@ -24,6 +24,6 @@ where `α` is a small, fixed constant (e.g., 0.01). It was proposed to prevent n
 *   **Empirical Performance**: Does not consistently outperform ReLU across all tasks; benefits are often dataset and architecture dependent.
 
 ## Related pages
-- [[concepts/activation-function.md]]
-- [[Rectified Linear Unit (ReLU)]]
-- [[Parametric ReLU (PReLU)]]
+- *[Page for 'activation-function' not found]*
+- *[Page for 'Rectified Linear Unit (ReLU)' not found]*
+- *[Page for 'Parametric ReLU (PReLU)' not found]*
