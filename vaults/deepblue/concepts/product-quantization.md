@@ -1,14 +1,14 @@
 # Product Quantization
 
-**Summary**: Product quantization (PQ) is a technique for compressing high-dimensional vectors by dividing them into subspaces and quantizing each subspace separately, commonly used in nearest neighbor search.
-**Source Context**: turboqaunt.pdf
+**Summary**: Product Quantization (PQ) is a classic vector quantization method that decomposes vectors into subvectors and quantizes each with a codebook learned via k-means. It is widely used for nearest neighbor search.
+
+**Source Context**: turboqaunt.pdf, Chunk 4 of 5
 
 ---
 
-In the nearest neighbor search literature, PQ often relies on codebooks learned via k-means during indexing, making it ill-suited for online settings. TurboQuant outperforms PQ in recall while reducing indexing time to virtually zero, due to its data-oblivious and accelerator-friendly design.
+In turboqaunt.pdf, PQ is used as a baseline for [[concepts/near-neighbor-search.md]]. The implementation uses AVX2 In-Register Lookup Tables with 256 codewords (LUT256) for better accuracy, grouping 4 coordinates per lookup for 2-bit and 2 coordinates for 4-bit. PQ benefits from training on the same dataset (DBpedia), giving it an inherent advantage. Despite this, [[concepts/turboquant.md]] outperforms PQ in recall@k (Figure 5 in turboqaunt.pdf).
 
 ## Related pages
-- [[concepts/vector-quantization.md]]
 - [[concepts/turboquant.md]]
-- [[concepts/nearest-neighbor-search.md]] (optional, but not in the source explicitly; may be omitted)
-- [[sources/turboquant-paper.md]]
+- [[concepts/near-neighbor-search.md]]
+- [[concepts/rabitq.md]]
