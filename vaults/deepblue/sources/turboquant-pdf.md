@@ -1,28 +1,13 @@
 # TurboQuant PDF
 
-**Summary**: A research paper presenting TurboQuant, a family of vector quantization algorithms optimized for minimizing mean-squared error (MSE) and inner product distortion, with theoretical lower bounds and practical applications in KV cache compression and near neighbor search.
-
-**Source Context**: turboqaunt.pdf
+**Summary**: Document describing TurboQuant, a quantization method for high-dimensional vectors on the unit sphere, optimized for MSE and inner product.
+**Source Context**: Document filename "turboqaunt.pdf" (likely "turboquant.pdf"), Chunk 3 of 5.
 
 ---
 
-## Content Overview
-
-The document introduces two vector quantization (VQ) schemes:
-- **MSE-optimal TurboQuant** – minimizes reconstruction MSE via random rotation and optimal scalar quantization per coordinate.
-- **Inner-product‑optimal TurboQuant** – a two‑stage algorithm combining MSE quantization with a 1‑bit unbiased quantizer (QJL) on the residual, achieving unbiased inner product estimation.
-
-Key results include:
-- Distortion upper bounds for both schemes (Theorem 2 for inner product, Theorem 3 for lower bounds).
-- Use of Shannon Lower Bound (SLB) to derive information‑theoretic lower bounds for any quantizer.
-- Experimental validation on needle‑in‑a‑haystack tasks and near neighbor search.
+The PDF describes TurboQuant, a quantization algorithm that first multiplies vectors by a random rotation matrix, then applies optimal scalar quantizers independently to each coordinate. It provides performance guarantees for MSE and inner product estimation.
 
 ## Related pages
-- [[concepts/turboquant.md]]
-- [[concepts/quantized-johnson-lindenstrauss.md]]
-- [[concepts/shannon-lower-bound.md]]
-- [[concepts/mse-distortion.md]]
-- [[concepts/inner-product-distortion.md]]
-- [[concepts/bias-in-mse-quantizers.md]]
-- [[concepts/random-rotation.md]]
-- [[concepts/beta-distribution-hypersphere.md]]
+- [[concepts/turboquant-overview.md]]
+- [[concepts/turboquant-mse.md]]
+- [[concepts/turboquant-prod.md]]
