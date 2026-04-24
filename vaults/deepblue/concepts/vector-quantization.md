@@ -1,16 +1,16 @@
 # Vector Quantization
 
-**Summary**: Vector quantization (VQ) is the process of compressing high-dimensional vectors into low-bitwidth representations while minimizing geometric distortion, with roots in Shannon's source coding theory.
+**Summary**: Vector quantization (VQ) maps continuous vectors to discrete codewords, minimizing distortion. Foundational works by Lloyd ([[42]]), Max ([[43]]), Gersho ([[25]], [[26]]), and Zador ([[61]]) establish the theory.
+
 **Source Context**: turboqaunt.pdf
 
 ---
 
-Vector quantization maps a high-dimensional vector \(x \in \mathbb{R}^d\) to a binary string of \(B\) bits, with an inverse map for approximate reconstruction. The primary goals are to minimize mean-squared error (MSE) or inner product error. VQ is critical for AI model deployment, KV cache compression, and nearest neighbor search in vector databases. Existing VQ algorithms either lack accelerator compatibility or have suboptimal distortion bounds. TurboQuant addresses these limitations.
+Vector quantization is a classical compression technique. Lloyd's algorithm ([[42]]) is the basis for k-means clustering and scalar quantization [42]. Asymptotically optimal block quantization is analyzed by Gersho ([[25]]) [25], and structure of vector quantizers by Gersho ([[26]]) [26]. Zador's thesis ([[61]]) provides foundational analysis [61].
+
+Modern extensions include anisotropic vector quantization (Guo et al. [[27]]) [27] and learning to hash ([[56]]) [56]. These methods underpin [[concepts/product-quantization.md]] and [[concepts/kv-cache-quantization.md]].
 
 ## Related pages
-- [[concepts/turboquant.md]]
-- [[concepts/mse-distortion.md]]
-- [[concepts/inner-product-distortion.md]]
 - [[concepts/product-quantization.md]]
 - [[concepts/kv-cache-quantization.md]]
-- [[sources/turboquant-paper.md]]
+- [[sources/turboqaunt.md]]
