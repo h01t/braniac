@@ -1,22 +1,19 @@
-# Mean‑Squared Error (MSE) Distortion
+# MSE Distortion
 
-**Summary**: MSE distortion is the expected squared L2 distance between an input vector and its reconstruction after quantization. It is a standard measure of reconstruction quality.
+**Summary**: Mean squared error (MSE) distortion measures the squared L2 distance between an original vector x and its quantized reconstruction Q⁻¹(Q(x)). TurboQuant provides upper and lower bounds on MSE distortion.
 
-**Source Context**: turboqaunt.pdf (Equations (1), (2))
+**Source Context**: turboqaunt.pdf, Chunk 4 of 5
 
 ---
 
-## Definition
+MSE distortion is defined as D_mse = E[‖x - Q⁻¹(Q(x))‖₂²]. Theorem 1 (referenced from earlier parts of turboqaunt.pdf) provides upper bounds for TurboQuant's MSE distortion. In the lower bound section, Theorem 3 proves that for any quantization algorithm, there exists a worst-case input x on the unit sphere such that D_mse ≥ 1/4^b (source: turboqaunt.pdf, Section 3.3).
 
-For a quantization scheme ![Q](https://latex.codecogs.com/svg.latex?Q) with dequantizer ![Q^{-1}](https://latex.codecogs.com/svg.latex?Q%5E%7B-1%7D), the MSE distortion for input ![x](https://latex.codecogs.com/svg.latex?x) is:
+The proof of Theorem 3 uses [[concepts/yao-minimax-principle.md]] to relate randomized algorithm lower bounds to deterministic algorithm lower bounds under a maximally difficult distribution, then invokes [[concepts/shannon-lower-bound.md]] (Lemma 3) to bound the achievable MSE for uniformly distributed inputs on the unit sphere.
 
-![D_{\\mathrm{mse}}(Q) = \\mathbb{E}\\left[\\|x - Q^{-1}(Q(x))\\|_2^2\\right]](https://latex.codecogs.com/svg.latex?D_%7B%5Cmathrm%7Bmse%7D%7D(Q)%20%3D%20%5Cmathbb%7BE%7D%5Cleft%5B%5C%7Cx%20-%20Q%5E%7B-1%7D(Q(x))%5C%7C_2%5E2%5Cright%5D)
-
-## Role in TurboQuant
-
-The MSE‑optimal TurboQuant aims to minimize this distortion for worst‑case unit‑norm vectors. It achieves a distortion within a factor of ![\\sqrt{3\\pi/2}](https://latex.codecogs.com/svg.latex?%5Csqrt%7B3%5Cpi/2%7D) of the [[concepts/shannon-lower-bound.md|Shannon Lower Bound]].
+In experiments (turboqaunt.pdf, Section 4.1), the MSE error of TurboQuant is compared against theoretical bounds, showing alignment across different bit ratios (Figure 3).
 
 ## Related pages
 - [[concepts/turboquant.md]]
-- [[concepts/inner-product-distortion.md]]
-- [[concepts/bias-in-mse-quantizers.md]]
+- [[concepts/inner-product-estimation.md]]
+- [[concepts/lower-bound-compression.md]]
+- [[sources/shannon-lower-bound.md]]
