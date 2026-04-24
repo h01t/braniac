@@ -12,9 +12,9 @@ const SETTINGS_FILE = path.join(process.cwd(), 'settings.json');
 
 export const DEFAULT_SETTINGS: AppSettings = {
   ingestProvider: 'deepseek',
-  ingestModel: 'deepseek-reasoner',
+  ingestModel: 'deepseek-v4-pro',
   lintProvider: 'deepseek',
-  lintModel: 'deepseek-chat',
+  lintModel: 'deepseek-v4-flash',
 };
 
 export async function readSettings(): Promise<AppSettings> {
@@ -32,8 +32,8 @@ export async function writeSettings(settings: AppSettings): Promise<void> {
 
 export const AVAILABLE_MODELS = {
   deepseek: [
-    { id: 'deepseek-reasoner', name: 'DeepSeek Reasoner (R1)' },
-    { id: 'deepseek-chat', name: 'DeepSeek Chat (V3)' },
+    { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro' },
+    { id: 'deepseek-v4-flash', name: 'DeepSeek V4 Flash' },
   ],
   openai: [
     { id: 'gpt-4o', name: 'GPT-4o' },
