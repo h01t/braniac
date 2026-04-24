@@ -1,100 +1,108 @@
-# AI Knowledge Compiler
+# Braniac: AI Knowledge Compiler
 
-An intelligent, local-first platform designed to convert unstructured data—ranging from web pages to PDFs—into a structured, markdown-based knowledge vault. The system features interactive graph visualization and advanced hybrid semantic search. 
+Braniac is a local-first research prototype that converts raw sources into a Git-backed markdown knowledge graph. It combines model-assisted ingestion, semantic search, graph exploration, and a human-reviewed "Mint & Lint" workflow for keeping the vault coherent over time.
 
-![Landing Page Header](./img/landing_page.png)
+![Braniac landing view](./img/landing_page.png)
 
-## 🎓 Overview
+## Academic Project Note
 
-The **AI Knowledge Compiler** automates the transition from raw information to an interconnected knowledge graph. By leveraging large language model reasoning, it extracts atomic concepts, maintains structural health through automated constraint checks, and offers a highly fidelity search experience over localized data.
+This repository is being prepared as part of a master's application portfolio. It is intended to demonstrate system design, implementation quality, documentation discipline, and honest technical framing. The project is demo-ready, but it is not presented as a production-ready knowledge platform.
 
-This project demonstrates production-grade integration of automated ingestion, semantic graph structuring, and interactive visualization as part of an academic portfolio.
+The standalone note is available in [ACADEMIC_PROJECT_NOTE.md](./ACADEMIC_PROJECT_NOTE.md), and the committee-facing overview is in [docs/project-overview.md](./docs/project-overview.md).
 
-**Author:** Ognjen Jovanovic  
-**Documentation:** [Architecture & Workflow](./docs/Architecture_and_Workflow.md)
+## What The Project Does
 
----
+- Ingests raw text, URLs, and PDFs into structured markdown pages.
+- Organizes extracted knowledge into Git-backed vaults with categories like `concepts/`, `entities/`, `sources/`, and `events/`.
+- Builds a graph view from wiki-style `[[links]]` so relationships remain explorable.
+- Uses `qmd` for local semantic retrieval across the vault.
+- Surfaces lint proposals for missing structure, weak pages, and graph-health issues before changes are applied.
+- Exposes an EvalOps-style commit and diff view for reviewing vault history.
 
-## ✨ Key Features
+![Knowledge graph detail view](./img/node-overview.png)
 
-### 🧠 Intelligent Ingestion
-Automatically extract and categorize knowledge from robust web pages and PDF files using the `grapper` engine. Implements a section-aware chunking strategy that respects markdown heading boundaries while maintaining contextual overlap.
+## Architecture Snapshot
 
-### 🏗️ Structured Vaults
-Assets are categorized systematically into `concepts/`, `entities/`, and `sources/` within localized, Git-backed vaults. The application supports multi-vault operations, allowing for isolated knowledge corpora management.
+| Layer | Role | Main Tools |
+|---|---|---|
+| UI | Graph exploration, ingest, settings, history review | Next.js App Router, React 19 |
+| Ingestion | Extraction, chunking, model-driven page generation | `grapper`, Vercel AI SDK |
+| Storage | Markdown vaults with version history | file system, `simple-git` |
+| Retrieval | Local semantic lookup and snippet search | `qmd` |
+| Governance | Human-reviewed structural cleanup | custom lint/apply routes |
 
-### 📈 Graph Visualization
-Provides an interactive 2D force-directed layout for knowledge navigation. Nodes serve as dynamic entry points, grouped by classification (concepts, entities, sources) for intuitive semantic exploration.
+Additional technical details live in [docs/Architecture_and_Workflow.md](./docs/Architecture_and_Workflow.md).
 
-![Knowledge Node Exploration](./img/node-overview.png)
+## Demo Surfaces
 
-### 🔍 Hybrid Semantic Search
-Integrates `qmd` as a high-performance vector and BM25 local search engine. The query pipeline is fortified with retry-logic and contextually balanced JSON abstraction.
+- Main graph workspace for node navigation and markdown inspection
+- Ingest panel for URLs, text, and PDFs
+- EvalOps page for commit history and diffs
+- Settings page for switching ingest and lint providers/models
+- Sidebar tools for vault switching, search, file browsing, and lint review
 
-### 🛠️ "Mint & Lint" Mechanism
-An automated structural governance workflow. The system systematically analyzes local data boundaries to detect orphan concepts, contradictions, and syntax errors, proposing high-confidence diffs for user review before committing changes via async mutex-backed Git automation.
+![Mint and Lint workflow](./img/lint_and_mint.png)
 
-![Mint & Lint System](./img/lint_and_mint.png)
-
-### 📜 Version Control Integration
-Every state transition within the graph is transparent and fully version-controlled, providing an audit trail via the EvalOps interface for historic diff verification.
-
----
-
-## 🛠️ Architecture Summary
-
-| Layer | Technologies |
-|---|---|
-| **Framework** | [Next.js 15+](https://nextjs.org/) (App Router, v16.2.3) |
-| **Client UI** | [React 19](https://react.dev/), [react-force-graph-2d](https://github.com/vasturiano/react-force-graph-2d) |
-| **Search Engine** | [qmd](https://github.com/tobilu/qmd) (Local-first Hybrid Search) |
-| **AI Intelligence** | Vercel AI SDK, [DeepSeek Reasoner / Chat](https://github.com/deepseek-ai) |
-| **Data Ingestion** | `grapper` CLI integration, `remark-gfm`, `react-markdown` |
-| **Governance** | `simple-git`, `zod` |
-
-*For a detailed look at the pipeline between components like `qmd` and `grapper`, please see the [Architecture Documentation](./docs/Architecture_and_Workflow.md).*
-
----
-
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- [qmd CLI](https://github.com/tobilu/qmd) (`npm install -g @tobilu/qmd`)
-- A locally available `grapper` binary
+
+- Node.js `>=20.9.0`
+- A local `grapper` binary available on `PATH` or configured through `GRAPPER_PATH`
+- A DeepSeek API key for the default configuration
+- An OpenAI API key only if you want to switch models in the Settings page
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone [repository-url]
-   cd ai-knowledge-compiler
-   ```
+```bash
+git clone https://github.com/h01t/braniac.git
+cd braniac
+npm install
+cp .env.example .env.local
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+Configure `.env.local` as needed:
 
-3. **Configure Environment (`.env.local`):**
-   ```env
-   OPENAI_API_KEY=your_openai_key_here
-   DEEPSEEK_API_KEY=your_deepseek_key_here
-   GRAPPER_PATH=/path/to/grapper/binary
-   ```
-   *(Note: `GRAPPER_PATH` overrides the default binary location if needed)*
+```env
+DEEPSEEK_API_KEY=your_deepseek_key_here
+# OPENAI_API_KEY=your_openai_key_here
+# GRAPPER_PATH=/usr/local/bin/grapper
+# QMD_BIN=/usr/local/bin/qmd
+```
 
-4. **Run the Application:**
-   ```bash
-   npm run dev
-   ```
-   Access the client application at [http://localhost:3000](http://localhost:3000).
+### Development
 
----
+```bash
+npm run dev
+```
 
-## 🤝 Contributing
+Open [http://localhost:3000](http://localhost:3000).
 
-Contributions are welcome. Given the academic nature of this repository baseline, specific feature expansions may be reviewed with a focus on graph integrity and semantic search fidelity.
+### Verification
 
----
-*Built for the exploration and preservation of structured knowledge by Ognjen Jovanovic.*
+```bash
+npm run lint
+npm run build
+```
+
+## Repository Layout
+
+```text
+src/app/                    Next.js App Router pages and API routes
+src/components/             Client UI for graph, ingest, linting, search, and shell
+src/lib/                    Vault, extraction, parser, qmd, and utility logic
+docs/                       Architecture notes and submission-ready project overview
+img/                        Screenshots used in the docs
+vaults/                     Example Git-backed knowledge vaults
+```
+
+## Notes On Scope
+
+- The project is optimized for single-user, local-first experimentation.
+- Generated knowledge should still be reviewed; the lint flow is intentionally human-in-the-loop.
+- Example vault content is included for demonstration and may reference third-party material that remains subject to its original terms.
+- The repository prioritizes clarity and reproducibility over packaging this as a publishable npm library.
+
+## License
+
+The source code and original documentation in this repository are released under the [MIT License](./LICENSE).

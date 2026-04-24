@@ -1,8 +1,10 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useVaultId } from '@/lib/useVaultId';
 import ReactMarkdown from 'react-markdown';
+import type { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { getErrorMessage } from '@/lib/errors';
+import { useVaultId } from '@/lib/useVaultId';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,7 +22,6 @@ interface Proposal {
 
 interface LintResult {
   report: string;
-  proposals: Proposal[];
   fromCache: boolean;
   skippedCount: number;
   cacheCommitHash?: string;
@@ -195,22 +196,30 @@ function ProposalCard({
 
 // ── Markdown renderer (shared styles) ────────────────────────────────────────
 
-const mdComponents: any = {
-  h1: ({ node, ...p }: any) => <h1 style={{ fontSize: '18px', fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '16px', marginTop: 0 }} {...p} />,
-  h2: ({ node, ...p }: any) => {
-    const text = String((p.children as any)?.[0] ?? '');
-    const border = text.includes('⚠') || text.includes('Error') ? 'var(--diff-sub-text)'
-                 : text.includes('✅') || text.includes('Pass') ? 'var(--diff-add-text)'
-                 : 'var(--accent)';
-    return <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-main)', marginTop: '28px', marginBottom: '10px', paddingLeft: '12px', borderLeft: `3px solid ${border}` }} {...p} />;
+function getChildrenText(children: React.ReactNode): string {
+  return React.Children.toArray(children)
+    .map((child) => (typeof child === 'string' ? child : ''))
+    .join('');
+}
+
+const mdComponents: Components = {
+  h1: props => <h1 style={{ fontSize: '18px', fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '16px', marginTop: 0 }} {...props} />,
+  h2: props => {
+    const text = getChildrenText(props.children);
+    const border = text.includes('⚠') || text.includes('Error')
+      ? 'var(--diff-sub-text)'
+      : text.includes('✅') || text.includes('Pass')
+        ? 'var(--diff-add-text)'
+        : 'var(--accent)';
+    return <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-main)', marginTop: '28px', marginBottom: '10px', paddingLeft: '12px', borderLeft: `3px solid ${border}` }} {...props} />;
   },
-  p:  ({ node, ...p }: any) => <p  style={{ color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.65 }} {...p} />,
-  li: ({ node, ...p }: any) => <li style={{ color: 'var(--text-muted)', marginBottom: '4px'  }} {...p} />,
-  strong: ({ node, ...p }: any) => <strong style={{ color: 'var(--text-main)' }} {...p} />,
-  code: ({ node, inline, ...p }: any) => (
-    <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 5px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent)', fontFamily: "'SF Mono','Fira Code','Consolas',monospace" }} {...p} />
+  p: props => <p style={{ color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.65 }} {...props} />,
+  li: props => <li style={{ color: 'var(--text-muted)', marginBottom: '4px' }} {...props} />,
+  strong: props => <strong style={{ color: 'var(--text-main)' }} {...props} />,
+  code: props => (
+    <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 5px', borderRadius: '4px', fontSize: '12px', color: 'var(--accent)', fontFamily: "'SF Mono','Fira Code','Consolas',monospace" }} {...props} />
   ),
-  hr: ({ node, ...p }: any) => <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '20px 0' }} {...p} />,
+  hr: props => <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '20px 0' }} {...props} />,
 };
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -235,14 +244,28 @@ export default function Linter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vaultId }),
       });
-      const data = await res.json();
+      const data = await res.json() as {
+        error?: string;
+        report: string;
+        proposals?: Omit<Proposal, 'approved'>[];
+        fromCache: boolean;
+        skippedCount: number;
+        cacheCommitHash?: string;
+        currentCommitHash?: string;
+      };
       if (data.error) throw new Error(data.error);
-      const withApproval = (data.proposals ?? []).map((p: any) => ({ ...p, approved: false }));
-      setResult(data);
+      const withApproval = (data.proposals ?? []).map((proposal) => ({ ...proposal, approved: false }));
+      setResult({
+        report: data.report,
+        fromCache: data.fromCache,
+        skippedCount: data.skippedCount,
+        cacheCommitHash: data.cacheCommitHash,
+        currentCommitHash: data.currentCommitHash,
+      });
       setProposals(withApproval);
       setPhase('review');
-    } catch (e: any) {
-      setResult({ report: `⚠️ Linter failed: ${e.message}`, proposals: [], fromCache: false, skippedCount: 0 });
+    } catch (error: unknown) {
+      setResult({ report: `⚠️ Linter failed: ${getErrorMessage(error)}`, fromCache: false, skippedCount: 0 });
       setProposals([]);
       setPhase('review');
     }
@@ -270,13 +293,13 @@ export default function Linter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vaultId, proposals: toApply }),
       });
-      const data = await res.json();
+      const data = await res.json() as { applied?: number; errors?: string[] };
       setApplyProgress({ done: data.applied ?? 0, total: toApply.length });
       setApplyErrors(data.errors ?? []);
       // Signal graph + file tree to refresh
       window.dispatchEvent(new CustomEvent('vault-updated'));
-    } catch (e: any) {
-      setApplyErrors([e.message]);
+    } catch (error: unknown) {
+      setApplyErrors([getErrorMessage(error)]);
     }
     setPhase('done');
   };

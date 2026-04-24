@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import type { HistoryEntry } from '@/lib/types';
 import { useVaultId } from '@/lib/useVaultId';
 
 const GitBranchIcon = () => (
@@ -51,7 +52,12 @@ function formatDate(dateStr: string) {
 
 export default function EvalOps() {
   const vaultId = useVaultId();
-  const [history, setHistory] = useState<any[]>([]);
+
+  return <EvalOpsPanel key={vaultId} vaultId={vaultId} />;
+}
+
+function EvalOpsPanel({ vaultId }: { vaultId: string }) {
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [selectedCommit, setSelectedCommit] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<string>('');
   const [diff, setDiff] = useState('');
@@ -59,16 +65,16 @@ export default function EvalOps() {
   useEffect(() => {
     fetch(`/api/vaults/${vaultId}/history`)
       .then(res => res.json())
-      .then(d => setHistory(d.history || []));
+      .then((data: { history?: HistoryEntry[] }) => setHistory(data.history || []));
   }, [vaultId]);
 
   const loadDiff = (hash: string, message: string) => {
     setSelectedCommit(hash);
     setSelectedMessage(message);
     setDiff('');
-    fetch(`/api/vaults/default/diff?hash=${hash}`)
+    fetch(`/api/vaults/${vaultId}/diff?hash=${encodeURIComponent(hash)}`)
       .then(res => res.json())
-      .then(d => setDiff(d.diff || ''));
+      .then((data: { diff?: string }) => setDiff(data.diff || ''));
   };
 
   const renderDiffLine = (line: string, i: number) => {
@@ -142,7 +148,7 @@ export default function EvalOps() {
           </div>
         )}
 
-        {history.map((c: any) => {
+        {history.map((c) => {
           const isActive = selectedCommit === c.hash;
           return (
             <div

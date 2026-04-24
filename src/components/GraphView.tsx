@@ -1,8 +1,9 @@
 'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import ForceGraph2D from 'react-force-graph-2d';
-import ReactMarkdown from 'react-markdown';
+import ForceGraph2D, { type ForceGraphMethods } from 'react-force-graph-2d';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import type { KnowledgeGraphData, KnowledgeNode } from '@/lib/types';
 import { useVaultId } from '@/lib/useVaultId';
 
 const CloseIcon = () => (
@@ -57,12 +58,17 @@ const EmptyState = () => (
 
 export default function GraphView() {
   const vaultId = useVaultId();
-  const [data, setData] = useState<{ nodes: any[]; links: any[] }>({ nodes: [], links: [] });
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+
+  return <GraphViewPanel key={vaultId} vaultId={vaultId} />;
+}
+
+function GraphViewPanel({ vaultId }: { vaultId: string }) {
+  const [data, setData] = useState<KnowledgeGraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const [markdownContent, setMarkdownContent] = useState('');
   const [markdownCache, setMarkdownCache] = useState<Record<string, string>>({});
   const [panelVisible, setPanelVisible] = useState(false);
-  const fgRef = useRef<any>(null);
+  const fgRef = useRef<ForceGraphMethods<KnowledgeNode, { source: string; target: string }> | undefined>(undefined);
 
   const getCachedMarkdown = useCallback((filePath: string) => {
     if (markdownCache[filePath]) {
@@ -71,17 +77,10 @@ export default function GraphView() {
     return null;
   }, [markdownCache]);
 
-  useEffect(() => {
-    setSelectedNode(null);
-    setMarkdownContent('');
-    setPanelVisible(false);
-    setMarkdownCache({});
-  }, [vaultId]);
-
   const fetchGraph = useCallback(() => {
     fetch(`/api/vaults/${vaultId}/graph`)
       .then(res => res.json())
-      .then(setData);
+      .then((nextData: KnowledgeGraphData) => setData(nextData));
   }, [vaultId]);
 
   useEffect(() => { fetchGraph(); }, [fetchGraph]);
@@ -93,7 +92,7 @@ export default function GraphView() {
     return () => window.removeEventListener('vault-updated', handler);
   }, [fetchGraph]);
 
-  const openNode = useCallback((node: any) => {
+  const openNode = useCallback((node: KnowledgeNode) => {
     setSelectedNode(node);
     setPanelVisible(false);
 
@@ -118,7 +117,7 @@ export default function GraphView() {
         });
     }
     if (fgRef.current) {
-      fgRef.current.centerAt(node.x, node.y, 800);
+      fgRef.current.centerAt(node.x ?? 0, node.y ?? 0, 800);
       fgRef.current.zoom(2.8, 1000);
     }
   }, [vaultId, getCachedMarkdown]);
@@ -132,13 +131,13 @@ export default function GraphView() {
   useEffect(() => {
     const handler = (e: Event) => {
       const { id } = (e as CustomEvent).detail;
-      const node = data.nodes.find((n: any) => n.id === id);
+      const node = data.nodes.find((candidate) => candidate.id === id);
       if (node) {
         openNode(node);
       } else {
         // Fallback: node not in graph (e.g. root-level file) — open panel directly
         const name = (id as string).split('/').pop()?.replace('.md', '') ?? id;
-        openNode({ id, name, x: 0, y: 0 });
+        openNode({ id, name, val: 1, x: 0, y: 0 });
       }
     };
     window.addEventListener('open-node', handler);
@@ -151,6 +150,86 @@ export default function GraphView() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [closePanel]);
+
+  const markdownComponents: Components = {
+    h1: props => <h1 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border)', color: 'var(--text-main)' }} {...props} />,
+    h2: props => <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--accent)', marginTop: '20px', marginBottom: '8px' }} {...props} />,
+    h3: props => <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', marginTop: '16px', marginBottom: '6px' }} {...props} />,
+    p: props => <p style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-muted)', marginBottom: '12px' }} {...props} />,
+    a: ({ href, children, ...props }) => {
+      const isWikilink = href?.startsWith('wikilink:');
+      const isRelativeInternal = href
+        && !href.startsWith('http')
+        && !href.startsWith('#')
+        && !href.startsWith('mailto:')
+        && !href.startsWith('wikilink:');
+
+      if (isWikilink || isRelativeInternal) {
+        const nodeId = isWikilink ? href?.slice('wikilink:'.length) ?? '' : href ?? '';
+        return (
+          <a
+            href="#"
+            onClick={event => {
+              event.preventDefault();
+              window.dispatchEvent(new CustomEvent('open-node', { detail: { id: nodeId } }));
+            }}
+            title={`Open: ${nodeId}`}
+            style={{
+              color: 'var(--accent)',
+              textDecoration: 'underline',
+              textDecorationStyle: 'dotted',
+              textDecorationColor: 'var(--accent)',
+              cursor: 'pointer',
+            }}
+          >
+            {children}
+          </a>
+        );
+      }
+
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: 'var(--accent)', textDecoration: 'underline', textDecorationColor: 'var(--accent-border)' }}
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    },
+    strong: props => <strong style={{ color: 'var(--text-main)', fontWeight: 600 }} {...props} />,
+    hr: props => <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '16px 0' }} {...props} />,
+    code: props => (
+      <code
+        style={{
+          background: 'rgba(255,255,255,0.06)',
+          padding: '2px 5px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontFamily: "'SF Mono','Fira Code','Consolas',monospace",
+          color: 'var(--accent)',
+        }}
+        {...props}
+      />
+    ),
+    pre: props => (
+      <pre
+        style={{
+          background: '#010409',
+          padding: '14px',
+          borderRadius: 'var(--radius-md)',
+          overflowX: 'auto',
+          marginBottom: '12px',
+          border: '1px solid var(--border)',
+        }}
+        {...props}
+      />
+    ),
+    li: props => <li style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-muted)', marginBottom: '4px' }} {...props} />,
+    blockquote: props => <blockquote style={{ borderLeft: '3px solid var(--accent-border)', paddingLeft: '12px', marginLeft: 0, color: 'var(--text-dim)', fontStyle: 'italic' }} {...props} />,
+  };
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -168,10 +247,11 @@ export default function GraphView() {
         linkWidth={1.2}
         nodeRelSize={5}
         nodeCanvasObjectMode={() => 'after'}
-        nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D) => {
-          if (node === selectedNode) {
+        nodeCanvasObject={(node, ctx: CanvasRenderingContext2D) => {
+          const graphNode = node as KnowledgeNode;
+          if (graphNode === selectedNode) {
             ctx.beginPath();
-            ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI);
+            ctx.arc(graphNode.x ?? 0, graphNode.y ?? 0, 8, 0, 2 * Math.PI);
             ctx.strokeStyle = 'rgba(0,239,209,0.7)';
             ctx.lineWidth = 1.5;
             ctx.stroke();
@@ -226,65 +306,7 @@ export default function GraphView() {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               urlTransform={(url) => url}
-              components={{
-                h1: ({ node, ...props }) => <h1 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border)', color: 'var(--text-main)' }} {...props} />,
-                h2: ({ node, ...props }) => <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--accent)', marginTop: '20px', marginBottom: '8px' }} {...props} />,
-                h3: ({ node, ...props }) => <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', marginTop: '16px', marginBottom: '6px' }} {...props} />,
-                p: ({ node, ...props }) => <p style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-muted)', marginBottom: '12px' }} {...props} />,
-                a: ({ node, href, children, ...props }) => {
-                  const isWikilink = href?.startsWith('wikilink:');
-                  // Also catch relative .md links (e.g. [foo](concepts/foo.md)) —
-                  // these would otherwise navigate the browser away to a blank page
-                  const isRelativeInternal = href
-                    && !href.startsWith('http')
-                    && !href.startsWith('#')
-                    && !href.startsWith('mailto:')
-                    && !href.startsWith('wikilink:');
-
-                  if (isWikilink || isRelativeInternal) {
-                    const nodeId = isWikilink
-                      ? href!.slice('wikilink:'.length)
-                      : href!; // already a relative vault path
-                    return (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          window.dispatchEvent(new CustomEvent('open-node', { detail: { id: nodeId } }));
-                        }}
-                        title={`Open: ${nodeId}`}
-                        style={{
-                          color: 'var(--accent)', textDecoration: 'underline',
-                          textDecorationStyle: 'dotted', textDecorationColor: 'var(--accent)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {children}
-                      </a>
-                    );
-                  }
-                  return <a href={href} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline', textDecorationColor: 'var(--accent-border)' }} {...props}>{children}</a>;
-                },
-                strong: ({ node, ...props }) => <strong style={{ color: 'var(--text-main)', fontWeight: 600 }} {...props} />,
-                hr: ({ node, ...props }) => <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '16px 0' }} {...props} />,
-                code: ({ node, inline, ...props }: any) => (
-                  <code style={{
-                    background: 'rgba(255,255,255,0.06)', padding: inline ? '2px 5px' : '12px',
-                    borderRadius: '4px', fontSize: '12px',
-                    fontFamily: "'SF Mono','Fira Code','Consolas',monospace",
-                    color: 'var(--accent)',
-                  }} {...props} />
-                ),
-                pre: ({ node, ...props }) => (
-                  <pre style={{
-                    background: '#010409', padding: '14px', borderRadius: 'var(--radius-md)',
-                    overflowX: 'auto', marginBottom: '12px',
-                    border: '1px solid var(--border)',
-                  }} {...props} />
-                ),
-                li: ({ node, ...props }) => <li style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-muted)', marginBottom: '4px' }} {...props} />,
-                blockquote: ({ node, ...props }) => <blockquote style={{ borderLeft: '3px solid var(--accent-border)', paddingLeft: '12px', marginLeft: 0, color: 'var(--text-dim)', fontStyle: 'italic' }} {...props} />,
-              }}
+              components={markdownComponents}
             >
               {markdownContent}
             </ReactMarkdown>

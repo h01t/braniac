@@ -1,7 +1,10 @@
 import fs from 'fs/promises';
+import type { Dirent } from 'fs';
 import path from 'path';
 import { simpleGit, SimpleGit } from 'simple-git';
+import { isErrnoException } from './errors';
 import { withVaultLock } from './lock';
+import type { VaultFileEntry } from './types';
 
 export interface Metrics {
   graphRenderTime: number;
@@ -35,54 +38,54 @@ export async function listVaults() {
 export async function initVault(vaultId: string) {
   const vaultPath = path.join(VAULTS_ROOT, vaultId);
   await fs.mkdir(vaultPath, { recursive: true });
-  
+
   const git: SimpleGit = simpleGit(vaultPath);
   const isRepo = await git.checkIsRepo();
-  
+
   if (!isRepo) {
     await git.init();
     await git.addConfig('user.name', 'AI Knowledge Compiler');
     await git.addConfig('user.email', 'ai@knowledge.compiler');
-    
+
     // Create initial index.md
     await fs.writeFile(path.join(vaultPath, 'index.md'), '# Knowledge Vault\n\nInitial commit.');
     await git.add('.');
     await git.commit('Initial creation of knowledge vault');
   }
-  
+
   return vaultPath;
 }
 
-export async function listFiles(vaultId: string, subPath: string = '') {
+export async function listFiles(vaultId: string, subPath: string = ''): Promise<VaultFileEntry[]> {
   const vaultPath = path.join(VAULTS_ROOT, vaultId, subPath);
   try {
-    let dirents;
+    let dirents: Dirent[];
     try {
       dirents = await fs.readdir(vaultPath, { withFileTypes: true });
-    } catch (err: any) {
-      if (err.code === 'ENOENT' && subPath === '') {
+    } catch (error: unknown) {
+      if (isErrnoException(error) && error.code === 'ENOENT' && subPath === '') {
         // Auto-initialize default vault if it doesn't exist
         await initVault(vaultId);
         dirents = await fs.readdir(vaultPath, { withFileTypes: true });
       } else {
-        throw err;
+        throw error;
       }
     }
-    
-    const files: any[] = [];
+
+    const files: VaultFileEntry[] = [];
     for (const dirent of dirents) {
       if (dirent.name === '.git') continue;
       const relPath = path.join(subPath, dirent.name);
       if (dirent.isDirectory()) {
-         const nested = await listFiles(vaultId, relPath);
-         files.push(...nested);
+        const nested = await listFiles(vaultId, relPath);
+        files.push(...nested);
       } else {
-         files.push({ name: dirent.name, path: relPath, type: 'file' });
+        files.push({ name: dirent.name, path: relPath, type: 'file' });
       }
     }
     return files;
-  } catch(error) {
-    console.error("Error listing files:", error);
+  } catch (error) {
+    console.error('Error listing files:', error);
     return [];
   }
 }
@@ -91,7 +94,7 @@ export async function readMarkdown(vaultId: string, filename: string) {
   const filePath = path.join(VAULTS_ROOT, vaultId, filename);
   try {
     return await fs.readFile(filePath, 'utf-8');
-  } catch(e) {
+  } catch {
     return null;
   }
 }
@@ -115,7 +118,7 @@ export async function getHistory(vaultId: string) {
     const git: SimpleGit = simpleGit(vaultPath);
     const log = await git.log();
     return log.all;
-  } catch(e) {
+  } catch {
     return [];
   }
 }
@@ -126,7 +129,7 @@ export async function getDiff(vaultId: string, hash: string) {
     const git: SimpleGit = simpleGit(vaultPath);
     const diff = await git.show([hash]);
     return diff;
-  } catch (e) {
+  } catch {
     return '';
   }
 }
@@ -209,9 +212,12 @@ export async function generateUnifiedDiff(before: string, after: string): Promis
   try {
     const { stdout } = await execAsync(`diff -u "${beforePath}" "${afterPath}"`);
     return stdout;
-  } catch (e: any) {
+  } catch (error: unknown) {
     // diff exits with code 1 when files differ — that's normal
-    return e.stdout || '';
+    if (error && typeof error === 'object' && 'stdout' in error && typeof error.stdout === 'string') {
+      return error.stdout;
+    }
+    return '';
   } finally {
     await fs.unlink(beforePath).catch(() => {});
     await fs.unlink(afterPath).catch(() => {});
@@ -220,23 +226,21 @@ export async function generateUnifiedDiff(before: string, after: string): Promis
 
 // ── Performance Metrics ────────────────────────────────────────────────────────
 
-export async function collectMetrics(vaultId: string, operation: string, duration: number, metadata?: Record<string, unknown>): Promise<void> {
-  const startTime = Date.now();
-  
+export async function collectMetrics(vaultId: string, operation: string, duration: number, metadata: Record<string, unknown> = {}): Promise<void> {
   // Simulate graph rendering for node count
   const files = await listFiles(vaultId);
-  const nodeCount = files.filter((f: any) => f.type === 'file' && f.name.endsWith('.md')).length;
+  const nodeCount = files.filter((file) => file.path.endsWith('.md')).length;
   await new Promise(resolve => setTimeout(resolve, 10)); // Simulate 10ms render
-  
+
   const logs: MetricLog[] = [];
   logs.push({
     timestamp: new Date().toISOString(),
     vaultId,
     operation,
-    duration: 10,
-    metadata: { nodeCount }
+    duration,
+    metadata: { nodeCount, ...metadata },
   });
-  
+
   // In production, this would append to a metrics file or database
   console.log('[Metrics]', JSON.stringify(logs));
 }

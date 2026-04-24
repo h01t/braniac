@@ -1,12 +1,36 @@
 {
   "name": "ai-knowledge-compiler",
   "version": "0.1.0",
+  "description": "Braniac is a local-first AI knowledge compiler that turns raw sources into a Git-backed markdown knowledge graph with semantic search, graph exploration, and human-reviewed linting.",
   "private": true,
+  "author": "Ognjen Jovanovic",
+  "license": "MIT",
+  "homepage": "https://github.com/h01t/braniac#readme",
+  "bugs": {
+    "url": "https://github.com/h01t/braniac/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h01t/braniac.git"
+  },
+  "keywords": [
+    "nextjs",
+    "knowledge-graph",
+    "semantic-search",
+    "local-first",
+    "markdown",
+    "llm"
+  ],
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.29",

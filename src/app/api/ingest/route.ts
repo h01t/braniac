@@ -27,11 +27,9 @@ import { writeMarkdownAndCommit, getCurrentCommitHash } from '@/lib/vaultManager
 import { extractTextFromUrl, extractTextFromPdf } from '@/lib/extractor';
 import { chunkText } from '@/lib/chunker';
 import { parseAIOutput } from '@/lib/parser';
-import { exec } from 'child_process';
+import { updateQmdIndexInBackground } from '@/lib/qmd';
 
 export const maxDuration = 300;
-
-const ROLLBACK_EVENT = 'vault-rollback';
 
 const SYSTEM_PROMPT = `You are a strict AI Knowledge Compiler. Your goal is to ingest the raw text and extract concepts, entities, and sources to build an interconnected Markdown wiki.
 
@@ -199,15 +197,7 @@ Output EXACTLY using <file path="filename.md"> markup. No conversational text.`;
         }
 
         if (allPaths.length > 0 && !batchError) {
-          exec('export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update', { cwd: process.cwd() }, (err: any) => {
-            if (err) {
-              console.error('qmd background update failed', err);
-              window.dispatchEvent(new CustomEvent(ROLLBACK_EVENT, { detail: { vaultId, success: false, message: err.message || 'Rollback failed' }}));
-            } else {
-              console.log('qmd background update finished');
-              window.dispatchEvent(new CustomEvent(ROLLBACK_EVENT, { detail: { vaultId, success: true, message: 'Rollback complete' }}));
-            }
-          });
+          updateQmdIndexInBackground();
         }
 
         send(batchError ? `\n\n[Ingestion Failed — Rolled Back]` : `\n\n[Ingestion Complete: ${allPaths.length} files]`);

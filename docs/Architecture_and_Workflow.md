@@ -1,122 +1,130 @@
----
-title: AI Knowledge Compiler Architecture & Workflow
-author: Ognjen Jovanovic
-date: 2026-04-21
----
+# Architecture and Workflow
 
-# AI Knowledge Compiler: Architecture & Workflow
+This document is the technical companion to [project-overview.md](./project-overview.md). It focuses on how the system is structured, how knowledge moves through the application, and how vault integrity is maintained over time.
 
-**Author**: Ognjen Jovanovic
+## High-Level Architecture
 
-This document outlines the high-level architecture, the ingest and compilation workflows, and the synchronization strategy between components in the AI Knowledge Compiler.
-
----
-
-## 1. High-Level Architecture
-
-The AI Knowledge Compiler is built on a robust local-first architecture, leveraging **Next.js**, React, and the Vercel AI SDK to integrate multiple tools seamlessly. The core capabilities involve unstructured parsing via `grapper` and hybrid semantic search via `qmd`.
-
-```mermaid
-graph TD
-    A[Client UI / React] -->|API Requests| B(Next.js App Router API)
-    
-    subgraph Core Services
-    B -->|Ingest text/URLs/PDFs| C[Extractor via grapper]
-    B -->|Mint & Lint Requests| D[Vercel AI SDK]
-    B -->|Search Queries| E[Qmd Search & Embed]
-    end
-    
-    subgraph Data Layer
-    C -.->|Markdown chunks| F[(Git-Backed Vault System)]
-    D -.->|Analyses & Fixes| F
-    E -.->|Reads Models| F
-    end
-
-    subgraph External Dependencies
-    D -->|Calls| G[DeepSeek LLM APIs]
-    end
-```
-
-### Key Components
-
-- **Client UI**: Built with React 19, provides visual graph navigation (`react-force-graph-2d`) and ingest interfaces.
-- **Next.js Backend**: App Router handles the API logic for scraping, semantic embedding, and search retrieval.
-- **Grapper**: A CLI-based scraping utility configured locally to convert unstructured inputs (PDFs, robust web pages) into Markdown.
-- **Qmd**: Local-first vector and semantic search engine that indexes the Git-backed vault, enabling lightning-fast LLM-reranked text retrieval.
-- **Vault System**: A file-based, Git version-controlled knowledge graph enforcing localized state.
-
----
-
-## 2. Ingestion & Linting Workflow
-
-Transforming raw knowledge into interconnected markdown assets involves an iterative **Mint & Lint** process. The system safely buffers updates, detects inconsistencies, and provides interactive suggestions before committing.
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as API
-    participant G as Grapper (Extractor)
-    participant C as Chunker
-    participant L as LLM (DeepSeek)
-    participant V as Git Vault
-    
-    U->>A: Submit URL / PDF
-    A->>G: Extract Markdown content
-    G-->>A: Raw Markdown Payload
-    A->>C: Section-aware split
-    C-->>A: Markdown Sections
-    A->>L: Process to Nodes & Links
-    L-->>A: Structured JSON Updates
-    A->>V: Mint (Write Markdown nodes)
-    
-    Note over U, V: Linting Phase (Asynchronous or Manual)
-    
-    U->>A: Trigger "Mint & Lint"
-    A->>L: Scan Vault for orphans/contradictions
-    L-->>A: Issue Proposals
-    A->>U: Display Lint UI
-    U->>A: Approve Fixes
-    A->>V: Apply & Auto-Commit Fixes
-```
-
-### Mint & Lint Process Snapshot
-![Mint & Lint UI](../img/lint_and_mint.png)
-
----
-
-## 3. Synchronization: Qmd and Grapper
-
-The interaction between the raw extractor (`grapper`) and the semantic search engine (`qmd`) ensures that newly acquired information is instantly searchable.
+Braniac uses a local-first architecture built around a Next.js App Router frontend, API routes for orchestration, a file-based markdown vault, and two local command-line tools: `grapper` for extraction and `qmd` for retrieval.
 
 ```mermaid
 flowchart LR
-    Origin((External Source)) --> |PDF / Web| Grapp[Grapper CLI]
-    Grapp --> |Extracts| MD[Raw Markdown]
-    MD --> Minting[AI Node Structuring]
-    Minting --> Vault[(Git Vault)]
-    
-    Vault --> |Triggers| QmdIndex[Qmd Embed]
-    QmdIndex --> |Updates| VectorDB[(Qmd Vector Index)]
-    
-    Client((User Search)) --> |Query| QmdAPI[Qmd Retrieval API]
-    QmdAPI --> |Semantic Rerank| Client
-    VectorDB -.-> QmdAPI
+    U["User"] --> UI["Next.js + React UI"]
+    UI --> API["App Router API Routes"]
+
+    API --> EXT["grapper Extraction"]
+    API --> LLM["Provider-configurable LLM layer"]
+    API --> QMD["qmd Search / Update"]
+    API --> VAULT["Git-backed Markdown Vaults"]
+
+    EXT --> VAULT
+    LLM --> VAULT
+    VAULT --> QMD
+    QMD --> UI
 ```
 
-1. **Extraction Pipeline**: `grapper` ingests source content (e.g., academic PDFs) with high fidelity.
-2. **Structuring**: We chunk and mint these into nodes in our file system.
-3. **Synchronization Trigger**: Upon a successful Git commit in the Vault (handled via async mutex to prevent conflicts), a background indexation task triggers `qmd embed`.
-4. **Search Readiness**: Within seconds, the vector capabilities of `qmd` absorb the new context, allowing subsequent semantic searches to retrieve and navigate the freshly integrated concepts.
+### Core Components
 
----
+- `src/components/`: graph view, ingest panel, search, vault selector, lint modal, and EvalOps surfaces
+- `src/app/api/`: ingestion, lint, search, metrics, and vault-management routes
+- `src/lib/extractor.ts`: local `grapper` integration for URLs and PDFs
+- `src/lib/vaultManager.ts`: filesystem and Git operations for vault state
+- `src/lib/qmd.ts`: local semantic retrieval and background index refresh
 
-## UI Screenshots Overview
+## Ingestion Workflow
 
-### Landing Page & Architecture
-![Landing Page](../img/landing_page.png)
+The ingest path turns raw input into markdown files that can be searched, linked, and versioned.
 
-### Knowledge Node Exploration
-![Node Overview](../img/node-overview.png)
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Ingest UI
+    participant API as /api/ingest
+    participant Extract as grapper
+    participant Chunk as chunkText
+    participant Model as LLM
+    participant Parse as XML-like parser
+    participant Vault as Git-backed vault
+    participant Index as qmd update
 
----
-*Generated for the AI Knowledge Compiler documentation, 2026, by Ognjen Jovanovic.*
+    User->>UI: Submit text, URL, or PDF
+    UI->>API: POST payload
+    API->>Extract: Extract source text when needed
+    Extract-->>API: Markdown/text
+    API->>Chunk: Split into section-aware chunks
+    Chunk-->>API: ordered chunks
+    loop per chunk
+      API->>Model: Generate structured files
+      Model-->>API: file blocks
+      API->>Parse: Parse and validate output
+      Parse-->>Vault: write + commit
+    end
+    API->>Index: refresh local qmd index
+```
+
+## Search and Navigation Workflow
+
+Graph navigation and semantic search are designed to complement each other rather than compete.
+
+```mermaid
+flowchart LR
+    Q["Search query"] --> S["/api/search"]
+    S --> QMD["qmd query --json"]
+    QMD --> R["Ranked snippets"]
+    R --> UI["SearchBar / GraphView"]
+    UI --> N["Open node or related page"]
+    N --> C["/api/vaults/[vaultId]/content"]
+    C --> M["Markdown panel with wikilink navigation"]
+```
+
+The graph is generated directly from stored markdown files by scanning `[[wikilinks]]`, which means the visualization and the stored knowledge structure stay aligned.
+
+## Mint and Lint Workflow
+
+The "Mint & Lint" flow is intentionally human-reviewed. The model proposes changes, but the user approves them before they are written back to the vault.
+
+```mermaid
+flowchart TD
+    Start["Trigger lint from sidebar"] --> Scan["Read markdown files from active vault"]
+    Scan --> Analyze["LLM structural analysis"]
+    Analyze --> Report["Generate report + fix proposals"]
+    Report --> Review["Review diffs in modal"]
+    Review -->|Approve| Apply["Apply changes and commit"]
+    Review -->|Reject| End["Close without changes"]
+    Apply --> Refresh["Refresh qmd index and UI state"]
+```
+
+![Mint & Lint interface](../img/lint_and_mint.png)
+
+## Data Model and Vault Layout
+
+Each vault is a local directory with its own Git history. The current implementation uses lightweight folder conventions rather than a database schema.
+
+| Folder | Purpose |
+|---|---|
+| `concepts/` | conceptual or thematic pages |
+| `entities/` | people, companies, models, tools, institutions |
+| `sources/` | source-origin pages and extraction anchors |
+| `events/` | notable time-bounded items |
+| root files | overview documents such as `index.md`, `glossary.md`, `log.md` |
+
+## UI Reference
+
+![Landing page](../img/landing_page.png)
+
+![Node detail panel](../img/node-overview.png)
+
+![EvalOps commit history](../img/evalops.png)
+
+## Implementation Notes
+
+- The app supports multiple vaults and persists the active vault in local storage.
+- Ingest and lint models are configurable through the Settings page.
+- The repository includes sample vaults to make the demo immediately inspectable.
+- Lint caching is used to skip previously healthy files when possible.
+
+## Known Boundaries
+
+- The system is single-user and local-first by design.
+- Extraction and indexing rely on local CLI availability.
+- AI-generated knowledge is reviewable, but not guaranteed correct.
+- The current graph is optimized for explorable knowledge artifacts, not for very large collaborative deployments.

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import type { SearchResultItem } from '@/lib/types';
 
 const SearchIcon = ({ loading }: { loading: boolean }) => (
   <svg
@@ -33,11 +34,9 @@ const ScoreBadge = ({ score }: { score: number }) => {
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [offset, setOffset] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Click-outside dismiss
@@ -55,15 +54,13 @@ export default function SearchBar() {
     e.preventDefault();
     if (!query.trim()) { setResults([]); setOpen(false); return; }
     setLoading(true);
-    setOffset(0);
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=20&offset=${offset}`);
-      const data = await res.json();
-      const r = data.results || [];
-      setTotalCount(r.length);
-      setResults(r);
-      setOpen(r.length > 0);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json() as { results?: SearchResultItem[] };
+      const items = data.results ?? [];
+      setResults(items);
+      setOpen(items.length > 0);
     } catch (err) {
       console.error(err);
     }
@@ -113,7 +110,7 @@ export default function SearchBar() {
             const displayName = r.title ?? (normalizeNodeId(r.file ?? '').split('/').pop() ?? r.file);
             return (
               <div
-                key={i}
+                key={`${r.file}-${i}`}
                 onClick={() => handleResultClick(r.file)}
                 style={{
                   padding: '10px 12px',
@@ -144,15 +141,6 @@ export default function SearchBar() {
           >
             Clear results
           </button>
-          {totalCount > 20 && (
-            <button
-              onClick={() => { setOffset(prev => prev + 20); }}
-              disabled={loading}
-              style={{ padding: '4px 12px', fontSize: '11px', background: 'var(--accent)', color: 'var(--text-main)', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer' }}
-            >
-              Load More
-            </button>
-          )}
         </div>
       )}
     </div>

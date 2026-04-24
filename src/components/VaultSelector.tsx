@@ -6,7 +6,13 @@ const STORAGE_KEY = 'compiler-active-vault';
 
 export default function VaultSelector() {
   const [vaults, setVaults] = useState<string[]>([]);
-  const [active, setActive] = useState('default');
+  const [active, setActive] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 'default';
+    }
+
+    return localStorage.getItem(STORAGE_KEY) || 'default';
+  });
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [error, setError] = useState('');
@@ -22,9 +28,11 @@ export default function VaultSelector() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) || 'default';
-    setActive(saved);
-    loadVaults();
+    const timer = window.setTimeout(() => {
+      void loadVaults();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [loadVaults]);
 
   const switchVault = (id: string) => {
@@ -52,7 +60,7 @@ export default function VaultSelector() {
       setCreating(false);
       await loadVaults();
       switchVault(name);
-    } catch (err) {
+    } catch {
       setError('Failed to create vault');
     }
   };

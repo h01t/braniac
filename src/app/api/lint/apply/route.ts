@@ -19,8 +19,9 @@
  * ```
  */
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/errors';
+import { updateQmdIndexInBackground } from '@/lib/qmd';
 import { writeMarkdownAndCommit, deleteFileAndCommit } from '@/lib/vaultManager';
-import { exec } from 'child_process';
 
 export const maxDuration = 120;
 
@@ -62,23 +63,16 @@ export async function POST(request: Request) {
           );
         }
         applied++;
-      } catch (e: any) {
-        errors.push(`${p.path}: ${e.message}`);
+      } catch (error: unknown) {
+        errors.push(`${p.path}: ${getErrorMessage(error)}`);
       }
     }
 
-    // Re-index qmd in background after changes
-    exec(
-      'export PATH=$PATH:/opt/homebrew/bin:/usr/local/bin && npx qmd update',
-      { cwd: process.cwd() },
-      (err) => {
-        if (err) console.error('qmd update after lint apply failed', err);
-      },
-    );
+    updateQmdIndexInBackground();
 
     return NextResponse.json({ applied, errors });
-  } catch (err: any) {
-    console.error('Lint Apply Error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Lint Apply Error:', error);
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

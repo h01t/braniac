@@ -5,15 +5,21 @@ import path from 'path';
 import os from 'os';
 
 const execFileAsync = promisify(execFile);
+const GRAPPER_BIN = process.env.GRAPPER_PATH?.trim() || 'grapper';
 
-const GRAPPER_BIN = process.env.GRAPPER_PATH || '/Users/grmim/Dev/grapper/target/release/grapper';
+function logExtractionFailure(source: 'URL' | 'PDF', error: unknown) {
+  const reason = error instanceof Error ? error.message : String(error);
+  console.error(
+    `grapper ${source} extraction failed: ${reason}. Set GRAPPER_PATH or ensure "grapper" is available on PATH.`,
+  );
+}
 
 export async function extractTextFromUrl(url: string): Promise<string | null> {
   try {
     const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', url], { timeout: 30000 });
     return stdout.trim() || null;
   } catch (err) {
-    console.error('grapper URL extraction failed:', err);
+    logExtractionFailure('URL', err);
     return null;
   }
 }
@@ -25,7 +31,7 @@ export async function extractTextFromPdf(buffer: Buffer): Promise<string | null>
     const { stdout } = await execFileAsync(GRAPPER_BIN, ['--stdout', tmpPath], { timeout: 30000 });
     return stdout.trim() || null;
   } catch (err) {
-    console.error('grapper PDF extraction failed:', err);
+    logExtractionFailure('PDF', err);
     return null;
   } finally {
     await fs.unlink(tmpPath).catch(() => {});
