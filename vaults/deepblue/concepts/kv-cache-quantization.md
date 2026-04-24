@@ -1,15 +1,28 @@
 # KV Cache Quantization
 
-**Summary**: KV cache quantization compresses key/value embeddings stored in transformer models during autoregressive generation, reducing memory usage and inference latency.
+**Summary**: KV cache quantization reduces the memory footprint of the key-value cache used in transformer inference, enabling longer context lengths and faster decoding. The source references multiple methods including KIVI, KVQuant, PolarQuant, and BalanceKV.
+
 **Source Context**: turboqaunt.pdf
 
 ---
 
-The KV cache stores embeddings from previously generated tokens. Its size scales with model size and context length, becoming a bottleneck. TurboQuant applies online vector quantization to compress the KV cache with minimal quality loss. Experiments show absolute quality neutrality at 3.5 bits per channel and marginal degradation at 2.5 bits per channel.
+KV cache quantization is a technique to compress the stored keys and values in the attention layers of transformer models [[concepts/attention-mechanism.md]]. It is critical for scaling to long sequences, as the cache grows linearly with context length.
+
+Several methods are referenced in the source:
+- **KIVI** ([[41]]) – A tuning-free asymmetric 2-bit quantization for KV cache [41].
+- **KVQuant** ([[30]]) – Aims at 10 million context length LLM inference [30].
+- **PolarQuant** ([[28]]) – Uses polar transformation for quantizing KV caches [28].
+- **BalanceKV** ([[29]]) – Compresses KV cache through discrepancy theory [29].
+- **PyramidKV** ([[12]]) – Dynamic compression via pyramidal information funneling [12].
+- **QAQ** ([[17]]) – Quality adaptive quantization for LLM KV cache [17].
+- **GEAR** ([[33]]) – Near-lossless compression recipe [33].
+- **RotateKV** ([[51]]) – 2-bit quantization with outlier-aware rotations [51].
+- **WKVQuant** ([[60]]) – Quantizes both weights and key/value cache [60].
+
+Other works like [[concepts/product-quantization.md]] and [[concepts/vector-quantization.md]] provide foundational techniques adapted for KV cache compression.
 
 ## Related pages
-- [[concepts/turboquant.md]]
+- [[concepts/product-quantization.md]]
 - [[concepts/vector-quantization.md]]
-- [[concepts/mse-distortion.md]]
-- [[concepts/inner-product-distortion.md]]
-- [[sources/turboquant-paper.md]]
+- [[concepts/attention-mechanism.md]]
+- [[sources/turboqaunt.md]]
