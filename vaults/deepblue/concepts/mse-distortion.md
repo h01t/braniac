@@ -1,24 +1,22 @@
-# MSE Distortion
+# Mean‑Squared Error (MSE) Distortion
 
-**Summary**: Mean-squared error (MSE) distortion measures the expected squared Euclidean distance between an original vector and its quantized reconstruction.
-**Source Context**: turboqaunt.pdf
+**Summary**: MSE distortion is the expected squared L2 distance between an input vector and its reconstruction after quantization. It is a standard measure of reconstruction quality.
+
+**Source Context**: turboqaunt.pdf (Equations (1), (2))
 
 ---
 
-Formally, for a quantization map \(Q\) and dequantization map \(Q^{-1}\), the MSE distortion is defined as:
-\[
-D_{\text{mse}} := \mathbb{E}_Q\left[ \| x - Q^{-1}(Q(x)) \|_2^2 \right]
-\]
-TurboQuant's MSE-optimized quantizer achieves a distortion bound:
-\[
-D_{\text{mse}} \le \sqrt{\frac{3}{\pi}} \cdot \frac{1}{4^b} \quad \text{for } b \ge 0
-\]
-for unit-norm vectors, where \(b\) is the bit-width per coordinate. The algorithm uses random rotation and optimal scalar quantization via the Lloyd-Max algorithm on Beta-distributed coordinates.
+## Definition
+
+For a quantization scheme ![Q](https://latex.codecogs.com/svg.latex?Q) with dequantizer ![Q^{-1}](https://latex.codecogs.com/svg.latex?Q%5E%7B-1%7D), the MSE distortion for input ![x](https://latex.codecogs.com/svg.latex?x) is:
+
+![D_{\\mathrm{mse}}(Q) = \\mathbb{E}\\left[\\|x - Q^{-1}(Q(x))\\|_2^2\\right]](https://latex.codecogs.com/svg.latex?D_%7B%5Cmathrm%7Bmse%7D%7D(Q)%20%3D%20%5Cmathbb%7BE%7D%5Cleft%5B%5C%7Cx%20-%20Q%5E%7B-1%7D(Q(x))%5C%7C_2%5E2%5Cright%5D)
+
+## Role in TurboQuant
+
+The MSE‑optimal TurboQuant aims to minimize this distortion for worst‑case unit‑norm vectors. It achieves a distortion within a factor of ![\\sqrt{3\\pi/2}](https://latex.codecogs.com/svg.latex?%5Csqrt%7B3%5Cpi/2%7D) of the [[concepts/shannon-lower-bound.md|Shannon Lower Bound]].
 
 ## Related pages
 - [[concepts/turboquant.md]]
-- [[concepts/random-rotation.md]]
-- [[concepts/beta-distribution.md]]
-- [[concepts/lloyd-max-quantizer.md]]
 - [[concepts/inner-product-distortion.md]]
-- [[sources/turboquant-paper.md]]
+- [[concepts/bias-in-mse-quantizers.md]]
