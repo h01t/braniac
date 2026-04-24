@@ -16,4 +16,4 @@ In experiments (turboqaunt.pdf, Section 4.1), the MSE error of TurboQuant is com
 - [[concepts/turboquant.md]]
 - [[concepts/inner-product-estimation.md]]
 - [[concepts/lower-bound-compression.md]]
-- [[sources/shannon-lower-bound.md]]
+- [[concepts/shannon-lower-bound.md]]
