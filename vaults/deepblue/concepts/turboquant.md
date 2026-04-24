@@ -1,36 +1,23 @@
 # TurboQuant
 
-**Summary**: TurboQuant is a family of vector quantization algorithms designed to minimize either mean‑squared error (MSE) or inner product distortion, achieving near‑optimal performance with closed‑form upper bounds.
+**Summary**: TurboQuant is a quantization algorithm designed for high-dimensional vectors, providing theoretical guarantees for both mean squared error (MSE) and inner product estimation distortion. It achieves optimal distortion rates up to a small constant factor and is applied to KV cache compression and nearest neighbor search.
 
-**Source Context**: turboqaunt.pdf
+**Source Context**: turboqaunt.pdf, Chunk 4 of 5
 
 ---
 
-## Overview
+TurboQuant is introduced as a quantization method that minimizes distortion in both MSE and inner product estimation. The algorithm uses a two-stage process: first, it computes a mean squared error (MSE) approximant, then applies a randomized quantization based on the Quasi-Johnson-Lindenstrauss Lemma (QJL) to achieve unbiased inner product estimates.
 
-TurboQuant consists of two separate schemes:
+Theoretical results show that TurboQuant achieves optimal distortion rates for any bit-width, proven via lower bounds using [[concepts/yao-minimax-principle.md]] and [[concepts/shannon-lower-bound.md]]. Specifically, Theorem 3 (source: turboqaunt.pdf) establishes that for any randomized quantization algorithm, there exists a hard input such that MSE ≥ 1/(4^b) and inner product distortion ≥ 1/(d·4^b).
 
-### MSE‑optimal TurboQuant (`Q_mse`)
-1. Apply a random rotation matrix ![\\Sigma](https://latex.codecogs.com/svg.latex?%5CSigma) to the input vector ![x](https://latex.codecogs.com/svg.latex?x) so that the result is uniformly distributed on the unit sphere.
-2. Quantize each coordinate independently using an optimal scalar quantizer designed for the Beta distribution of a rotated coordinate (see [[concepts/beta-distribution-hypersphere.md]]).
-3. The scalar quantizer solves a continuous k‑means problem on the interval [[-1,1]] with ![2^b](https://latex.codecogs.com/svg.latex?2%5Eb) clusters, using Voronoi tessellation.
+Experiments on [[entities/dbpedia-entities.md]] with [[entities/openai-embeddings.md]] validate the theoretical bounds. Two variants are evaluated: **TurboQuant_prod** (unbiased for inner product) and **TurboQuant_mse** (optimized for MSE). The results confirm that TurboQuant_prod remains unbiased across all bit widths, while TurboQuant_mse exhibits bias that diminishes with increasing bit width (source: turboqaunt.pdf, Section 4.1).
 
-### Inner‑product‑optimal TurboQuant (`Q_prod`)
-1. Apply **MSE‑optimal TurboQuant** with bit‑width ![b-1](https://latex.codecogs.com/svg.latex?b-1) to minimize the residual L2 norm.
-2. Apply a single‑bit unbiased quantizer ([[concepts/quantized-johnson-lindenstrauss.md]]) to the residual error.
-This scheme is proven to be **unbiased** for inner product estimation and achieves near‑optimal distortion.
-
-## Theoretical Guarantees
-- **MSE distortion**: Within a factor of at most ![\\sqrt{3\\pi/2} \\approx 2.7](https://latex.codecogs.com/svg.latex?%5Csqrt%7B3%5Cpi/2%7D%20%5Capprox%202.7) of the information‑theoretic lower bound ([[concepts/shannon-lower-bound.md]]). For ![b=1](https://latex.codecogs.com/svg.latex?b%3D1) the factor is only ~1.45.
-- **Inner product distortion**: For worst‑case vectors ![x,y](https://latex.codecogs.com/svg.latex?x%2Cy) with ![\\|x\\|=1](https://latex.codecogs.com/svg.latex?%5C%7Cx%5C%7C%3D1):  
-![\\mathbb{E}[\\langle y, Q^{-1}(Q(x))\\rangle] = \\langle y, x\\rangle](https://latex.codecogs.com/svg.latex?%5Cmathbb%7BE%7D%5B%5Clangle%20y%2C%20Q%5E%7B-1%7D(Q(x))%5Crangle%5D%20%3D%20%5Clangle%20y%2C%20x%5Crangle) (unbiased)  
-and variance bounded by ![\\frac{\\pi}{2d} \\|y\\|_2^2](https://latex.codecogs.com/svg.latex?%5Cfrac%7B%5Cpi%7D%7B2d%7D%20%5C%7Cy%5C%7C_2%5E2).
+In downstream tasks, TurboQuant is applied to [[concepts/kv-cache-compression.md]] on LLMs like [[entities/llama-3-1-8b-instruct.md]] and [[entities/ministral-7b-instruct.md]]. On the [[concepts/needle-in-a-haystack-test.md]] and [[concepts/longbench-dataset.md]], TurboQuant achieves performance matching full-precision models at 4× compression or higher (source: turboqaunt.pdf, Sections 4.2 and 4.3). It also outperforms [[concepts/product-quantization.md]] and [[concepts/rabitq.md]] in [[concepts/near-neighbor-search.md]] tasks (source: turboqaunt.pdf, Section 4.4).
 
 ## Related pages
-- [[concepts/quantized-johnson-lindenstrauss.md]]
+- [[concepts/inner-product-estimation.md]]
 - [[concepts/mse-distortion.md]]
-- [[concepts/inner-product-distortion.md]]
-- [[concepts/bias-in-mse-quantizers.md]]
-- [[concepts/random-rotation.md]]
-- [[concepts/beta-distribution-hypersphere.md]]
-- [[concepts/shannon-lower-bound.md]]
+- [[concepts/lower-bound-compression.md]]
+- [[entities/dbpedia-entities.md]]
+- [[entities/llama-3-1-8b-instruct.md]]
+- [[sources/turboqaunt-paper.md]]
