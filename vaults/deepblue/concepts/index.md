@@ -41,6 +41,7 @@
 - [concepts/longbench-dataset.md](./concepts/longbench-dataset.md) — LongBench dataset for long‑context evaluation.
 - [concepts/near-neighbor-search.md](./concepts/near-neighbor-search.md) — Near neighbor search with quantized representations.
 - [concepts/rabitq.md](./concepts/rabitq.md) — RABITQ (a related quantization method).
+- [concepts/polarquant.md](./concepts/polarquant.md) — PolarQuant quantization method.
 - [concepts/yao-minimax-principle.md](./concepts/yao-minimax-principle.md) — Yao’s minimax principle applied to quantization.
 
 ## Entity Files
