@@ -1,6 +1,6 @@
 # PolarQuant
 
-**Summary**: A quantization method that transforms Cartesian vectors into polar coordinates, exploiting the known angular concentration to eliminate the memory overhead of traditional vector quantization, forming the first stage of TurboQuant.
+**Summary**: A quantization method that transforms Cartesian vectors into polar coordinates, exploiting the known angular concentration to eliminate the memory overhead of traditional vector quantization.
 
 **Source Context**: https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/
 
@@ -10,7 +10,7 @@ PolarQuant addresses the memory overhead problem in [[concepts/vector-quantizati
 
 The process recursively groups pairs of coordinates, converting them to polar form and repeating until a single radius and a set of angles remain. This results in a compact “shorthand” that can be stored and processed efficiently (source URL, animated diagram description).
 
-PolarQuant is used as the first (high‑quality) stage of [[concepts/turboquant.md|TurboQuant]], providing most of the compression. It is scheduled for presentation at AISTATS 2026 (source URL, "Quick links").
+PolarQuant is a companion method to [[concepts/turboquant.md|TurboQuant]], both presented in the same blog post. It is scheduled for presentation at AISTATS 2026 (source URL, "Quick links").
 
 ## Related pages
 - [[concepts/turboquant.md]]
