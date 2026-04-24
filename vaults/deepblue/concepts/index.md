@@ -1,5 +1,11 @@
 # Table of Contents
 
+**Summary**: Index of all pages in the TurboQuant vault, grouped by type (sources, concepts, entities).
+
+**Source Context**: Generated from the vault file listing.
+
+---
+
 ## Source Files
 - [sources/turboquant-paper.md](./sources/turboquant-paper.md) — Original PDF text extracted from the TurboQuant paper.
 - [sources/turboquant-pdf.md](./sources/turboquant-pdf.md) — PDF metadata and extraction details.
@@ -51,4 +57,7 @@
 - [entities/claude.md](./entities/claude.md) — Claude model for comparison.
 - [entities/llama-3.md](./entities/llama-3.md) — LLaMA‑3 model family.
 - [entities/gemini.md](./entities/gemini.md) — Gemini model family.
-</file path="index.md">
+
+## Related pages
+- [[concepts/glossary.md]]
+- [[concepts/log.md]]
