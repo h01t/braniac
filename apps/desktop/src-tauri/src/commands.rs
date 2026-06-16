@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use braniac_core::ai::build_ingest_adapter;
+use braniac_core::ai::{build_ingest_adapter, build_lint_adapter};
 use braniac_core::migrate::import_legacy_vaults;
 use braniac_core::palette::{
     help_text, ingest_request_from_link, ingest_request_from_pdf, ingest_request_from_text,
@@ -49,7 +49,7 @@ async fn run_lint_with_events(
     vault_id: &str,
 ) -> Result<Uuid, String> {
     let settings = state.settings_snapshot().map_err(|e| e.to_string())?;
-    let adapter = build_ingest_adapter(&settings.lint_provider, &settings.lint_model)
+    let adapter = build_lint_adapter(&settings.lint_provider, &settings.lint_model)
         .map_err(|e| e.to_string())?;
     state
         .jobs
@@ -187,14 +187,10 @@ pub fn search_query(
 
 #[tauri::command]
 pub fn index_status(state: State<'_, SharedState>, vault_id: String) -> Result<IndexStatus, String> {
-    let manifest = state
-        .vaults
-        .lock()
-        .open_vault(&vault_id)
-        .map_err(|e| e.to_string())?;
+    let vault = state.vaults.lock();
     state
         .index
-        .status(&vault_id, manifest.document_count)
+        .status_for_vault(&vault, &vault_id)
         .map_err(|e| e.to_string())
 }
 
@@ -226,7 +222,7 @@ pub fn graph_snapshot(
 ) -> Result<GraphSnapshot, String> {
     state
         .graph
-        .snapshot(&state.vaults.lock(), &vault_id)
+        .snapshot_with_vaults(&state.vaults, &vault_id)
         .map_err(|e| e.to_string())
 }
 
@@ -236,10 +232,9 @@ pub fn graph_layout_start(
     vault_id: String,
     options: Option<LayoutOptions>,
 ) -> Result<GraphSnapshot, String> {
-    let vaults = state.vaults.lock();
     let snapshot = state
         .graph
-        .snapshot(&vaults, &vault_id)
+        .snapshot_with_vaults(&state.vaults, &vault_id)
         .map_err(|e| e.to_string())?;
     let opts = options.unwrap_or_default();
     state
@@ -267,40 +262,42 @@ pub async fn job_start_lint(
 }
 
 #[tauri::command]
-pub fn job_lint_result(state: State<'_, SharedState>) -> Result<Option<LintResult>, String> {
-    Ok(state.jobs.latest_lint_result())
+pub fn job_lint_result(
+    state: State<'_, SharedState>,
+    job_id: Uuid,
+) -> Result<Option<LintResult>, String> {
+    Ok(state.jobs.get_lint_result(job_id))
 }
 
 #[tauri::command]
-pub fn job_lint_apply(state: State<'_, SharedState>, vault_id: String) -> Result<usize, String> {
-    let lint = state
-        .jobs
-        .latest_lint_result()
-        .ok_or_else(|| "no lint result available".to_string())?;
-    let vault = state.vaults.lock();
-    let result = state.jobs.apply_lint_fixes(&vault, &vault_id, &lint.fixes);
-    if result.applied > 0 {
-        let _ = state.index.rebuild(&vault, &vault_id);
-    }
-    state.jobs.clear_lint_results();
-    if !result.errors.is_empty() {
-        return Err(result.errors.join("; "));
-    }
-    Ok(result.applied)
+pub fn job_lint_apply(_state: State<'_, SharedState>, _vault_id: String) -> Result<usize, String> {
+    Err(braniac_core::BraniacError::ReviewRequired(
+        "blind lint apply is disabled; review fixes in Mint & Lint and apply by fix id".into(),
+    )
+    .to_string())
 }
 
 #[tauri::command]
 pub fn job_lint_apply_selected(
     state: State<'_, SharedState>,
     vault_id: String,
-    fixes: Vec<LintFix>,
+    job_id: Uuid,
+    fix_ids: Vec<String>,
 ) -> Result<ApplyLintResult, String> {
-    let vault = state.vaults.lock();
-    let result = state.jobs.apply_lint_fixes(&vault, &vault_id, &fixes);
+    let lint = state
+        .jobs
+        .get_lint_result(job_id)
+        .ok_or_else(|| format!("no lint result for job {job_id}"))?;
+    let result = {
+        let vault = state.vaults.lock();
+        state
+            .jobs
+            .apply_lint_fixes_by_ids(&vault, &vault_id, &lint, &fix_ids)
+    };
     if result.applied > 0 {
-        let _ = state.index.rebuild(&vault, &vault_id);
+        let _ = state.index.rebuild_with_vaults(&state.vaults, &vault_id);
     }
-    state.jobs.clear_lint_results();
+    state.jobs.clear_job_state(job_id);
     Ok(result)
 }
 
@@ -428,19 +425,9 @@ pub async fn palette_execute(
                 index_status: None,
             })
         }
-        PaletteCommandKind::LintApply => {
-            let applied = job_lint_apply(state, vault_id)?;
-            Ok(PaletteResult {
-                ok: true,
-                message: format!("Applied {applied} lint fixes"),
-                job_id: None,
-                error: None,
-                ui_action: None,
-                ui_value: None,
-                search_results: None,
-                index_status: None,
-            })
-        }
+        PaletteCommandKind::LintApply => Ok(palette_err(
+            "lint apply requires review in Mint & Lint; blind apply is disabled",
+        )),
         PaletteCommandKind::Vault { id } => {
             vault_open(state, id.clone())?;
             Ok(PaletteResult {

@@ -10,7 +10,6 @@ import type {
   IngestRequest,
   JobEvent,
   KnowledgeDocument,
-  LintFix,
   LintResult,
   PaletteResult,
   LayoutOptions,
@@ -59,10 +58,11 @@ export const api = {
     invoke<string>("job_start_ingest", { request }),
   jobStartLint: (vaultId: string) =>
     invoke<string>("job_start_lint", { vaultId }),
-  jobLintResult: () => invoke<LintResult | null>("job_lint_result"),
+  jobLintResult: (jobId: string) =>
+    invoke<LintResult | null>("job_lint_result", { jobId }),
   jobLintApply: (vaultId: string) => invoke<number>("job_lint_apply", { vaultId }),
-  jobLintApplySelected: (vaultId: string, fixes: LintFix[]) =>
-    invoke<ApplyLintResult>("job_lint_apply_selected", { vaultId, fixes }),
+  jobLintApplySelected: (vaultId: string, jobId: string, fixIds: string[]) =>
+    invoke<ApplyLintResult>("job_lint_apply_selected", { vaultId, jobId, fixIds }),
   jobCancel: (jobId: string) => invoke<void>("job_cancel", { jobId }),
   paletteExecute: (command: string, vaultId: string) =>
     invoke<PaletteResult>("palette_execute", { command, vaultId }),

@@ -64,7 +64,9 @@ For deletions (self-closing):
 
 Rules:
 - Output NO conversational text outside the <report> and <fix> blocks.
-- Every <fix> must target a real path that exists in the vault data provided.
+- Every <fix> must target a valid vault path.
+- `create` fixes may target new paths that do not yet exist in the vault.
+- `update` and `delete` fixes must target paths that already exist in the vault data provided.
 - Only propose fixes with high confidence. Do not hallucinate paths."#;
 
 #[async_trait]
@@ -105,6 +107,21 @@ pub fn build_ingest_adapter(
     provider: &AiProvider,
     model: &str,
 ) -> Result<Box<dyn AiProviderAdapter>> {
+    build_http_adapter(provider, model, None)
+}
+
+pub fn build_lint_adapter(
+    provider: &AiProvider,
+    model: &str,
+) -> Result<Box<dyn AiProviderAdapter>> {
+    build_http_adapter(provider, model, Some(0.0))
+}
+
+fn build_http_adapter(
+    provider: &AiProvider,
+    model: &str,
+    temperature: Option<f32>,
+) -> Result<Box<dyn AiProviderAdapter>> {
     if use_mock_adapter() {
         return Ok(Box::new(MockAiAdapter));
     }
@@ -119,6 +136,7 @@ pub fn build_ingest_adapter(
                 api_key: key,
                 base_url: "https://api.deepseek.com/chat/completions".into(),
                 model: model.to_string(),
+                temperature,
             }))
         }
         AiProvider::Openai => {
@@ -131,6 +149,7 @@ pub fn build_ingest_adapter(
                 api_key: key,
                 base_url: "https://api.openai.com/v1/chat/completions".into(),
                 model: model.to_string(),
+                temperature,
             }))
         }
     }
@@ -140,6 +159,7 @@ pub struct HttpChatAdapter {
     api_key: String,
     base_url: String,
     model: String,
+    temperature: Option<f32>,
 }
 
 #[derive(Serialize)]
@@ -147,6 +167,8 @@ struct ChatRequest<'a> {
     model: &'a str,
     messages: Vec<ChatMessage<'a>>,
     stream: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    temperature: Option<f32>,
 }
 
 #[derive(Serialize)]
@@ -187,6 +209,7 @@ impl AiProviderAdapter for HttpChatAdapter {
                 },
             ],
             stream: false,
+            temperature: self.temperature,
         };
         let response = client
             .post(&self.base_url)

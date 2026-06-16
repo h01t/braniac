@@ -9,6 +9,7 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 use crate::error::{BraniacError, Result};
+use crate::vault_scan::{content_hash, VaultDocumentScan, VaultRevision};
 
 const ALLOWED_PREFIXES: &[&str] = &["concepts/", "entities/", "sources/", "events/", "papers/"];
 
@@ -182,9 +183,45 @@ impl VaultResolver {
     }
 
     pub fn current_head_hash(&self, vault_id: &str) -> Result<String> {
+        Ok(self.vault_revision(vault_id)?.head_hash)
+    }
+
+    pub fn vault_revision(&self, vault_id: &str) -> Result<VaultRevision> {
         let repo = Repository::open(&self.resolve_vault_path(vault_id)?)?;
         let head = repo.head()?.peel_to_commit()?;
-        Ok(head.id().to_string())
+        let worktree_dirty = is_worktree_dirty(&repo)?;
+        Ok(VaultRevision {
+            head_hash: head.id().to_string(),
+            worktree_dirty,
+        })
+    }
+
+    pub fn scan_documents(
+        &self,
+        vault_id: &str,
+        include_content: bool,
+    ) -> Result<Vec<VaultDocumentScan>> {
+        let files = self.list_files(vault_id)?;
+        let mut scans = Vec::with_capacity(files.len());
+        for file in &files {
+            let doc = self.read_document(vault_id, &file.path)?;
+            let title = doc
+                .title
+                .clone()
+                .unwrap_or_else(|| file.name.clone());
+            let hash = content_hash(&doc.content);
+            scans.push(VaultDocumentScan {
+                path: file.path.clone(),
+                title,
+                content_hash: hash,
+                content: if include_content {
+                    Some(doc.content)
+                } else {
+                    None
+                },
+            });
+        }
+        Ok(scans)
     }
 
     pub fn files_changed_since(&self, vault_id: &str, from_hash: &str) -> Result<Vec<String>> {
@@ -414,6 +451,14 @@ fn copy_dir_recursive(src: &Path, dest: &Path) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn is_worktree_dirty(repo: &Repository) -> Result<bool> {
+    let mut opts = git2::StatusOptions::new();
+    opts.include_untracked(true);
+    opts.include_ignored(false);
+    let statuses = repo.statuses(Some(&mut opts))?;
+    Ok(statuses.iter().any(|entry| entry.path() != Some(".lint-cache.json")))
 }
 
 #[cfg(test)]

@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { isCliCommand, PALETTE_HELP } from "../lib/paletteCli";
 
 export interface CommandItem {
   id: string;
   label: string;
   shortcut?: string;
+  group?: string;
+  icon?: ReactNode;
   run: () => void;
 }
 
@@ -15,6 +17,46 @@ interface CommandPaletteProps {
   commands: CommandItem[];
   onClose: () => void;
   onExecuteCli?: (line: string) => Promise<void>;
+}
+
+type CommandSection = {
+  group?: string;
+  items: CommandItem[];
+};
+
+function buildSections(commands: CommandItem[]): CommandSection[] {
+  const ungrouped: CommandItem[] = [];
+  const groups = new Map<string, CommandItem[]>();
+  for (const cmd of commands) {
+    if (cmd.group) {
+      const list = groups.get(cmd.group) ?? [];
+      list.push(cmd);
+      groups.set(cmd.group, list);
+    } else {
+      ungrouped.push(cmd);
+    }
+  }
+  const sections: CommandSection[] = [];
+  if (ungrouped.length > 0) sections.push({ items: ungrouped });
+  for (const [group, items] of groups) {
+    sections.push({ group, items });
+  }
+  return sections;
+}
+
+function filterSections(sections: CommandSection[], query: string): CommandSection[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return sections;
+  return sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (c) =>
+          c.label.toLowerCase().includes(q) ||
+          (section.group?.toLowerCase().includes(q) ?? false),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 }
 
 function CommandPalettePanel({
@@ -28,11 +70,27 @@ function CommandPalettePanel({
 
   const cliActive = isCliCommand(query) || query.trim() === "help" || query.trim() === "?";
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q || cliActive) return commands;
-    return commands.filter((c) => c.label.toLowerCase().includes(q));
+  const sections = useMemo(() => {
+    const built = buildSections(commands);
+    if (cliActive) return built;
+    return filterSections(built, query);
   }, [commands, query, cliActive]);
+
+  const itemsWithIndex = useMemo(() => {
+    let index = 0;
+    return sections.flatMap((section) =>
+      section.items.map((command) => ({
+        section,
+        command,
+        index: index++,
+      })),
+    );
+  }, [sections]);
+
+  const filtered = useMemo(
+    () => itemsWithIndex.map((row) => row.command),
+    [itemsWithIndex],
+  );
 
   const preview = useMemo(() => {
     const q = query.trim();
@@ -40,6 +98,10 @@ function CommandPalettePanel({
     if (cliActive) return `CLI: ${q}`;
     return null;
   }, [query, cliActive]);
+
+  useEffect(() => {
+    setFocusIndex(0);
+  }, [query]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -79,6 +141,9 @@ function CommandPalettePanel({
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="command-palette">
         <input
@@ -97,20 +162,38 @@ function CommandPalettePanel({
         />
         {preview && <pre className="palette-preview">{preview}</pre>}
         {!cliActive && (
-          <ul>
-            {filtered.map((command, index) => (
-              <li key={command.id}>
-                <button
-                  type="button"
-                  className={index === focusIndex ? "focused" : undefined}
-                  onClick={() => {
-                    command.run();
-                    onClose();
-                  }}
-                >
-                  {command.label}
-                  {command.shortcut ? ` (${command.shortcut})` : ""}
-                </button>
+          <ul className="command-palette-list">
+            {sections.map((section) => (
+              <li key={section.group ?? "__ungrouped"} className="command-palette-section">
+                {section.group && (
+                  <div className="palette-group-heading">{section.group}</div>
+                )}
+                <ul>
+                  {section.items.map((command) => {
+                    const row = itemsWithIndex.find((r) => r.command.id === command.id);
+                    const index = row?.index ?? 0;
+                    return (
+                      <li key={command.id}>
+                        <button
+                          type="button"
+                          className={index === focusIndex ? "focused" : undefined}
+                          onClick={() => {
+                            command.run();
+                            onClose();
+                          }}
+                        >
+                          {command.icon && (
+                            <span className="palette-item-icon">{command.icon}</span>
+                          )}
+                          <span className="palette-item-label">{command.label}</span>
+                          {command.shortcut && (
+                            <span className="palette-item-shortcut">{command.shortcut}</span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </li>
             ))}
           </ul>

@@ -13,17 +13,18 @@ interface InspectorPanelProps {
   history: HistoryEntry[];
   searchMatch?: SearchMatchContext | null;
   onNavigateToPath?: (path: string) => void;
+  onCreateMissingPage?: (nodeId: string) => void;
   embedded?: boolean;
 }
 
-type HistoryTag = "link" | "orphan" | "section" | null;
+type HistoryTag = "link" | "orphan" | "section" | "edit";
 
 function deriveHistoryTag(message: string): HistoryTag {
   const lower = message.toLowerCase();
   if (lower.includes("orphan")) return "orphan";
   if (lower.includes("link") || lower.includes("wikilink")) return "link";
   if (lower.includes("section")) return "section";
-  return null;
+  return "edit";
 }
 
 export function InspectorPanel({
@@ -32,10 +33,18 @@ export function InspectorPanel({
   history,
   searchMatch,
   onNavigateToPath,
+  onCreateMissingPage,
   embedded = false,
 }: InspectorPanelProps) {
+  const showEmpty = !document && !node && !searchMatch;
+
   const body = (
     <div className="panel-body">
+      {showEmpty && (
+        <div className="inspector-empty">
+          <p>Select a node or document to inspect.</p>
+        </div>
+      )}
       {searchMatch && (
         <div className="inspector-block inspector-search-match">
           <h4>Search match</h4>
@@ -51,7 +60,20 @@ export function InspectorPanel({
           <h4>Node</h4>
           <div>{node.label}</div>
           <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{node.id}</div>
-          {node.missing && <div className="stale-warning">Missing page</div>}
+          {node.missing && (
+            <div className="inspector-missing-row">
+              <span className="stale-warning">Missing page</span>
+              {onCreateMissingPage && (
+                <button
+                  type="button"
+                  className="inspector-create-page-btn"
+                  onClick={() => onCreateMissingPage(node.id)}
+                >
+                  Create page
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
       {document && (
@@ -67,16 +89,20 @@ export function InspectorPanel({
       )}
       <div className="inspector-block">
         <h4>History</h4>
-        {history.slice(0, 8).map((entry) => {
-          const tag = deriveHistoryTag(entry.message);
-          return (
-            <div key={entry.hash} className="history-item">
-              {tag && <span className={`history-tag history-tag--${tag}`}>{tag}</span>}
-              <div className="history-message">{entry.message}</div>
-              <div className="history-hash">{entry.hash.slice(0, 8)}</div>
-            </div>
-          );
-        })}
+        {history.length === 0 ? (
+          <p className="inspector-history-empty">No history entries yet.</p>
+        ) : (
+          history.slice(0, 8).map((entry) => {
+            const tag = deriveHistoryTag(entry.message);
+            return (
+              <div key={entry.hash} className="history-item">
+                <span className={`history-tag history-tag--${tag}`}>{tag}</span>
+                <div className="history-message">{entry.message}</div>
+                <div className="history-hash">{entry.hash.slice(0, 8)}</div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 use std::process::Command;
+use std::sync::Arc;
 use std::time::Instant;
 
 use braniac_core::graph::GraphEngine;
 use braniac_core::index::IndexManager;
-use braniac_core::qmd::qmd_bin;
+use braniac_core::qmd::{qmd_bin, ProcessQmdClient};
 use braniac_core::vault::VaultResolver;
 use braniac_types::{LayoutOptions, SearchQuery};
 
@@ -33,27 +34,28 @@ fn main() {
             .expect("write");
     }
 
-    let index = IndexManager::new(data_dir.join("index")).expect("index");
+    let qmd = Arc::new(ProcessQmdClient);
+    let index = IndexManager::new(data_dir.join("index"), qmd).expect("index");
 
     if qmd_available() {
         let start = Instant::now();
         index.rebuild(&resolver, "bench").expect("rebuild");
         println!("cold_index_build_ms={}", start.elapsed().as_millis());
 
+        let query = SearchQuery {
+            text: "topic 42".into(),
+            limit: Some(5),
+            fuzzy: None,
+            field: None,
+        };
+
         let start = Instant::now();
-        let _ = index
-            .search(
-                &resolver,
-                "bench",
-                &SearchQuery {
-                    text: "topic 42".into(),
-                    limit: Some(5),
-                    fuzzy: None,
-                    field: None,
-                },
-            )
-            .expect("search");
+        let _ = index.search(&resolver, "bench", &query).expect("search");
         println!("search_latency_ms={}", start.elapsed().as_millis());
+
+        let start = Instant::now();
+        let _ = index.search(&resolver, "bench", &query).expect("warm search");
+        println!("warm_search_latency_ms={}", start.elapsed().as_millis());
     } else {
         eprintln!("skip: qmd not installed ({})", qmd_bin());
     }

@@ -10,11 +10,11 @@ interface JobActivityFeedProps {
   compact?: boolean;
 }
 
-function phaseTitle(phase: JobActivityState["phase"]): string {
+function phaseStatusLabel(phase: JobActivityState["phase"]): string | null {
   if (phase === "success") return "Complete";
   if (phase === "error") return "Failed";
   if (phase === "running") return "In progress";
-  return "";
+  return null;
 }
 
 export function JobActivityFeed({ activity, busy, compact = false }: JobActivityFeedProps) {
@@ -22,7 +22,7 @@ export function JobActivityFeed({ activity, busy, compact = false }: JobActivity
   const visibleChunks = activity.streamChunks.slice(-4);
   const showProgress = activity.phase === "running" && activity.percent != null;
   const showIndeterminate = activity.phase === "running" && activity.percent == null && busy;
-  const title = phaseTitle(activity.phase);
+  const statusLabel = phaseStatusLabel(activity.phase);
   const [consoleOpen, setConsoleOpen] = useState(false);
 
   useEffect(() => {
@@ -44,13 +44,12 @@ export function JobActivityFeed({ activity, busy, compact = false }: JobActivity
       aria-live="polite"
       aria-busy={busy || activity.phase === "running"}
     >
-      {(title || showProgress || showIndeterminate) && (
-        <div className="job-activity-header">
-          {title && <span className="job-activity-title">{title}</span>}
-          {showProgress && <ActivityProgressBar percent={activity.percent} />}
-          {showIndeterminate && <ActivityProgressBar indeterminate />}
-        </div>
-      )}
+      <div className="job-activity-header">
+        <span className="job-activity-heading">Activity</span>
+        {statusLabel && <span className="job-activity-status">{statusLabel}</span>}
+        {showProgress && <ActivityProgressBar percent={activity.percent} />}
+        {showIndeterminate && <ActivityProgressBar indeterminate />}
+      </div>
 
       {activity.steps.length > 0 && (
         <ul className="activity-steps">

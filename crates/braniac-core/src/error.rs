@@ -34,6 +34,9 @@ pub enum BraniacError {
 
     #[error("Invalid input: {0}")]
     InvalidInput(String),
+
+    #[error("Review required: {0}")]
+    ReviewRequired(String),
 }
 
 pub type Result<T> = std::result::Result<T, BraniacError>;

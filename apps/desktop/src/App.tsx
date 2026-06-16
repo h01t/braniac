@@ -10,9 +10,10 @@ import { MintLintModal, type MintLintPhase } from "./components/MintLintModal";
 import { ResizableInspector, useInspectorLayout } from "./components/ResizableInspector";
 import { SourceDialog } from "./components/SourceDialog";
 import { StatusBar } from "./components/StatusBar";
+import { ToastStack, type Toast } from "./components/ToastStack";
 import { VaultFileTree } from "./components/VaultFileTree";
 import { VaultOverflowMenu } from "./components/VaultOverflowMenu";
-import { BrandGlyphIcon, SearchIcon, SparklesIcon } from "./components/icons";
+import { BrandGlyphIcon, MonitorIcon, MoonIcon, SearchIcon, SparklesIcon, SunIcon } from "./components/icons";
 import { useJobActivity } from "./hooks/useJobActivity";
 import { executePaletteCommand, type PaletteContext } from "./lib/paletteCli";
 import { SearchActivity } from "./components/SearchActivity";
@@ -126,6 +127,7 @@ export default function App() {
   const [pluginPath, setPluginPath] = useState("");
   const [initDone, setInitDone] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(loadSidebarCollapsed);
+  const [toasts, setToasts] = useState<Toast[]>([]);
   const inspectorLayout = useInspectorLayout();
 
   const persistSidebarCollapsed = useCallback((collapsed: boolean) => {
@@ -147,6 +149,15 @@ export default function App() {
   const log = useCallback((line: string) => {
     setStatusLine(line);
     setConsoleLines((prev) => [...prev.slice(-100), line]);
+  }, []);
+
+  const pushToast = useCallback((message: string, variant: Toast["variant"]) => {
+    const id = crypto.randomUUID();
+    setToasts((prev) => [...prev, { id, message, variant }]);
+  }, []);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const setStatusBarModePersisted = useCallback((mode: StatusBarMode) => {
@@ -278,10 +289,12 @@ export default function App() {
           break;
         case "completed":
           log(`Job ${event.jobId} completed`);
+          pushToast("Compile completed", "success");
           setIngestBusy(false);
           break;
         case "failed":
           log(`Job failed: ${event.error}`);
+          pushToast(`Job failed: ${event.error}`, "error");
           setIngestBusy(false);
           break;
         case "cancelled":
@@ -302,7 +315,7 @@ export default function App() {
       unlisten = fn;
     });
     return () => unlisten?.();
-  }, [log, handleJobEvent]);
+  }, [log, handleJobEvent, pushToast]);
 
   useEffect(() => {
     if (!statusLine) return;
@@ -555,8 +568,10 @@ export default function App() {
         setMintLintApplyResult(result);
         setMintLintPhase("done");
         log(`Applied ${result.applied} lint fixes`);
+        pushToast(`Applied ${result.applied} lint fixes`, "success");
         if (result.errors.length > 0) {
           log(result.errors.join("; "));
+          pushToast(result.errors[0] ?? "Some fixes failed", "error");
         }
         await refreshVault(vaultId);
         setLintResult(null);
@@ -565,11 +580,12 @@ export default function App() {
         setMintLintApplyResult({ applied: 0, errors: [String(error)] });
         setMintLintPhase("done");
         log(`Apply fixes failed: ${String(error)}`);
+        pushToast(`Apply fixes failed: ${String(error)}`, "error");
       } finally {
         setLintBusy(false);
       }
     },
-    [vaultId, lintJobId, log, refreshVault],
+    [vaultId, lintJobId, log, refreshVault, pushToast],
   );
 
   const openMintLintReview = useCallback(() => {
@@ -651,6 +667,30 @@ export default function App() {
     [settings, log],
   );
 
+  const createMissingPage = useCallback(
+    async (nodeId: string) => {
+      if (!vaultId) return;
+      const baseName = nodeId.split("/").pop()?.replace(/\.md$/i, "") ?? "untitled";
+      const title = baseName
+        .split("-")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+      const content = `# ${title}\n\n**Summary**: \n\n`;
+      try {
+        await api.documentWrite(vaultId, nodeId, content, `Create ${nodeId}`);
+        log(`Created ${nodeId}`);
+        pushToast(`Created ${nodeId}`, "success");
+        await refreshVault(vaultId);
+        changeCenterTab("editor");
+        await openDocument(nodeId);
+      } catch (error) {
+        log(`Create failed: ${String(error)}`);
+        pushToast(`Could not create page: ${String(error)}`, "error");
+      }
+    },
+    [vaultId, log, pushToast, refreshVault, changeCenterTab, openDocument],
+  );
+
   const commands = useMemo<CommandItem[]>(
     () => [
       {
@@ -697,17 +737,23 @@ export default function App() {
       },
       {
         id: "theme-dark",
-        label: "Theme: Dark",
+        label: "Dark",
+        group: "Theme",
+        icon: <MoonIcon size={14} />,
         run: () => void persistTheme("dark"),
       },
       {
         id: "theme-light",
-        label: "Theme: Light",
+        label: "Light",
+        group: "Theme",
+        icon: <SunIcon size={14} />,
         run: () => void persistTheme("light"),
       },
       {
         id: "theme-system",
-        label: "Theme: System",
+        label: "System",
+        group: "Theme",
+        icon: <MonitorIcon size={14} />,
         run: () => void persistTheme("system"),
       },
       {
@@ -722,6 +768,10 @@ export default function App() {
 
   const hasVaults = vaults.length > 0;
   const searchPhase = resolveSearchPhase(searchText, searchResults, searchBusy);
+  const graphFocusIds = useMemo(
+    () => (centerTab === "graph" && selectedNode?.id ? [selectedNode.id] : []),
+    [centerTab, selectedNode?.id],
+  );
 
   return (
     <div className="app-shell">
@@ -940,11 +990,10 @@ export default function App() {
                   <GraphCanvas
                     snapshot={graph}
                     selectedId={selectedNode?.id}
+                    focusIds={graphFocusIds}
                     themePreference={resolveThemePreference(settings)}
                     onSelect={(id) => {
-                      const node = graph?.nodes.find((n) => n.id === id) ?? null;
-                      setSelectedNode(node);
-                      void openDocument(id);
+                      void navigateToLinkedPage(id);
                     }}
                   />
                   <IngestBar
@@ -1101,6 +1150,7 @@ export default function App() {
           history={history}
           searchMatch={searchMatch}
           onNavigateToPath={(path) => void navigateToLinkedPage(path)}
+          onCreateMissingPage={(nodeId) => void createMissingPage(nodeId)}
           width={inspectorLayout.width}
           collapsed={inspectorLayout.collapsed}
           onWidthChange={inspectorLayout.setWidth}
@@ -1150,6 +1200,8 @@ export default function App() {
         }}
         onExecuteCli={handlePaletteCli}
       />
+
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

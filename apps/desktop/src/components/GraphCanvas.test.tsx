@@ -14,6 +14,15 @@ beforeAll(() => {
     unobserve() {}
   }
   vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }));
 });
 
 afterEach(() => {
@@ -73,5 +82,38 @@ describe("GraphCanvas", () => {
     );
     expect(document.documentElement.dataset.theme).toBe("light");
     expect(container.querySelector('[data-testid="force-graph"]')).toBeTruthy();
+  });
+
+  it("renders cluster legend for present clusters", () => {
+    const { getByText } = render(
+      <GraphCanvas
+        snapshot={{
+          nodes: [
+            {
+              id: "concepts/a.md",
+              label: "A",
+              val: 1,
+              x: 0,
+              y: 0,
+              cluster: "concepts",
+              missing: false,
+            },
+            {
+              id: "entities/b.md",
+              label: "B",
+              val: 1,
+              x: 0.1,
+              y: 0.1,
+              cluster: "entities",
+              missing: false,
+            },
+          ],
+          edges: [{ source: "concepts/a.md", target: "entities/b.md" }],
+          frame: 1,
+        }}
+      />,
+    );
+    expect(getByText("Concept")).toBeTruthy();
+    expect(getByText("Entities")).toBeTruthy();
   });
 });

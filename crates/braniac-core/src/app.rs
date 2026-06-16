@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use braniac_types::{AppSettings, BootstrapResult};
 use parking_lot::Mutex;
@@ -8,6 +9,7 @@ use crate::graph::GraphEngine;
 use crate::index::IndexManager;
 use crate::jobs::JobManager;
 use crate::plugins::PluginRuntime;
+use crate::qmd::{ProcessQmdClient, QmdClient};
 use crate::settings::SettingsStore;
 use crate::vault::VaultResolver;
 
@@ -19,6 +21,7 @@ pub struct AppState {
     pub graph: GraphEngine,
     pub jobs: JobManager,
     pub plugins: Mutex<PluginRuntime>,
+    pub qmd: Arc<dyn QmdClient>,
 }
 
 impl AppState {
@@ -30,14 +33,17 @@ impl AppState {
         let plugins_dir = data_dir.join("plugins");
         std::fs::create_dir_all(&plugins_dir)?;
 
+        let qmd: Arc<dyn QmdClient> = Arc::new(ProcessQmdClient);
+
         Ok(Self {
             data_dir: data_dir.clone(),
             settings,
             vaults: Mutex::new(VaultResolver::new(vaults_root)),
-            index: IndexManager::new(data_dir.join("index"))?,
+            index: IndexManager::new(data_dir.join("index"), qmd.clone())?,
             graph: GraphEngine::new(data_dir.join("graph")),
             jobs: JobManager::default(),
             plugins: Mutex::new(PluginRuntime::new(plugins_dir)),
+            qmd,
         })
     }
 

@@ -65,6 +65,21 @@
   margin-bottom: 6px;
 }
 
+.job-activity-heading {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.job-activity-status {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
 .job-activity-title {
   font-size: 11px;
   text-transform: uppercase;
@@ -246,4 +261,21 @@
 .activity-console-chevron {
   margin-left: auto;
   display: inline-flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-shimmer,
+  .activity-spin,
+  .activity-indeterminate,
+  .activity-ellipsis,
+  .activity-stream-line,
+  .mint-lint-spinner,
+  .busy-btn-spinner,
+  .search-field-spinner {
+    animation: none !important;
+  }
+
+  .toast {
+    animation: none;
+  }
 }

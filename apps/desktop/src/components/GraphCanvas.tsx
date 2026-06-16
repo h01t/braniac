@@ -4,11 +4,21 @@ import ForceGraph2D, {
   type LinkObject,
   type NodeObject,
 } from "react-force-graph-2d";
+import {
+  clusterCssVar,
+  clusterLabel,
+  computeDegreeMap,
+  linkEndpointId,
+  nodeRadius,
+} from "../lib/graphPaint";
+import { useReducedMotion } from "../lib/motion";
 import type { GraphNode, GraphSnapshot, ThemePreference } from "../types";
+import { EyeIcon, EyeOffIcon, FitIcon, ResetIcon } from "./icons";
 
 interface GraphCanvasProps {
   snapshot: GraphSnapshot | null;
   selectedId?: string | null;
+  focusIds?: string[];
   onSelect?: (nodeId: string) => void;
   themePreference?: ThemePreference;
 }
@@ -30,6 +40,7 @@ type GraphPaintColors = {
   ring: string;
   label: string;
   link: string;
+  clusters: Record<string, string>;
 };
 
 const FALLBACK_COLORS: GraphPaintColors = {
@@ -39,7 +50,8 @@ const FALLBACK_COLORS: GraphPaintColors = {
   default: "#4B5568",
   ring: "rgba(255, 255, 255, 0.85)",
   label: "rgba(248, 250, 252, 0.92)",
-  link: "rgba(129, 140, 248, 0.18)",
+  link: "rgba(129, 140, 248, 0.22)",
+  clusters: {},
 };
 
 function readGraphColors(el: HTMLElement | null): GraphPaintColors {
@@ -47,6 +59,11 @@ function readGraphColors(el: HTMLElement | null): GraphPaintColors {
   const styles = getComputedStyle(target);
   const read = (name: string, fallback: string) =>
     styles.getPropertyValue(name).trim() || fallback;
+
+  const clusters: Record<string, string> = {};
+  for (const cluster of ["concepts", "entities", "events", "papers", "sources"]) {
+    clusters[cluster] = read(clusterCssVar(cluster), read("--graph-node-default", FALLBACK_COLORS.default));
+  }
 
   return {
     missing: read("--graph-node-missing", FALLBACK_COLORS.missing),
@@ -56,12 +73,19 @@ function readGraphColors(el: HTMLElement | null): GraphPaintColors {
     ring: read("--graph-node-ring", FALLBACK_COLORS.ring),
     label: read("--graph-node-label", FALLBACK_COLORS.label),
     link: read("--graph-link-color", FALLBACK_COLORS.link),
+    clusters,
   };
+}
+
+function clusterFill(colors: GraphPaintColors, cluster: string | null | undefined): string {
+  if (!cluster) return colors.default;
+  return colors.clusters[cluster] ?? colors.default;
 }
 
 export function GraphCanvas({
   snapshot,
   selectedId,
+  focusIds = [],
   onSelect,
   themePreference = "dark",
 }: GraphCanvasProps) {
@@ -70,8 +94,17 @@ export function GraphCanvas({
   );
   const [hoverNode, setHoverNode] = useState<GraphNodeObj | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [hideMissing, setHideMissing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [colors, setColors] = useState<GraphPaintColors>(FALLBACK_COLORS);
+  const reducedMotion = useReducedMotion();
+
+  const focusSet = useMemo(() => new Set(focusIds), [focusIds]);
+
+  const allPositioned = useMemo(
+    () => snapshot?.nodes.every((n) => n.x != null && n.y != null) ?? false,
+    [snapshot],
+  );
 
   useLayoutEffect(() => {
     setColors(readGraphColors(containerRef.current));
@@ -106,21 +139,51 @@ export function GraphCanvas({
     if (!snapshot) {
       return { nodes: [] as GraphNodeObj[], links: [] as GraphLinkObj[] };
     }
-    const nodes: GraphNodeObj[] = snapshot.nodes.map((n: GraphNode) => ({
-      id: n.id,
-      label: n.label,
-      missing: n.missing,
-      cluster: n.cluster,
-      val: n.val,
-      x: n.x != null ? n.x * dimensions.width : undefined,
-      y: n.y != null ? n.y * dimensions.height : undefined,
-    }));
-    const links: GraphLinkObj[] = snapshot.edges.map((e) => ({
-      source: e.source,
-      target: e.target,
-    }));
+    const nodes: GraphNodeObj[] = snapshot.nodes
+      .filter((n) => !hideMissing || !n.missing)
+      .map((n: GraphNode) => {
+        const x = n.x != null ? n.x * dimensions.width : undefined;
+        const y = n.y != null ? n.y * dimensions.height : undefined;
+        return {
+          id: n.id,
+          label: n.label,
+          missing: n.missing,
+          cluster: n.cluster,
+          val: n.val,
+          x,
+          y,
+          ...(allPositioned && x != null && y != null ? { fx: x, fy: y } : {}),
+        };
+      });
+    const nodeIds = new Set(nodes.map((n) => n.id));
+    const links: GraphLinkObj[] = snapshot.edges
+      .filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target))
+      .map((e) => ({
+        source: e.source,
+        target: e.target,
+      }));
     return { nodes, links };
-  }, [snapshot, dimensions.width, dimensions.height]);
+  }, [snapshot, dimensions.width, dimensions.height, hideMissing, allPositioned]);
+
+  const degreeMap = useMemo(() => computeDegreeMap(graphData.links), [graphData.links]);
+
+  const presentClusters = useMemo(() => {
+    const set = new Set<string>();
+    for (const node of graphData.nodes) {
+      if (!node.missing && node.cluster) set.add(node.cluster);
+    }
+    return Array.from(set).sort();
+  }, [graphData.nodes]);
+
+  const clusterCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const node of graphData.nodes) {
+      if (!node.missing && node.cluster) {
+        counts.set(node.cluster, (counts.get(node.cluster) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [graphData.nodes]);
 
   const FOCUS_ZOOM = 2.5;
   const FOCUS_DURATION_MS = 400;
@@ -135,15 +198,22 @@ export function GraphCanvas({
     fg.zoom(FOCUS_ZOOM, FOCUS_DURATION_MS);
   }, [selectedId, graphData]);
 
+  // Force canvas repaint when selection/hover/focus change while simulation is idle.
+  useEffect(() => {
+    fgRef.current?.d3ReheatSimulation();
+  }, [selectedId, hoverNode?.id, focusIds]);
+
   const paintNode = useCallback(
     (node: GraphNodeObj, ctx: CanvasRenderingContext2D, globalScale: number) => {
       const label = node.label;
       const fontSize = 11 / globalScale;
-      const radius = node.missing ? 4 : 5.5;
+      const degree = degreeMap.get(node.id) ?? 0;
+      const radius = nodeRadius(degree, node.missing);
       const isSelected = node.id === selectedId;
       const isHover = node.id === hoverNode?.id;
       const x = node.x ?? 0;
       const y = node.y ?? 0;
+      const dimmed = focusSet.size > 0 && !focusSet.has(node.id);
 
       const fill = node.missing
         ? colors.missing
@@ -151,8 +221,10 @@ export function GraphCanvas({
           ? colors.selected
           : isHover
             ? colors.hover
-            : colors.default;
+            : clusterFill(colors, node.cluster);
 
+      ctx.save();
+      ctx.globalAlpha = dimmed ? 0.22 : 1;
       ctx.beginPath();
       ctx.fillStyle = fill;
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
@@ -169,9 +241,32 @@ export function GraphCanvas({
         ctx.fillStyle = colors.label;
         ctx.fillText(label, x + 9 / globalScale, y + 3 / globalScale);
       }
+      ctx.restore();
     },
-    [colors, hoverNode?.id, selectedId],
+    [colors, degreeMap, focusSet, hoverNode?.id, selectedId],
   );
+
+  const linkColor = useCallback(
+    (link: GraphLinkObj) => {
+      if (focusSet.size === 0) return colors.link;
+      const s = linkEndpointId(link.source);
+      const t = linkEndpointId(link.target);
+      if (focusSet.has(s) || focusSet.has(t)) return colors.link;
+      return colors.link.replace(/[\d.]+\)$/, "0.08)");
+    },
+    [colors.link, focusSet],
+  );
+
+  const zoomToFit = useCallback(() => {
+    fgRef.current?.zoomToFit(400, 40);
+  }, []);
+
+  const resetView = useCallback(() => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    fg.centerAt(0, 0, 300);
+    fg.zoom(1, 300);
+  }, []);
 
   if (!snapshot || snapshot.nodes.length === 0) {
     return (
@@ -182,24 +277,50 @@ export function GraphCanvas({
   }
 
   const isLargeGraph = snapshot.nodes.length > 1500;
-  const allPositioned = snapshot.nodes.every((n) => n.x != null && n.y != null);
+  const missingCount = graphData.nodes.filter((n) => n.missing).length;
 
   return (
     <div ref={containerRef} className="graph-canvas-wrap">
       <div className="graph-canvas-overlay" aria-hidden="true">
         <div className="graph-legend">
-          <span className="graph-legend-item">
-            <span className="graph-legend-dot graph-legend-dot--concept" />
-            Concept
-          </span>
-          <span className="graph-legend-item">
-            <span className="graph-legend-dot graph-legend-dot--missing" />
-            Missing
-          </span>
+          {presentClusters.map((cluster) => (
+            <span key={cluster} className="graph-legend-item">
+              <span
+                className="graph-legend-dot"
+                style={{ background: colors.clusters[cluster] ?? colors.default }}
+              />
+              {clusterLabel(cluster)}
+              {clusterCounts.get(cluster) != null && (
+                <span className="graph-legend-count">({clusterCounts.get(cluster)})</span>
+              )}
+            </span>
+          ))}
+          {missingCount > 0 && (
+            <span className="graph-legend-item">
+              <span className="graph-legend-dot graph-legend-dot--missing" />
+              Missing
+            </span>
+          )}
         </div>
         <div className="graph-stats-chip">
           {graphData.nodes.length} nodes · {graphData.links.length} links
         </div>
+      </div>
+      <div className="graph-controls">
+        <button type="button" className="graph-control-btn" title="Zoom to fit" onClick={zoomToFit}>
+          <FitIcon size={14} />
+        </button>
+        <button type="button" className="graph-control-btn" title="Reset view" onClick={resetView}>
+          <ResetIcon size={14} />
+        </button>
+        <button
+          type="button"
+          className={`graph-control-btn${hideMissing ? " graph-control-btn--active" : ""}`}
+          title={hideMissing ? "Show missing nodes" : "Hide missing nodes"}
+          onClick={() => setHideMissing((v) => !v)}
+        >
+          {hideMissing ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
+        </button>
       </div>
       <ForceGraph2D
         ref={fgRef}
@@ -209,21 +330,28 @@ export function GraphCanvas({
         nodeId="id"
         nodeVal="val"
         nodeCanvasObject={paintNode}
+        nodeCanvasObjectMode={() => "replace"}
         nodePointerAreaPaint={(node, color, ctx) => {
           const n = node as GraphNodeObj;
+          const degree = degreeMap.get(n.id) ?? 0;
+          const r = nodeRadius(degree, n.missing) + 4;
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(n.x ?? 0, n.y ?? 0, 10, 0, 2 * Math.PI);
+          ctx.arc(n.x ?? 0, n.y ?? 0, r, 0, 2 * Math.PI);
           ctx.fill();
         }}
-        linkColor={() => colors.link}
+        linkColor={linkColor}
         linkWidth={1}
-        linkDirectionalParticles={isLargeGraph ? 0 : 1}
+        linkDirectionalParticles={
+          reducedMotion || isLargeGraph ? 0 : 1
+        }
         linkDirectionalParticleWidth={2}
         cooldownTicks={isLargeGraph ? 30 : 120}
         d3AlphaDecay={isLargeGraph ? 0.05 : 0.02}
         warmupTicks={allPositioned ? 0 : undefined}
-        onNodeClick={(node) => onSelect?.((node as GraphNodeObj).id)}
+        onNodeClick={(node) => {
+          onSelect?.((node as GraphNodeObj).id);
+        }}
         onNodeHover={(node) => setHoverNode((node as GraphNodeObj | null) ?? null)}
         backgroundColor="transparent"
       />

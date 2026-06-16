@@ -13,6 +13,7 @@ pub mod palette;
 pub mod plugins;
 pub mod settings;
 pub mod vault;
+pub mod vault_scan;
 
 pub use app::{AppState, SharedAppState};
 pub use error::{BraniacError, Result};

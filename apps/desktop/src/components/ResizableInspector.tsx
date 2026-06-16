@@ -38,6 +38,7 @@ interface ResizableInspectorProps {
   history: HistoryEntry[];
   searchMatch?: SearchMatchContext | null;
   onNavigateToPath?: (path: string) => void;
+  onCreateMissingPage?: (nodeId: string) => void;
   onWidthChange: (width: number) => void;
   onCollapsedChange: (collapsed: boolean) => void;
   width: number;
@@ -50,6 +51,7 @@ export function ResizableInspector({
   history,
   searchMatch,
   onNavigateToPath,
+  onCreateMissingPage,
   onWidthChange,
   onCollapsedChange,
   width,
@@ -146,6 +148,7 @@ export function ResizableInspector({
         history={history}
         searchMatch={searchMatch}
         onNavigateToPath={onNavigateToPath}
+        onCreateMissingPage={onCreateMissingPage}
         embedded
       />
     </aside>

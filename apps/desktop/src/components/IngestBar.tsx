@@ -27,14 +27,9 @@ export function IngestBar({
   const [text, setText] = useState("");
   const [pdfPath, setPdfPath] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [activityPinned, setActivityPinned] = useState(false);
-  const [activityCollapsed, setActivityCollapsed] = useState(false);
 
   const hasActivity =
     busy || activity.phase !== "idle" || activity.steps.length > 0 || activity.streamChunks.length > 0;
-  const autoExpand = busy || activity.phase === "running";
-  const activityOpen =
-    autoExpand || ((hasActivity || activityPinned) && !activityCollapsed);
 
   const pickPdf = async () => {
     const selected = await open({
@@ -50,8 +45,6 @@ export function IngestBar({
   const handleCompile = async () => {
     if (!canSubmit) return;
     onActivityReset();
-    setActivityPinned(true);
-    setActivityCollapsed(false);
     onBusyChange(true);
     try {
       if (pdfPath) {
@@ -132,26 +125,9 @@ export function IngestBar({
           Compile
         </BusyButton>
       </div>
-      {(hasActivity || activityPinned) && (
+      {hasActivity && (
         <div className="ingest-activity">
-          <button
-            type="button"
-            className={`ingest-activity-toggle${activityOpen ? " ingest-activity-toggle--open" : ""}`}
-            onClick={() => {
-              if (activityOpen) {
-                setActivityCollapsed(true);
-                setActivityPinned(false);
-              } else {
-                setActivityCollapsed(false);
-                setActivityPinned(true);
-              }
-            }}
-            aria-expanded={activityOpen}
-          >
-            <span>Activity</span>
-            <span className="ingest-activity-chevron" aria-hidden="true" />
-          </button>
-          {activityOpen && <JobActivityFeed activity={activity} busy={busy} />}
+          <JobActivityFeed activity={activity} busy={busy} />
         </div>
       )}
     </div>

@@ -1,6 +1,8 @@
 use std::io::Read;
 use std::path::Path;
 use std::process::{Command, Output, Stdio};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::thread;
 
 use braniac_types::SearchResult;
@@ -100,7 +102,7 @@ fn parse_path_conflict_collection(stderr: &str) -> Option<String> {
     for line in stderr.lines() {
         let trimmed = line.trim();
         if let Some(rest) = trimmed.strip_prefix("Name:") {
-            let name = rest.trim().split_whitespace().next()?.trim();
+            let name = rest.split_whitespace().next()?;
             if !name.is_empty() {
                 return Some(name.to_string());
             }
@@ -112,6 +114,74 @@ fn parse_path_conflict_collection(stderr: &str) -> Option<String> {
 fn collection_exists(name: &str) -> Result<bool> {
     let output = run_qmd(&["collection", "show", name])?;
     Ok(output.status.success())
+}
+
+pub trait QmdClient: Send + Sync {
+    fn resolve_collection(&self, vault_root: &Path, vault_id: &str) -> Result<String>;
+    fn update_collection(&self, collection: &str) -> Result<()>;
+    fn embed_collection(&self, collection: &str) -> Result<()>;
+    fn query(&self, collection: &str, text: &str, limit: u32) -> Result<Vec<SearchResult>>;
+    fn collection_exists(&self, collection: &str) -> bool;
+}
+
+pub struct ProcessQmdClient;
+
+impl QmdClient for ProcessQmdClient {
+    fn resolve_collection(&self, vault_root: &Path, vault_id: &str) -> Result<String> {
+        resolve_collection_name(vault_root, vault_id)
+    }
+
+    fn update_collection(&self, collection: &str) -> Result<()> {
+        update_collection_named(collection)
+    }
+
+    fn embed_collection(&self, collection: &str) -> Result<()> {
+        embed_collection_named(collection)
+    }
+
+    fn query(&self, collection: &str, text: &str, limit: u32) -> Result<Vec<SearchResult>> {
+        query_collection(collection, text, limit)
+    }
+
+    fn collection_exists(&self, collection: &str) -> bool {
+        collection_exists(collection).unwrap_or(false)
+    }
+}
+
+#[derive(Default)]
+pub struct RecordingQmdClient {
+    pub resolve_calls: AtomicUsize,
+    pub query_calls: AtomicUsize,
+}
+
+impl RecordingQmdClient {
+    pub fn new() -> Arc<Self> {
+        Arc::new(Self::default())
+    }
+}
+
+impl QmdClient for RecordingQmdClient {
+    fn resolve_collection(&self, _vault_root: &Path, vault_id: &str) -> Result<String> {
+        self.resolve_calls.fetch_add(1, Ordering::SeqCst);
+        Ok(collection_name(vault_id))
+    }
+
+    fn update_collection(&self, _collection: &str) -> Result<()> {
+        Ok(())
+    }
+
+    fn embed_collection(&self, _collection: &str) -> Result<()> {
+        Ok(())
+    }
+
+    fn query(&self, _collection: &str, _text: &str, _limit: u32) -> Result<Vec<SearchResult>> {
+        self.query_calls.fetch_add(1, Ordering::SeqCst);
+        Ok(Vec::new())
+    }
+
+    fn collection_exists(&self, _collection: &str) -> bool {
+        true
+    }
 }
 
 fn parse_collection_names(list_stdout: &str) -> Vec<String> {

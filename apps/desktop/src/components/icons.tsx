@@ -124,3 +124,89 @@ export function BrandGlyphIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function SunIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" d="M8 1.5v1.2M8 13.3v1.2M1.5 8h1.2M13.3 8h1.2M3.4 3.4l.85.85M11.75 11.75l.85.85M12.6 3.4l-.85.85M4.25 11.75l-.85.85" />
+    </svg>
+  );
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path
+        fill="currentColor"
+        d="M10.2 2.8a5.5 5.5 0 1 0 2.9 9.9A4.8 4.8 0 0 1 10.2 2.8z"
+      />
+    </svg>
+  );
+}
+
+export function MonitorIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <rect x="2" y="3" width="12" height="8" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <path stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" d="M6 13h4M8 11v2" />
+    </svg>
+  );
+}
+
+export function FitIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        d="M2.5 5.5V2.5h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"
+      />
+    </svg>
+  );
+}
+
+export function ResetIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 8a5 5 0 0 1 8.2-3.8L12 5M13 8a5 5 0 0 1-8.2 3.8L4 11"
+      />
+    </svg>
+  );
+}
+
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8s-2.5 4.5-6.5 4.5S1.5 8 1.5 8z"
+      />
+      <circle cx="8" cy="8" r="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        d="M2 2l12 12M6.2 6.4A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 1.8-.5M4.7 4.9C3.4 5.9 2.3 7.2 1.5 8c0 0 2.5 4.5 6.5 4.5 1 0 1.9-.2 2.7-.6M11.1 11.1c1.3-1 2.4-2.3 3.2-3.1"
+      />
+    </svg>
+  );
+}
