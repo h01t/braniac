@@ -1,30 +1,11 @@
 import { useMemo, useState } from "react";
 import type { VaultFileEntry } from "../types";
 import { buildFileTree, type FileTreeNode } from "../lib/fileTree";
+import { ChevronIcon, FileIcon, FolderIcon } from "./icons";
 
-function MdIcon() {
-  return (
-    <svg className="file-tree-icon" viewBox="0 0 16 16" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M3 1h7l3 3v11H3V1zm6 0v3h3M5 8h6M5 10h6M5 12h4"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      />
-    </svg>
-  );
-}
-
-function FolderIcon({ open }: { open: boolean }) {
-  return (
-    <svg className="file-tree-icon" viewBox="0 0 16 16" aria-hidden="true">
-      {open ? (
-        <path fill="currentColor" d="M2 4h5l1 1h6v8H2V4zm0-1v1h5l1 1h7v1H2V3z" />
-      ) : (
-        <path fill="currentColor" d="M2 4h5l1 1h6v8H2V4z" />
-      )}
-    </svg>
-  );
+function countFiles(node: FileTreeNode): number {
+  if (node.kind === "file") return 1;
+  return node.children.reduce((sum, child) => sum + countFiles(child), 0);
 }
 
 interface VaultFileTreeProps {
@@ -47,10 +28,11 @@ export function VaultFileTree({ files, activePath, onOpen }: VaultFileTreeProps)
   };
 
   const renderNode = (node: FileTreeNode, depth: number) => {
-    const pad = 8 + depth * 14;
+    const pad = 6 + depth * 12;
 
     if (node.kind === "folder") {
       const isOpen = expanded.has(node.path);
+      const fileCount = countFiles(node);
       return (
         <div key={node.path}>
           <button
@@ -60,9 +42,12 @@ export function VaultFileTree({ files, activePath, onOpen }: VaultFileTreeProps)
             onClick={() => toggleFolder(node.path)}
             aria-expanded={isOpen}
           >
-            <span className="file-tree-chevron">{isOpen ? "▾" : "▸"}</span>
-            <FolderIcon open={isOpen} />
+            <span className="file-tree-chevron">
+              <ChevronIcon size={12} direction={isOpen ? "down" : "right"} />
+            </span>
+            <FolderIcon open={isOpen} size={14} className="file-tree-icon" />
             <span className="file-tree-label">{node.name}</span>
+            <span className="file-tree-count">{fileCount}</span>
           </button>
           {isOpen &&
             node.children.map((child) => (
@@ -84,7 +69,7 @@ export function VaultFileTree({ files, activePath, onOpen }: VaultFileTreeProps)
         onClick={() => onOpen(node.path)}
       >
         <span className="file-tree-chevron file-tree-chevron-spacer" />
-        <MdIcon />
+        <FileIcon size={14} className="file-tree-icon" />
         <span className="file-tree-label">{node.name}</span>
       </button>
     );

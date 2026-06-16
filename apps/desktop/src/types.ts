@@ -1,11 +1,14 @@
 export type AiProvider = "deepseek" | "openai";
 
+export type ThemePreference = "light" | "dark" | "system";
+
 export interface AppSettings {
   ingestProvider: AiProvider;
   ingestModel: string;
   lintProvider: AiProvider;
   lintModel: string;
   vaultsRoot?: string | null;
+  theme?: ThemePreference;
 }
 
 export interface BootstrapResult {
@@ -103,6 +106,9 @@ export interface IndexStatus {
   documentCount: number;
   indexedCount: number;
   stale: boolean;
+  changedCount?: number;
+  missingCount?: number;
+  staleReason?: string | null;
   lastRebuildAt?: string | null;
   embeddingModel?: string | null;
 }
@@ -134,6 +140,7 @@ export interface PluginManifest {
 }
 
 export interface LintFix {
+  id: string;
   path: string;
   action: string;
   reason: string;

@@ -163,6 +163,15 @@
   --shadow-sm: 0 1px 2px rgba(10, 11, 13, 0.06);
   --shadow-md: 0 4px 12px rgba(10, 11, 13, 0.08);
   --shadow-lg: 0 12px 32px rgba(10, 11, 13, 0.12);
+
+  --graph-bg-gradient: radial-gradient(ellipse at 50% 0%, #f0f4ff 0%, #e8ecf4 55%, #dfe4ee 100%);
+  --graph-node-default: #475569;
+  --graph-node-selected: #4f46e5;
+  --graph-node-hover: #6366f1;
+  --graph-node-missing: rgba(217, 119, 6, 0.92);
+  --graph-node-ring: rgba(15, 23, 42, 0.85);
+  --graph-node-label: rgba(15, 23, 42, 0.92);
+  --graph-link-color: rgba(79, 70, 229, 0.22);
 }
 
 /* ---------- Semantic tokens (DARK) ---------- */
@@ -171,13 +180,13 @@
    sync between the two selectors below. */
 
 :root[data-theme="dark"] {
-  --color-bg:             var(--p-neutral-950);
-  --color-surface:        var(--p-neutral-900);
-  --color-surface-raised: var(--p-neutral-800);
-  --color-surface-sunken: var(--p-neutral-950);
+  --color-bg:             #07090f;
+  --color-surface:        #0f1219;
+  --color-surface-raised: #181d28;
+  --color-surface-sunken: #05070c;
 
-  --color-border:        var(--p-neutral-800);
-  --color-border-strong: var(--p-neutral-700);
+  --color-border:        #1e2433;
+  --color-border-strong: #2a3142;
 
   --color-text:        var(--p-neutral-50);
   --color-text-muted:  var(--p-neutral-400);
@@ -213,17 +222,26 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.50);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.60);
+
+  --graph-bg-gradient: radial-gradient(ellipse at 50% 0%, #12182a 0%, #07090f 55%, #05070c 100%);
+  --graph-node-default: #4b5568;
+  --graph-node-selected: #818cf8;
+  --graph-node-hover: #a5b4fc;
+  --graph-node-missing: rgba(245, 158, 11, 0.92);
+  --graph-node-ring: rgba(255, 255, 255, 0.85);
+  --graph-node-label: rgba(248, 250, 252, 0.92);
+  --graph-link-color: rgba(129, 140, 248, 0.18);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-bg:             var(--p-neutral-950);
-    --color-surface:        var(--p-neutral-900);
-    --color-surface-raised: var(--p-neutral-800);
-    --color-surface-sunken: var(--p-neutral-950);
+    --color-bg:             #07090f;
+    --color-surface:        #0f1219;
+    --color-surface-raised: #181d28;
+    --color-surface-sunken: #05070c;
 
-    --color-border:        var(--p-neutral-800);
-    --color-border-strong: var(--p-neutral-700);
+    --color-border:        #1e2433;
+    --color-border-strong: #2a3142;
 
     --color-text:        var(--p-neutral-50);
     --color-text-muted:  var(--p-neutral-400);
@@ -259,5 +277,14 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.50);
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.60);
+
+    --graph-bg-gradient: radial-gradient(ellipse at 50% 0%, #12182a 0%, #07090f 55%, #05070c 100%);
+    --graph-node-default: #4b5568;
+    --graph-node-selected: #818cf8;
+    --graph-node-hover: #a5b4fc;
+    --graph-node-missing: rgba(245, 158, 11, 0.92);
+    --graph-node-ring: rgba(255, 255, 255, 0.85);
+    --graph-node-label: rgba(248, 250, 252, 0.92);
+    --graph-link-color: rgba(129, 140, 248, 0.18);
   }
 }

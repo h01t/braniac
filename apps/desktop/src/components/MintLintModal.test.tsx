@@ -9,7 +9,7 @@ vi.mock("../api", () => ({
 }));
 
 describe("MintLintModal", () => {
-  it("calls onApplyApproved with only approved fixes", async () => {
+  it("calls onApplyApproved with only approved fix ids", async () => {
     const onApplyApproved = vi.fn().mockResolvedValue(undefined);
     render(
       <MintLintModal
@@ -20,12 +20,14 @@ describe("MintLintModal", () => {
           report: "## Structural Health Analysis",
           fixes: [
             {
+              id: "job-1:0",
               path: "concepts/foo.md",
               action: "update",
               reason: "Fix format",
               content: "new line\n",
             },
             {
+              id: "job-1:1",
               path: "concepts/bar.md",
               action: "delete",
               reason: "Remove stub",
@@ -47,14 +49,7 @@ describe("MintLintModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /Apply 1 Change/ }));
 
     await waitFor(() => {
-      expect(onApplyApproved).toHaveBeenCalledWith([
-        {
-          path: "concepts/foo.md",
-          action: "update",
-          reason: "Fix format",
-          content: "new line\n",
-        },
-      ]);
+      expect(onApplyApproved).toHaveBeenCalledWith(["job-1:0"]);
     });
   });
 });

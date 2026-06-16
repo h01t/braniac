@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { JobActivityState } from "../hooks/useJobActivity";
 import { ActivityProgressBar } from "./ActivityProgressBar";
+import { ChevronIcon, TerminalIcon } from "./icons";
 import { StepIcon } from "./StepIcon";
 
 interface JobActivityFeedProps {
@@ -22,11 +23,12 @@ export function JobActivityFeed({ activity, busy, compact = false }: JobActivity
   const showProgress = activity.phase === "running" && activity.percent != null;
   const showIndeterminate = activity.phase === "running" && activity.percent == null && busy;
   const title = phaseTitle(activity.phase);
+  const [consoleOpen, setConsoleOpen] = useState(false);
 
   useEffect(() => {
     const el = streamRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [visibleChunks.length]);
+  }, [visibleChunks.length, consoleOpen]);
 
   const hasContent =
     activity.phase !== "idle" ||
@@ -70,12 +72,28 @@ export function JobActivityFeed({ activity, busy, compact = false }: JobActivity
       {activity.error && <p className="activity-error">{activity.error}</p>}
 
       {!compact && visibleChunks.length > 0 && (
-        <div ref={streamRef} className="activity-stream">
-          {visibleChunks.map((line, i) => (
-            <div key={`${line}-${i}`} className="activity-stream-line">
-              {line}
+        <div className="activity-console">
+          <button
+            type="button"
+            className={`activity-console-toggle${consoleOpen ? " activity-console-toggle--open" : ""}`}
+            onClick={() => setConsoleOpen((open) => !open)}
+            aria-expanded={consoleOpen}
+          >
+            <TerminalIcon size={12} />
+            <span>Console</span>
+            <span className="activity-console-chevron" aria-hidden="true">
+              <ChevronIcon size={12} direction={consoleOpen ? "down" : "right"} />
+            </span>
+          </button>
+          {consoleOpen && (
+            <div ref={streamRef} className="activity-stream">
+              {visibleChunks.map((line, i) => (
+                <div key={`${line}-${i}`} className="activity-stream-line">
+                  {line}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

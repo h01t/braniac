@@ -9,6 +9,24 @@ interface StatusBarProps {
   onModeChange: (mode: StatusBarMode) => void;
 }
 
+function IdleHint({ hint }: { hint: string }) {
+  const parts = hint.split(/(⌘K|⌘J|Ctrl\+K|Ctrl\+J)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part === "⌘K" || part === "⌘J" || part === "Ctrl+K" || part === "Ctrl+J") {
+          return (
+            <kbd key={`${part}-${i}`} className="kbd">
+              {part}
+            </kbd>
+          );
+        }
+        return <span key={`${part}-${i}`}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 export function StatusBar({
   mode,
   statusLine,
@@ -57,7 +75,9 @@ export function StatusBar({
         </div>
         <div className="status-bar-log">
           {consoleLines.length === 0 ? (
-            <div className="status-bar-idle">{idleHint}</div>
+            <div className="status-bar-idle">
+              <IdleHint hint={idleHint} />
+            </div>
           ) : (
             consoleLines.map((line, index) => (
               <div key={`${line}-${index}`}>{line}</div>
@@ -72,7 +92,7 @@ export function StatusBar({
     <footer className="status-bar status-bar--compact" aria-label="Status bar">
       {busy && <span className="status-bar-spinner" aria-hidden="true" />}
       <span className={`status-bar-message ${statusLine ? "" : "status-bar-message--idle"}`}>
-        {statusLine || idleHint}
+        {statusLine || <IdleHint hint={idleHint} />}
       </span>
       <div className="status-bar-actions">
         <button

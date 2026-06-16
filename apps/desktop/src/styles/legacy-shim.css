@@ -3,11 +3,14 @@
   --bg-app: var(--color-bg);
   --bg-panel: var(--color-surface);
   --bg-elevated: var(--color-surface-raised);
+  --bg-sunken: var(--color-surface-sunken);
   --border: var(--color-border);
   --text: var(--color-text);
   --text-muted: var(--color-text-muted);
   --accent: var(--color-primary);
   --accent-soft: var(--color-primary-subtle);
+  --accent-grad: linear-gradient(135deg, var(--p-indigo-500), var(--p-indigo-700));
+  --focus-ring: var(--color-focus-ring);
   --danger: var(--color-danger);
   --success: var(--color-success);
   --warning: var(--color-warning);
@@ -40,4 +43,14 @@ select {
 
 button {
   cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }

@@ -80,6 +80,7 @@ mod tests {
 
         let defaults = store.read().unwrap();
         assert_eq!(defaults.ingest_provider, AiProvider::Deepseek);
+        assert_eq!(defaults.theme, braniac_types::ThemePreference::Dark);
 
         let updated = AppSettings {
             ingest_model: "custom-model".into(),

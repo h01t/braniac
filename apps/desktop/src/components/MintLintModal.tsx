@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { api } from "../api";
-import type { ApplyLintResult, LintFix, LintResult } from "../types";
+import type { ApplyLintResult, LintResult } from "../types";
 import {
   actionLabel,
   diffForFix,
@@ -22,7 +22,7 @@ interface MintLintModalProps {
   applyProgress: { done: number; total: number };
   applyResult: ApplyLintResult | null;
   onClose: () => void;
-  onApplyApproved: (fixes: LintFix[]) => Promise<void>;
+  onApplyApproved: (fixIds: string[]) => Promise<void>;
 }
 
 function SparkleIcon() {
@@ -271,7 +271,7 @@ export function MintLintModal({
                     <p className="activity-working">Loading previews…</p>
                   )}
                   {proposals.map((p, i) => (
-                    <ProposalCard key={`${p.path}-${p.action}`} proposal={p} index={i} onToggle={toggleProposal} />
+                    <ProposalCard key={p.id} proposal={p} index={i} onToggle={toggleProposal} />
                   ))}
                 </div>
               )}
@@ -337,12 +337,7 @@ export function MintLintModal({
                   void onApplyApproved(
                     proposals
                       .filter((p) => p.approved)
-                      .map(({ path, action, reason, content }) => ({
-                        path,
-                        action,
-                        reason,
-                        content,
-                      })),
+                      .map((p) => p.id),
                   )
                 }
               >

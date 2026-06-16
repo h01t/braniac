@@ -193,12 +193,13 @@
 }
 
 .activity-stream {
-  max-height: 72px;
+  max-height: 96px;
   overflow: auto;
-  margin-top: 6px;
-  padding: 6px 8px;
-  background: var(--color-surface-sunken, var(--bg-panel));
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: var(--bg-sunken);
   border-radius: var(--radius-sm, 4px);
+  border: 1px solid var(--border);
   font-family: var(--font-mono);
   font-size: 11px;
 }
@@ -209,4 +210,40 @@
   overflow: hidden;
   text-overflow: ellipsis;
   animation: activity-line-enter var(--duration-base, 180ms) var(--ease-out, ease);
+}
+
+.activity-console {
+  margin-top: 8px;
+}
+
+.activity-console-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.activity-console-toggle:hover {
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+
+.activity-console-toggle--open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+
+.activity-console-chevron {
+  margin-left: auto;
+  display: inline-flex;
 }

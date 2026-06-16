@@ -149,6 +149,15 @@ pub enum AiProvider {
     Openai,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum ThemePreference {
+    Light,
+    #[default]
+    Dark,
+    System,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
@@ -157,6 +166,8 @@ pub struct AppSettings {
     pub lint_provider: AiProvider,
     pub lint_model: String,
     pub vaults_root: Option<String>,
+    #[serde(default)]
+    pub theme: ThemePreference,
 }
 
 impl Default for AppSettings {
@@ -167,6 +178,7 @@ impl Default for AppSettings {
             lint_provider: AiProvider::Deepseek,
             lint_model: "deepseek-v4-flash".to_string(),
             vaults_root: None,
+            theme: ThemePreference::Dark,
         }
     }
 }
@@ -186,6 +198,12 @@ pub struct IndexStatus {
     pub document_count: u64,
     pub indexed_count: u64,
     pub stale: bool,
+    #[serde(default)]
+    pub changed_count: u64,
+    #[serde(default)]
+    pub missing_count: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stale_reason: Option<String>,
     pub last_rebuild_at: Option<DateTime<Utc>>,
     pub embedding_model: Option<String>,
 }
@@ -193,6 +211,7 @@ pub struct IndexStatus {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct LintFix {
+    pub id: String,
     pub path: String,
     pub action: String,
     pub reason: String,
@@ -255,7 +274,7 @@ pub struct VaultFileEntry {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{AppSettings, ThemePreference};
 
     #[test]
     fn shared_types_serialize_with_camel_case() {
@@ -263,5 +282,7 @@ mod tests {
         let json = serde_json::to_string(&settings).unwrap();
         assert!(json.contains("ingestProvider"));
         assert!(json.contains("ingestModel"));
+        assert!(json.contains("theme"));
+        assert_eq!(settings.theme, ThemePreference::Dark);
     }
 }

@@ -12,6 +12,7 @@ import { SourceDialog } from "./components/SourceDialog";
 import { StatusBar } from "./components/StatusBar";
 import { VaultFileTree } from "./components/VaultFileTree";
 import { VaultOverflowMenu } from "./components/VaultOverflowMenu";
+import { BrandGlyphIcon, SearchIcon, SparklesIcon } from "./components/icons";
 import { useJobActivity } from "./hooks/useJobActivity";
 import { executePaletteCommand, type PaletteContext } from "./lib/paletteCli";
 import { SearchActivity } from "./components/SearchActivity";
@@ -26,6 +27,7 @@ import {
   saveStatusBarMode,
   type StatusBarMode,
 } from "./lib/statusBar";
+import { applyThemePreference, themePreferenceLabel } from "./lib/theme";
 import type {
   ApplyLintResult,
   AppSettings,
@@ -35,10 +37,10 @@ import type {
   IndexStatus,
   JobEvent,
   KnowledgeDocument,
-  LintFix,
   LintResult,
   SearchMatchContext,
   SearchResult,
+  ThemePreference,
   VaultManifest,
   VaultFileEntry,
 } from "./types";
@@ -50,7 +52,12 @@ const defaultSettings: AppSettings = {
   ingestModel: "deepseek-v4-pro",
   lintProvider: "deepseek",
   lintModel: "deepseek-v4-flash",
+  theme: "dark",
 };
+
+function resolveThemePreference(settings: AppSettings): ThemePreference {
+  return settings.theme ?? "dark";
+}
 
 const isMac =
   typeof navigator !== "undefined" && /Mac|iPhone|iPod|iPad/i.test(navigator.platform);
@@ -94,6 +101,7 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [lintResult, setLintResult] = useState<LintResult | null>(null);
+  const [lintJobId, setLintJobId] = useState<string | null>(null);
   const [centerTab, setCenterTab] = useState<CenterTab>("editor");
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [consoleLines, setConsoleLines] = useState<string[]>([]);
@@ -232,6 +240,7 @@ export default function App() {
     await selectFirstVault(listed);
     const s = await api.settingsGet();
     setSettings(s);
+    applyThemePreference(resolveThemePreference(s));
     return result;
   }, [log, loadVaultList, selectFirstVault]);
 
@@ -241,6 +250,7 @@ export default function App() {
         await loadVaultsRoot();
         const s = await api.settingsGet();
         setSettings(s);
+        applyThemePreference(resolveThemePreference(s));
         let listed = await loadVaultList();
         if (listed.length === 0) {
           await runBootstrap();
@@ -501,6 +511,7 @@ export default function App() {
     setMintLintPhase("idle");
     setMintLintApplyProgress({ done: 0, total: 0 });
     setMintLintApplyResult(null);
+    setLintJobId(null);
   }, []);
 
   const startMintLint = useCallback(async () => {
@@ -512,8 +523,9 @@ export default function App() {
     resetJobActivity();
     log("Running lint...");
     try {
-      await api.jobStartLint(vaultId);
-      const result = await api.jobLintResult();
+      const jobId = await api.jobStartLint(vaultId);
+      setLintJobId(jobId);
+      const result = await api.jobLintResult(jobId);
       setLintResult(result);
       setMintLintPhase("review");
       if (result) {
@@ -532,14 +544,14 @@ export default function App() {
   }, [vaultId, log, lintBusy, resetJobActivity]);
 
   const applyApprovedLintFixes = useCallback(
-    async (fixes: LintFix[]) => {
-      if (!vaultId || fixes.length === 0) return;
+    async (fixIds: string[]) => {
+      if (!vaultId || !lintJobId || fixIds.length === 0) return;
       setMintLintPhase("applying");
-      setMintLintApplyProgress({ done: 0, total: fixes.length });
+      setMintLintApplyProgress({ done: 0, total: fixIds.length });
       setLintBusy(true);
       try {
-        const result = await api.jobLintApplySelected(vaultId, fixes);
-        setMintLintApplyProgress({ done: result.applied, total: fixes.length });
+        const result = await api.jobLintApplySelected(vaultId, lintJobId, fixIds);
+        setMintLintApplyProgress({ done: result.applied, total: fixIds.length });
         setMintLintApplyResult(result);
         setMintLintPhase("done");
         log(`Applied ${result.applied} lint fixes`);
@@ -548,6 +560,7 @@ export default function App() {
         }
         await refreshVault(vaultId);
         setLintResult(null);
+        setLintJobId(null);
       } catch (error) {
         setMintLintApplyResult({ applied: 0, errors: [String(error)] });
         setMintLintPhase("done");
@@ -556,7 +569,7 @@ export default function App() {
         setLintBusy(false);
       }
     },
-    [vaultId, log, refreshVault],
+    [vaultId, lintJobId, log, refreshVault],
   );
 
   const openMintLintReview = useCallback(() => {
@@ -615,6 +628,29 @@ export default function App() {
     [paletteContext, startMintLint, openMintLintReview],
   );
 
+  const saveSettings = async () => {
+    applyThemePreference(resolveThemePreference(settings));
+    const updated = await api.settingsUpdate(settings);
+    setSettings(updated);
+    applyThemePreference(resolveThemePreference(updated));
+    await loadVaultsRoot();
+    const listed = await loadVaultList();
+    await selectFirstVault(listed);
+    log("Settings saved");
+  };
+
+  const persistTheme = useCallback(
+    async (theme: ThemePreference) => {
+      applyThemePreference(theme);
+      const next = { ...settings, theme };
+      setSettings(next);
+      const updated = await api.settingsUpdate(next);
+      setSettings(updated);
+      log(`Theme set to ${themePreferenceLabel(theme)}`);
+    },
+    [settings, log],
+  );
+
   const commands = useMemo<CommandItem[]>(
     () => [
       {
@@ -660,23 +696,29 @@ export default function App() {
         run: () => changeCenterTab("settings"),
       },
       {
+        id: "theme-dark",
+        label: "Theme: Dark",
+        run: () => void persistTheme("dark"),
+      },
+      {
+        id: "theme-light",
+        label: "Theme: Light",
+        run: () => void persistTheme("light"),
+      },
+      {
+        id: "theme-system",
+        label: "Theme: System",
+        run: () => void persistTheme("system"),
+      },
+      {
         id: "toggle-status-bar",
         label: "Toggle Status Bar",
         shortcut: "Cmd+J",
         run: () => toggleStatusBar(),
       },
     ],
-    [saveDocument, rebuildIndex, startMintLint, toggleStatusBar, changeCenterTab],
+    [saveDocument, rebuildIndex, startMintLint, toggleStatusBar, changeCenterTab, persistTheme],
   );
-
-  const saveSettings = async () => {
-    const updated = await api.settingsUpdate(settings);
-    setSettings(updated);
-    await loadVaultsRoot();
-    const listed = await loadVaultList();
-    await selectFirstVault(listed);
-    log("Settings saved");
-  };
 
   const hasVaults = vaults.length > 0;
   const searchPhase = resolveSearchPhase(searchText, searchResults, searchBusy);
@@ -685,30 +727,37 @@ export default function App() {
     <div className="app-shell">
       <header className="top-bar">
         <div className="top-bar-left">
-          <div className="brand">Braniac</div>
-          <select
-            aria-label="Vault selector"
-            value={vaultId}
-            onChange={(e) => {
-              const id = e.target.value;
-              clearSearch();
-              setVaultId(id);
-              void refreshVault(id);
-            }}
-            disabled={!hasVaults}
-          >
-            {vaults.length === 0 ? (
-              <option value="">No vaults</option>
-            ) : (
-              vaults.map((vault) => (
-                <option key={vault.id} value={vault.id}>
-                  {vault.name} ({vault.documentCount})
-                </option>
-              ))
-            )}
-          </select>
+          <div className="brand">
+            <BrandGlyphIcon className="brand-glyph" />
+            <span className="brand-wordmark">Braniac</span>
+          </div>
+          <div className="vault-select">
+            <select
+              aria-label="Vault selector"
+              value={vaultId}
+              onChange={(e) => {
+                const id = e.target.value;
+                clearSearch();
+                setVaultId(id);
+                void refreshVault(id);
+              }}
+              disabled={!hasVaults}
+            >
+              {vaults.length === 0 ? (
+                <option value="">No vaults</option>
+              ) : (
+                vaults.map((vault) => (
+                  <option key={vault.id} value={vault.id}>
+                    {vault.name} ({vault.documentCount})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
           {indexStatus && (
-            <span className={`status-pill ${indexStatus.stale ? "stale-warning" : ""}`}>
+            <span
+              className={`status-pill index-pill ${indexStatus.stale ? "index-pill--stale" : "index-pill--fresh"}`}
+            >
               Index {indexStatus.indexedCount}/{indexStatus.documentCount}
               {indexStatus.stale ? " · stale" : ""}
             </span>
@@ -760,6 +809,9 @@ export default function App() {
           </div>
           <div className="toolbar-row">
             <div className="search-field">
+              <span className="search-field-icon" aria-hidden="true">
+                <SearchIcon size={14} />
+              </span>
               <input
                 aria-label="Search vault"
                 placeholder="Search..."
@@ -789,12 +841,7 @@ export default function App() {
                 {searchBusy ? (
                   <span className="activity-step-icon activity-step-icon--spin search-field-spinner" aria-hidden="true" />
                 ) : (
-                  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                    <path
-                      fill="currentColor"
-                      d="M11.2 10.4l3.1 3.1-0.8 0.8-3.1-3.1a5 5 0 1 1 0.8-0.8zM6 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
-                    />
-                  </svg>
+                  <SearchIcon size={14} />
                 )}
               </button>
             </div>
@@ -806,7 +853,8 @@ export default function App() {
               disabled={!hasVaults || lintBusy}
               onClick={() => void startMintLint()}
             >
-              ✨ Mint &amp; Lint Vault
+              <SparklesIcon size={14} />
+              Mint &amp; Lint Vault
             </button>
           </div>
           <div className="panel-body file-list">
@@ -892,6 +940,7 @@ export default function App() {
                   <GraphCanvas
                     snapshot={graph}
                     selectedId={selectedNode?.id}
+                    themePreference={resolveThemePreference(settings)}
                     onSelect={(id) => {
                       const node = graph?.nodes.find((n) => n.id === id) ?? null;
                       setSelectedNode(node);
@@ -927,6 +976,23 @@ export default function App() {
               <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
                 Vaults root: <code>{vaultsRoot}</code>
               </p>
+              <h3 className="settings-section">Appearance</h3>
+              <label>
+                Theme
+                <select
+                  value={resolveThemePreference(settings)}
+                  onChange={(e) =>
+                    setSettings((s) => ({
+                      ...s,
+                      theme: e.target.value as ThemePreference,
+                    }))
+                  }
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="system">System</option>
+                </select>
+              </label>
               <h3 className="settings-section">AI — Ingest</h3>
               <label>
                 Ingest provider

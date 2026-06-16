@@ -16,6 +16,16 @@ interface InspectorPanelProps {
   embedded?: boolean;
 }
 
+type HistoryTag = "link" | "orphan" | "section" | null;
+
+function deriveHistoryTag(message: string): HistoryTag {
+  const lower = message.toLowerCase();
+  if (lower.includes("orphan")) return "orphan";
+  if (lower.includes("link") || lower.includes("wikilink")) return "link";
+  if (lower.includes("section")) return "section";
+  return null;
+}
+
 export function InspectorPanel({
   document,
   node,
@@ -57,12 +67,16 @@ export function InspectorPanel({
       )}
       <div className="inspector-block">
         <h4>History</h4>
-        {history.slice(0, 8).map((entry) => (
-          <div key={entry.hash} className="history-item" style={{ fontSize: 12 }}>
-            <div>{entry.message}</div>
-            <div style={{ color: "var(--text-muted)" }}>{entry.hash.slice(0, 8)}</div>
-          </div>
-        ))}
+        {history.slice(0, 8).map((entry) => {
+          const tag = deriveHistoryTag(entry.message);
+          return (
+            <div key={entry.hash} className="history-item">
+              {tag && <span className={`history-tag history-tag--${tag}`}>{tag}</span>}
+              <div className="history-message">{entry.message}</div>
+              <div className="history-hash">{entry.hash.slice(0, 8)}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
