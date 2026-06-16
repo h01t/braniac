@@ -6,6 +6,7 @@ pub mod extract;
 pub mod graph;
 pub mod index;
 pub mod jobs;
+pub mod lint_cache;
 pub mod qmd;
 pub mod migrate;
 pub mod palette;

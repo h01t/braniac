@@ -143,6 +143,15 @@ export interface LintFix {
 export interface LintResult {
   report: string;
   fixes: LintFix[];
+  fromCache?: boolean;
+  skippedCount?: number;
+  cacheCommitHash?: string | null;
+  currentCommitHash?: string | null;
+}
+
+export interface ApplyLintResult {
+  applied: number;
+  errors: string[];
 }
 
 export interface PaletteResult {

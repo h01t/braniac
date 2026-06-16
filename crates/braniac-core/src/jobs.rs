@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use braniac_types::{DocumentPatch, IngestRequest, JobEvent, LintFix, LintResult};
+use braniac_types::{ApplyLintResult, DocumentPatch, IngestRequest, JobEvent, LintFix, LintResult};
 use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::ai::{AiProviderAdapter, LINT_SYSTEM_PROMPT, INGEST_SYSTEM_PROMPT};
 use crate::error::{BraniacError, Result};
 use crate::extract::prepare_source;
+use crate::lint_cache::{read_lint_cache, update_cache_after_lint, write_lint_cache};
 use crate::vault::VaultResolver;
 
 pub struct JobManager {
@@ -179,24 +180,111 @@ impl JobManager {
                 percent: Some(10),
             });
 
-            let corpus = {
+            let lint_plan = {
                 let vault = vaults.lock();
+                let vault_path = vault.resolve_vault_path(vault_id)?;
                 let files = vault.list_files(vault_id)?;
-                let mut parts = Vec::new();
-                for file in files.iter().take(40) {
-                    if let Ok(doc) = vault.read_document(vault_id, &file.path) {
-                        parts.push(format!("--- {} ---\n{}", file.path, doc.content));
+                let current_hash = vault.current_head_hash(vault_id).unwrap_or_default();
+                let cache = read_lint_cache(&vault_path);
+                let cache_commit_hash = cache.as_ref().map(|c| c.commit_hash.clone());
+
+                let (changed_paths, from_cache) = if let Some(ref c) = cache {
+                    if !c.commit_hash.is_empty() && c.commit_hash != current_hash {
+                        match vault.files_changed_since(vault_id, &c.commit_hash) {
+                            Ok(paths) => (
+                                Some(paths.into_iter().collect::<std::collections::HashSet<String>>()),
+                                true,
+                            ),
+                            Err(_) => (None, false),
+                        }
+                    } else {
+                        (None, false)
+                    }
+                } else {
+                    (None, false)
+                };
+                let mut skipped_count = 0usize;
+                let mut skipped_healthy = Vec::new();
+                let mut corpus_parts = Vec::new();
+                let md_paths: Vec<String> = files.iter().map(|f| f.path.clone()).collect();
+
+                if files.is_empty() {
+                    LintPlan {
+                        empty_vault: true,
+                        corpus: String::new(),
+                        skipped_count: 0,
+                        skipped_healthy,
+                        md_paths,
+                        from_cache,
+                        cache,
+                        cache_commit_hash,
+                        current_hash,
+                    }
+                } else {
+                    for file in &files {
+                        if let Some(ref changed) = changed_paths {
+                            if !changed.contains(&file.path) {
+                                let healthy = cache
+                                    .as_ref()
+                                    .and_then(|c| c.file_statuses.get(&file.path))
+                                    .map(|s| s.healthy)
+                                    .unwrap_or(false);
+                                if healthy {
+                                    skipped_healthy.push(file.path.clone());
+                                    skipped_count += 1;
+                                    continue;
+                                }
+                            }
+                        }
+                        if let Ok(doc) = vault.read_document(vault_id, &file.path) {
+                            corpus_parts.push(format!(
+                                "<file path=\"{}\">\n{}\n</file>",
+                                file.path, doc.content
+                            ));
+                        }
+                    }
+
+                    LintPlan {
+                        empty_vault: false,
+                        corpus: corpus_parts.join("\n\n"),
+                        skipped_count,
+                        skipped_healthy,
+                        md_paths,
+                        from_cache,
+                        cache,
+                        cache_commit_hash,
+                        current_hash,
                     }
                 }
-                parts.join("\n\n")
             };
 
-            if corpus.is_empty() {
+            if lint_plan.empty_vault {
                 let lint = LintResult {
                     report: "The vault is empty. Nothing to lint.".into(),
                     fixes: Vec::new(),
+                    from_cache: false,
+                    skipped_count: 0,
+                    cache_commit_hash: None,
+                    current_commit_hash: Some(lint_plan.current_hash),
                 };
-                self.lint_results.lock().insert(job_id, lint.clone());
+                self.lint_results.lock().insert(job_id, lint);
+                on_event(JobEvent::Completed { job_id });
+                return Ok(job_id);
+            }
+
+            if lint_plan.corpus.is_empty() && lint_plan.skipped_count > 0 {
+                let lint = LintResult {
+                    report: format!(
+                        "✅ All {} files were unchanged since the last checkpoint and previously marked healthy. Nothing new to lint.",
+                        lint_plan.skipped_count
+                    ),
+                    fixes: Vec::new(),
+                    from_cache: true,
+                    skipped_count: lint_plan.skipped_count,
+                    cache_commit_hash: lint_plan.cache_commit_hash,
+                    current_commit_hash: Some(lint_plan.current_hash.clone()),
+                };
+                self.lint_results.lock().insert(job_id, lint);
                 on_event(JobEvent::Completed { job_id });
                 return Ok(job_id);
             }
@@ -207,14 +295,45 @@ impl JobManager {
                 percent: Some(50),
             });
 
-            let user = format!("<vault id=\"{vault_id}\">\n{corpus}\n</vault>");
+            let cache_note = if lint_plan.from_cache && lint_plan.skipped_count > 0 {
+                format!(
+                    "> **Checkpoint active**: {} previously-healthy unchanged files were skipped. Only changed or previously-flagged files are included below.\n\n",
+                    lint_plan.skipped_count
+                )
+            } else {
+                String::new()
+            };
+
+            let user = format!(
+                "{cache_note}<vault id=\"{vault_id}\">\n{}\n</vault>",
+                lint_plan.corpus
+            );
             let output = adapter.complete(LINT_SYSTEM_PROMPT, &user).await?;
             on_event(JobEvent::Chunk {
                 job_id,
                 content: output.clone(),
             });
 
-            let lint = parse_lint_output(&output);
+            let mut lint = parse_lint_output(&output);
+            lint.from_cache = lint_plan.from_cache;
+            lint.skipped_count = lint_plan.skipped_count;
+            lint.cache_commit_hash = lint_plan.cache_commit_hash.clone();
+            lint.current_commit_hash = Some(lint_plan.current_hash.clone());
+
+            {
+                let vault = vaults.lock();
+                let vault_path = vault.resolve_vault_path(vault_id)?;
+                let base_cache = lint_plan.cache.unwrap_or_default();
+                let updated = update_cache_after_lint(
+                    base_cache,
+                    &lint_plan.md_paths,
+                    &lint_plan.skipped_healthy,
+                    &lint.fixes,
+                    &lint_plan.current_hash,
+                );
+                write_lint_cache(&vault_path, &updated)?;
+            }
+
             self.lint_results.lock().insert(job_id, lint);
             on_event(JobEvent::Completed { job_id });
             Ok(job_id)
@@ -238,26 +357,47 @@ impl JobManager {
         vault_id: &str,
         lint: &LintResult,
     ) -> Result<usize> {
+        Ok(self
+            .apply_lint_fixes(vault, vault_id, &lint.fixes)
+            .applied)
+    }
+
+    pub fn apply_lint_fixes(
+        &self,
+        vault: &VaultResolver,
+        vault_id: &str,
+        fixes: &[LintFix],
+    ) -> ApplyLintResult {
         let mut applied = 0usize;
-        for fix in &lint.fixes {
-            match fix.action.as_str() {
+        let mut errors = Vec::new();
+        for fix in fixes {
+            let result = match fix.action.as_str() {
                 "delete" => {
                     if vault.read_document(vault_id, &fix.path).is_ok() {
-                        vault.delete_document(vault_id, &fix.path, &fix.reason)?;
-                        applied += 1;
+                        vault.delete_document(vault_id, &fix.path, &fix.reason)
+                    } else {
+                        Err(BraniacError::NotFound(fix.path.clone()))
                     }
                 }
                 "update" | "create" => {
                     let content = fix.content.clone().unwrap_or_default();
-                    if !content.is_empty() {
-                        vault.write_document(vault_id, &fix.path, &content, &fix.reason)?;
-                        applied += 1;
+                    if content.is_empty() {
+                        Err(BraniacError::InvalidInput(format!(
+                            "empty content for {}",
+                            fix.path
+                        )))
+                    } else {
+                        vault.write_document(vault_id, &fix.path, &content, &fix.reason)
                     }
                 }
-                _ => {}
+                _ => Ok(()),
+            };
+            match result {
+                Ok(()) => applied += 1,
+                Err(e) => errors.push(format!("{}: {e}", fix.path)),
             }
         }
-        Ok(applied)
+        ApplyLintResult { applied, errors }
     }
 
     pub fn apply_patches(
@@ -352,7 +492,26 @@ pub fn parse_lint_output(text: &str) -> LintResult {
         });
     }
 
-    LintResult { report, fixes }
+    LintResult {
+        report,
+        fixes,
+        from_cache: false,
+        skipped_count: 0,
+        cache_commit_hash: None,
+        current_commit_hash: None,
+    }
+}
+
+struct LintPlan {
+    empty_vault: bool,
+    corpus: String,
+    skipped_count: usize,
+    skipped_healthy: Vec<String>,
+    md_paths: Vec<String>,
+    from_cache: bool,
+    cache: Option<crate::lint_cache::LintCache>,
+    cache_commit_hash: Option<String>,
+    current_hash: String,
 }
 
 #[cfg(test)]
@@ -428,6 +587,41 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn apply_lint_fixes_selected_subset() {
+        let dir = tempdir().unwrap();
+        let vault = VaultResolver::new(dir.path().to_path_buf());
+        vault.open_vault("v").unwrap();
+        vault
+            .write_document("v", "concepts/a.md", "# A\n", "init")
+            .unwrap();
+        vault
+            .write_document("v", "concepts/b.md", "# B\n", "init")
+            .unwrap();
+        let jobs = JobManager::new();
+        let fixes = vec![
+            LintFix {
+                path: "concepts/a.md".into(),
+                action: "update".into(),
+                reason: "update a".into(),
+                content: Some("# A updated\n".into()),
+            },
+            LintFix {
+                path: "concepts/b.md".into(),
+                action: "update".into(),
+                reason: "update b".into(),
+                content: Some("# B updated\n".into()),
+            },
+        ];
+        let result = jobs.apply_lint_fixes(&vault, "v", &[fixes[0].clone()]);
+        assert_eq!(result.applied, 1);
+        assert!(result.errors.is_empty());
+        let doc = vault.read_document("v", "concepts/a.md").unwrap();
+        assert!(doc.content.contains("updated"));
+        let doc_b = vault.read_document("v", "concepts/b.md").unwrap();
+        assert_eq!(doc_b.content, "# B\n");
+    }
+
+    #[tokio::test]
     async fn clear_lint_results_removes_cached_results() {
         let dir = tempdir().unwrap();
         let vault = Mutex::new(VaultResolver::new(dir.path().to_path_buf()));
@@ -443,5 +637,40 @@ mod tests {
         assert!(jobs.latest_lint_result().is_some());
         jobs.clear_lint_results();
         assert!(jobs.latest_lint_result().is_none());
+    }
+
+    #[tokio::test]
+    async fn stale_lint_cache_commit_falls_back_to_full_scan() {
+        use crate::lint_cache::{write_lint_cache, LintCache, LintFileStatus};
+
+        let dir = tempdir().unwrap();
+        let vault = Mutex::new(VaultResolver::new(dir.path().to_path_buf()));
+        vault.lock().open_vault("v").unwrap();
+        vault
+            .lock()
+            .write_document("v", "concepts/a.md", "# A\n", "init")
+            .unwrap();
+
+        let vault_path = vault.lock().resolve_vault_path("v").unwrap();
+        let mut cache = LintCache::default();
+        cache.commit_hash = "c215dd1a0a9f803edda305861e0bcd087eb1d0b7".into();
+        cache.file_statuses.insert(
+            "concepts/a.md".into(),
+            LintFileStatus {
+                healthy: true,
+                issues: vec![],
+                last_checked: "now".into(),
+            },
+        );
+        write_lint_cache(&vault_path, &cache).unwrap();
+
+        let jobs = JobManager::new();
+        let job_id = jobs
+            .run_lint(&vault, &MockAiAdapter, "v", |_| {})
+            .await
+            .expect("stale cache hash should not abort lint");
+        let lint = jobs.take_lint_result(job_id).unwrap();
+        assert!(!lint.from_cache);
+        assert!(!lint.fixes.is_empty());
     }
 }

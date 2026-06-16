@@ -37,15 +37,35 @@ You must output your response ONLY using the following XML-like file formatting.
 
 Do not write any introductory or trailing conversational text outside the file blocks. Keep filenames lowercase with hyphens."#;
 
-pub const LINT_SYSTEM_PROMPT: &str = r#"You are a vault linter. Analyze markdown vault health and output:
-<report>
-[human-readable summary]
-</report>
+pub const LINT_SYSTEM_PROMPT: &str = r#"You are the Knowledge Vault Linter for an LLM-Wiki. Analyze the structural health of the provided markdown vault files.
 
-For each fix use either:
-<fix path="concepts/foo.md" action="update" reason="...">new content</fix>
-<fix path="concepts/orphan.md" action="delete" reason="..."/>
-<fix path="concepts/new.md" action="create" reason="...">content</fix>"#;
+Evaluate and identify:
+1. Contradictions between pages.
+2. Orphan pages (no inbound [[links]] from any other page).
+3. Concepts mentioned in text but lacking their own dedicated page.
+4. Claims missing citations or that may be outdated.
+5. Pages missing the standard format: '# Title', '**Summary**', '**Source Context**', '---', '## Related pages'.
+6. Near-empty stubs with little to no substantive content (candidates for deletion).
+
+YOUR OUTPUT MUST FOLLOW THIS EXACT FORMAT — two parts, nothing else:
+
+PART 1 — Wrap a comprehensive markdown analysis report in <report>...</report> tags.
+Use clear headings (## Section), bullet points, and flag severity with ⚠️ or ✅.
+
+PART 2 — For each file you propose to fix, output a <fix> block immediately after the closing </report> tag.
+
+For updates or new file creation:
+<fix path="concepts/foo.md" action="update" reason="One-line justification">
+[complete new file content here — must be a valid, fully-formed markdown file]
+</fix>
+
+For deletions (self-closing):
+<fix path="concepts/stub.md" action="delete" reason="One-line justification" />
+
+Rules:
+- Output NO conversational text outside the <report> and <fix> blocks.
+- Every <fix> must target a real path that exists in the vault data provided.
+- Only propose fixes with high confidence. Do not hallucinate paths."#;
 
 #[async_trait]
 impl AiProviderAdapter for MockAiAdapter {

@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InspectorPanel } from "./InspectorPanel";
-import type { JobActivityState } from "../hooks/useJobActivity";
 import type {
   GraphNode,
   HistoryEntry,
   KnowledgeDocument,
-  LintResult,
   SearchMatchContext,
 } from "../types";
 
@@ -39,12 +37,6 @@ interface ResizableInspectorProps {
   node: GraphNode | null;
   history: HistoryEntry[];
   searchMatch?: SearchMatchContext | null;
-  vaultId: string;
-  lintResult?: LintResult | null;
-  lintBusy?: boolean;
-  lintActivity?: JobActivityState;
-  showLintActivity?: boolean;
-  onLintApply?: () => Promise<void>;
   onNavigateToPath?: (path: string) => void;
   onWidthChange: (width: number) => void;
   onCollapsedChange: (collapsed: boolean) => void;
@@ -57,12 +49,6 @@ export function ResizableInspector({
   node,
   history,
   searchMatch,
-  vaultId,
-  lintResult,
-  lintBusy,
-  lintActivity,
-  showLintActivity,
-  onLintApply,
   onNavigateToPath,
   onWidthChange,
   onCollapsedChange,
@@ -159,12 +145,6 @@ export function ResizableInspector({
         node={node}
         history={history}
         searchMatch={searchMatch}
-        vaultId={vaultId}
-        lintResult={lintResult}
-        lintBusy={lintBusy}
-        lintActivity={lintActivity}
-        showLintActivity={showLintActivity}
-        onLintApply={onLintApply}
         onNavigateToPath={onNavigateToPath}
         embedded
       />

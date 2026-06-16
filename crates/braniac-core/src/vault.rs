@@ -187,6 +187,35 @@ impl VaultResolver {
         Ok(head.id().to_string())
     }
 
+    pub fn files_changed_since(&self, vault_id: &str, from_hash: &str) -> Result<Vec<String>> {
+        let repo = Repository::open(&self.resolve_vault_path(vault_id)?)?;
+        let from = repo.find_commit(parse_oid(from_hash)?)?;
+        let to = repo.head()?.peel_to_commit()?;
+        if from.id() == to.id() {
+            return Ok(Vec::new());
+        }
+        let diff = repo.diff_tree_to_tree(Some(&from.tree()?), Some(&to.tree()?), None)?;
+        let mut paths = Vec::new();
+        diff.foreach(
+            &mut |_, _| true,
+            None,
+            None,
+            Some(&mut |delta, _, _| {
+                if let Some(path) = delta
+                    .new_file()
+                    .path()
+                    .or_else(|| delta.old_file().path())
+                {
+                    paths.push(path.to_string_lossy().replace('\\', "/"));
+                }
+                true
+            }),
+        )?;
+        paths.sort();
+        paths.dedup();
+        Ok(paths)
+    }
+
     pub fn reset_hard(&self, vault_id: &str, commit_hash: &str) -> Result<()> {
         let repo = Repository::open(&self.resolve_vault_path(vault_id)?)?;
         let commit = repo.find_commit(parse_oid(commit_hash)?)?;

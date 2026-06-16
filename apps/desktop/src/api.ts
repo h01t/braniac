@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type {
+  ApplyLintResult,
   AppSettings,
   BootstrapResult,
   GraphSnapshot,
@@ -9,6 +10,7 @@ import type {
   IngestRequest,
   JobEvent,
   KnowledgeDocument,
+  LintFix,
   LintResult,
   PaletteResult,
   LayoutOptions,
@@ -59,6 +61,8 @@ export const api = {
     invoke<string>("job_start_lint", { vaultId }),
   jobLintResult: () => invoke<LintResult | null>("job_lint_result"),
   jobLintApply: (vaultId: string) => invoke<number>("job_lint_apply", { vaultId }),
+  jobLintApplySelected: (vaultId: string, fixes: LintFix[]) =>
+    invoke<ApplyLintResult>("job_lint_apply_selected", { vaultId, fixes }),
   jobCancel: (jobId: string) => invoke<void>("job_cancel", { jobId }),
   paletteExecute: (command: string, vaultId: string) =>
     invoke<PaletteResult>("palette_execute", { command, vaultId }),

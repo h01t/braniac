@@ -278,13 +278,30 @@ pub fn job_lint_apply(state: State<'_, SharedState>, vault_id: String) -> Result
         .latest_lint_result()
         .ok_or_else(|| "no lint result available".to_string())?;
     let vault = state.vaults.lock();
-    let applied = state
-        .jobs
-        .apply_lint(&vault, &vault_id, &lint)
-        .map_err(|e| e.to_string())?;
-    let _ = state.index.rebuild(&vault, &vault_id);
+    let result = state.jobs.apply_lint_fixes(&vault, &vault_id, &lint.fixes);
+    if result.applied > 0 {
+        let _ = state.index.rebuild(&vault, &vault_id);
+    }
     state.jobs.clear_lint_results();
-    Ok(applied)
+    if !result.errors.is_empty() {
+        return Err(result.errors.join("; "));
+    }
+    Ok(result.applied)
+}
+
+#[tauri::command]
+pub fn job_lint_apply_selected(
+    state: State<'_, SharedState>,
+    vault_id: String,
+    fixes: Vec<LintFix>,
+) -> Result<ApplyLintResult, String> {
+    let vault = state.vaults.lock();
+    let result = state.jobs.apply_lint_fixes(&vault, &vault_id, &fixes);
+    if result.applied > 0 {
+        let _ = state.index.rebuild(&vault, &vault_id);
+    }
+    state.jobs.clear_lint_results();
+    Ok(result)
 }
 
 #[tauri::command]

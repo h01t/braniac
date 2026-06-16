@@ -204,6 +204,21 @@ pub struct LintFix {
 pub struct LintResult {
     pub report: String,
     pub fixes: Vec<LintFix>,
+    #[serde(default)]
+    pub from_cache: bool,
+    #[serde(default)]
+    pub skipped_count: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cache_commit_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_commit_hash: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ApplyLintResult {
+    pub applied: usize,
+    pub errors: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

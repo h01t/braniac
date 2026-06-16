@@ -32,6 +32,7 @@ pub fn run() {
             commands::job_start_lint,
             commands::job_lint_result,
             commands::job_lint_apply,
+            commands::job_lint_apply_selected,
             commands::job_cancel,
             commands::palette_execute,
             commands::history_log,

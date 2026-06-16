@@ -4,23 +4,14 @@ import type {
   GraphNode,
   HistoryEntry,
   KnowledgeDocument,
-  LintResult,
   SearchMatchContext,
 } from "../types";
-import type { JobActivityState } from "../hooks/useJobActivity";
-import { LintChangesPanel } from "./LintChangesPanel";
 
 interface InspectorPanelProps {
   document: KnowledgeDocument | null;
   node: GraphNode | null;
   history: HistoryEntry[];
   searchMatch?: SearchMatchContext | null;
-  lintResult?: LintResult | null;
-  vaultId?: string;
-  lintBusy?: boolean;
-  lintActivity?: JobActivityState;
-  showLintActivity?: boolean;
-  onLintApply?: () => Promise<void>;
   onNavigateToPath?: (path: string) => void;
   embedded?: boolean;
 }
@@ -30,12 +21,6 @@ export function InspectorPanel({
   node,
   history,
   searchMatch,
-  lintResult,
-  vaultId = "",
-  lintBusy = false,
-  lintActivity,
-  showLintActivity = false,
-  onLintApply,
   onNavigateToPath,
   embedded = false,
 }: InspectorPanelProps) {
@@ -79,16 +64,6 @@ export function InspectorPanel({
           </div>
         ))}
       </div>
-      {vaultId && onLintApply && lintActivity && (
-        <LintChangesPanel
-          vaultId={vaultId}
-          lintResult={lintResult ?? null}
-          lintBusy={lintBusy}
-          activity={lintActivity}
-          showActivity={showLintActivity}
-          onApply={onLintApply}
-        />
-      )}
     </div>
   );
 

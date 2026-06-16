@@ -6,6 +6,7 @@ import { EmptyVaultPanel } from "./components/EmptyVaultPanel";
 import { GraphCanvas } from "./components/GraphCanvas";
 import { IngestBar } from "./components/IngestBar";
 import { MarkdownEditor } from "./components/MarkdownEditor";
+import { MintLintModal, type MintLintPhase } from "./components/MintLintModal";
 import { ResizableInspector, useInspectorLayout } from "./components/ResizableInspector";
 import { SourceDialog } from "./components/SourceDialog";
 import { StatusBar } from "./components/StatusBar";
@@ -26,6 +27,7 @@ import {
   type StatusBarMode,
 } from "./lib/statusBar";
 import type {
+  ApplyLintResult,
   AppSettings,
   GraphNode,
   GraphSnapshot,
@@ -33,6 +35,7 @@ import type {
   IndexStatus,
   JobEvent,
   KnowledgeDocument,
+  LintFix,
   LintResult,
   SearchMatchContext,
   SearchResult,
@@ -82,7 +85,10 @@ export default function App() {
   const [searchBusy, setSearchBusy] = useState(false);
   const [searchStepLabel, setSearchStepLabel] = useState("Querying index…");
   const [lintBusy, setLintBusy] = useState(false);
-  const [lintJobActive, setLintJobActive] = useState(false);
+  const [mintLintOpen, setMintLintOpen] = useState(false);
+  const [mintLintPhase, setMintLintPhase] = useState<MintLintPhase>("idle");
+  const [mintLintApplyProgress, setMintLintApplyProgress] = useState({ done: 0, total: 0 });
+  const [mintLintApplyResult, setMintLintApplyResult] = useState<ApplyLintResult | null>(null);
   const [indexStatus, setIndexStatus] = useState<IndexStatus | null>(null);
   const [graph, setGraph] = useState<GraphSnapshot | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -490,45 +496,77 @@ export default function App() {
     }
   }, [vaultId, log, indexRebuildBusy]);
 
-  const runLint = useCallback(async () => {
+  const closeMintLintModal = useCallback(() => {
+    setMintLintOpen(false);
+    setMintLintPhase("idle");
+    setMintLintApplyProgress({ done: 0, total: 0 });
+    setMintLintApplyResult(null);
+  }, []);
+
+  const startMintLint = useCallback(async () => {
     if (!vaultId || lintBusy) return;
+    setMintLintOpen(true);
+    setMintLintPhase("scanning");
+    setMintLintApplyResult(null);
     setLintBusy(true);
-    setLintJobActive(true);
     resetJobActivity();
     log("Running lint...");
     try {
       await api.jobStartLint(vaultId);
       const result = await api.jobLintResult();
       setLintResult(result);
+      setMintLintPhase("review");
       if (result) {
-        log(result.report);
         log(`${result.fixes.length} proposed fixes`);
       }
     } catch (error) {
+      setLintResult({
+        report: `Lint failed: ${String(error)}`,
+        fixes: [],
+      });
+      setMintLintPhase("review");
       log(`Lint failed: ${String(error)}`);
     } finally {
       setLintBusy(false);
-      setLintJobActive(false);
     }
   }, [vaultId, log, lintBusy, resetJobActivity]);
 
-  const runMint = useCallback(async () => {
-    if (!vaultId || lintBusy) return;
-    setLintBusy(true);
-    try {
-      const applied = await api.jobLintApply(vaultId);
-      log(`Mint applied ${applied} fixes`);
-      await refreshVault(vaultId);
-      setLintResult(await api.jobLintResult());
-      if (applied === 0) {
-        log("No fixes were applied — re-run Lint Vault to refresh recommendations.");
+  const applyApprovedLintFixes = useCallback(
+    async (fixes: LintFix[]) => {
+      if (!vaultId || fixes.length === 0) return;
+      setMintLintPhase("applying");
+      setMintLintApplyProgress({ done: 0, total: fixes.length });
+      setLintBusy(true);
+      try {
+        const result = await api.jobLintApplySelected(vaultId, fixes);
+        setMintLintApplyProgress({ done: result.applied, total: fixes.length });
+        setMintLintApplyResult(result);
+        setMintLintPhase("done");
+        log(`Applied ${result.applied} lint fixes`);
+        if (result.errors.length > 0) {
+          log(result.errors.join("; "));
+        }
+        await refreshVault(vaultId);
+        setLintResult(null);
+      } catch (error) {
+        setMintLintApplyResult({ applied: 0, errors: [String(error)] });
+        setMintLintPhase("done");
+        log(`Apply fixes failed: ${String(error)}`);
+      } finally {
+        setLintBusy(false);
       }
-    } catch (error) {
-      log(`Apply fixes failed: ${String(error)}`);
-    } finally {
-      setLintBusy(false);
+    },
+    [vaultId, log, refreshVault],
+  );
+
+  const openMintLintReview = useCallback(() => {
+    if (lintResult) {
+      setMintLintOpen(true);
+      setMintLintPhase("review");
+      return;
     }
-  }, [vaultId, log, refreshVault, lintBusy]);
+    log("No lint results — run Mint & Lint first.");
+  }, [lintResult, log]);
 
   const paletteContext = useMemo<PaletteContext>(
     () => ({
@@ -560,31 +598,21 @@ export default function App() {
         line.startsWith("lint") && !line.includes("apply") && line !== "mint";
       const isLintApply = line === "mint" || line.includes("lint apply");
       if (isLintRun) {
-        setLintBusy(true);
-        setLintJobActive(true);
-        resetJobActivity();
-      } else if (isLintApply) {
-        setLintBusy(true);
-      } else {
-        setIngestBusy(true);
+        await startMintLint();
+        return;
       }
+      if (isLintApply) {
+        openMintLintReview();
+        return;
+      }
+      setIngestBusy(true);
       try {
         await executePaletteCommand(line, paletteContext);
-        if (isLintRun || isLintApply) {
-          setLintResult(await api.jobLintResult());
-        }
       } finally {
-        if (isLintRun) {
-          setLintBusy(false);
-          setLintJobActive(false);
-        } else if (isLintApply) {
-          setLintBusy(false);
-        } else {
-          setIngestBusy(false);
-        }
+        setIngestBusy(false);
       }
     },
-    [paletteContext, resetJobActivity],
+    [paletteContext, startMintLint, openMintLintReview],
   );
 
   const commands = useMemo<CommandItem[]>(
@@ -618,13 +646,8 @@ export default function App() {
       },
       {
         id: "lint",
-        label: "Lint Vault",
-        run: () => void runLint(),
-      },
-      {
-        id: "mint",
-        label: "Mint (Apply Lint)",
-        run: () => void runMint(),
+        label: "Mint & Lint Vault",
+        run: () => void startMintLint(),
       },
       {
         id: "open-graph",
@@ -643,7 +666,7 @@ export default function App() {
         run: () => toggleStatusBar(),
       },
     ],
-    [saveDocument, rebuildIndex, runLint, runMint, toggleStatusBar, changeCenterTab],
+    [saveDocument, rebuildIndex, startMintLint, toggleStatusBar, changeCenterTab],
   );
 
   const saveSettings = async () => {
@@ -775,6 +798,16 @@ export default function App() {
                 )}
               </button>
             </div>
+          </div>
+          <div className="toolbar-row mint-lint-trigger-row">
+            <button
+              type="button"
+              className="mint-lint-trigger"
+              disabled={!hasVaults || lintBusy}
+              onClick={() => void startMintLint()}
+            >
+              ✨ Mint &amp; Lint Vault
+            </button>
           </div>
           <div className="panel-body file-list">
             {!hasVaults && initDone ? (
@@ -1001,12 +1034,6 @@ export default function App() {
           node={selectedNode}
           history={history}
           searchMatch={searchMatch}
-          vaultId={vaultId}
-          lintResult={lintResult}
-          lintBusy={lintBusy}
-          lintActivity={jobActivity}
-          showLintActivity={lintJobActive}
-          onLintApply={runMint}
           onNavigateToPath={(path) => void navigateToLinkedPage(path)}
           width={inspectorLayout.width}
           collapsed={inspectorLayout.collapsed}
@@ -1022,6 +1049,17 @@ export default function App() {
         busy={ingestBusy || indexRebuildBusy || lintBusy || searchBusy || jobActivity.phase === "running"}
         idleHint={`Ready · ${modKey}K palette · ${modKey}J status bar`}
         onModeChange={setStatusBarModePersisted}
+      />
+
+      <MintLintModal
+        open={mintLintOpen}
+        vaultId={vaultId}
+        phase={mintLintPhase}
+        result={lintResult}
+        applyProgress={mintLintApplyProgress}
+        applyResult={mintLintApplyResult}
+        onClose={closeMintLintModal}
+        onApplyApproved={applyApprovedLintFixes}
       />
 
       <SourceDialog
