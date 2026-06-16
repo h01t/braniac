@@ -1,15 +1,16 @@
-# Astro’s Playroom
+# Astro's Playroom
 
-**Summary**: A pack‑in platformer for PlayStation 5 that serves as a showcase for the DualSense controller and Tempest 3D Audio.
-**Source Context**: “PlayStation 5 review: welcome to the next generation | Digital Foundry” (https://www.digitalfoundry.net/articles/playstation-5-review-digitalfoundry)
+**Summary**: A launch title for the PlayStation 5, pre‑installed on every console, that showcases the DualSense controller’s haptic feedback and adaptive triggers. Extraordinary tactile effects include perceiving individual raindrops.
+
+**Source Context**: https://www.digitalfoundry.net/articles/playstation-5-review-digitalfoundry (DualSense section)
 
 ---
 
-*Astro’s Playroom* comes pre‑installed on every [[entities/playstation-5.md]]. It is designed entirely around the capabilities of the [[entities/dualsense-controller.md]], making it a virtual tech demo. The review calls it a “*Wii Sports*‑style play” that demonstrates haptic feedback, adaptive triggers, and the internal speaker. The 3D audio (via [[concepts/tempest-3d-audio-engine.md]]) is additive but not revolutionary at launch.
-
-The game received a Eurogamer Essential award and is considered a strategic success by Sony to introduce players to the new console’s features.
+The game is highlighted in the Digital Foundry review as the best demonstration of the DualSense's capabilities. It also uses the Tempest 3D Audio Engine.
 
 ## Related pages
-- [[entities/playstation-5.md]]
-- [[entities/dualsense-controller.md]]
+- [[concepts/haptic-feedback.md]]
 - [[concepts/tempest-3d-audio-engine.md]]
+- [[entities/dualsense-controller.md]]
+- [[entities/playstation-5.md]]
+- [[sources/digital-foundry-ps5-review-2020.md]]

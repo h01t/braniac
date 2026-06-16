@@ -1,1 +1,0 @@
-**Source Context**: turboquant.pdf (used in the proof of Theorem 3)
