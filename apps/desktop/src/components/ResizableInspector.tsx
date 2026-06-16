@@ -45,6 +45,7 @@ interface ResizableInspectorProps {
   lintActivity?: JobActivityState;
   showLintActivity?: boolean;
   onLintApply?: () => Promise<void>;
+  onNavigateToPath?: (path: string) => void;
   onWidthChange: (width: number) => void;
   onCollapsedChange: (collapsed: boolean) => void;
   width: number;
@@ -62,6 +63,7 @@ export function ResizableInspector({
   lintActivity,
   showLintActivity,
   onLintApply,
+  onNavigateToPath,
   onWidthChange,
   onCollapsedChange,
   width,
@@ -163,6 +165,7 @@ export function ResizableInspector({
         lintActivity={lintActivity}
         showLintActivity={showLintActivity}
         onLintApply={onLintApply}
+        onNavigateToPath={onNavigateToPath}
         embedded
       />
     </aside>

@@ -15,6 +15,7 @@ import { useJobActivity } from "./hooks/useJobActivity";
 import { executePaletteCommand, type PaletteContext } from "./lib/paletteCli";
 import { SearchActivity } from "./components/SearchActivity";
 import { searchResultNavigationEffects } from "./lib/searchNavigation";
+import { normalizeWikilinkTarget } from "./lib/wikilinks";
 import { resolveSearchPhase } from "./lib/searchUi";
 import { formatSearchScore } from "./lib/searchSnippet";
 import {
@@ -335,6 +336,28 @@ export default function App() {
       setSelectedNode(node);
     },
     [vaultId, graph, changeCenterTab],
+  );
+
+  const navigateToLinkedPage = useCallback(
+    async (path: string) => {
+      if (!vaultId) return;
+      const normalized = normalizeWikilinkTarget(path);
+      setSearchMatch(null);
+      const node = graph?.nodes.find((n) => n.id === normalized) ?? null;
+      setSelectedNode(node);
+      setActivePath(normalized);
+      try {
+        const doc = await api.documentRead(vaultId, normalized);
+        setDocument(doc);
+        setEditorValue(doc.content);
+        log(`Opened ${normalized}`);
+      } catch (error) {
+        setDocument(null);
+        setEditorValue("");
+        log(`Could not open ${normalized}: ${String(error)}`);
+      }
+    },
+    [vaultId, graph, log],
   );
 
   const openSearchResult = useCallback(
@@ -984,6 +1007,7 @@ export default function App() {
           lintActivity={jobActivity}
           showLintActivity={lintJobActive}
           onLintApply={runMint}
+          onNavigateToPath={(path) => void navigateToLinkedPage(path)}
           width={inspectorLayout.width}
           collapsed={inspectorLayout.collapsed}
           onWidthChange={inspectorLayout.setWidth}

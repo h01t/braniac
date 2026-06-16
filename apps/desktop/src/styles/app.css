@@ -692,6 +692,29 @@
   margin-top: 1.2em;
 }
 
+.markdown-preview .wikilink {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.markdown-preview .wikilink:hover {
+  color: var(--accent-hover, #7eb3ff);
+}
+
+.markdown-preview .wikilink-inert {
+  cursor: default;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
 .settings-section {
   margin: 16px 0 8px;
   font-size: 13px;

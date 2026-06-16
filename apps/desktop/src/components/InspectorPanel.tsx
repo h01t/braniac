@@ -1,6 +1,5 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { formatSearchScore, formatSearchSnippet } from "../lib/searchSnippet";
+import { WikilinkMarkdown } from "./WikilinkMarkdown";
 import type {
   GraphNode,
   HistoryEntry,
@@ -22,6 +21,7 @@ interface InspectorPanelProps {
   lintActivity?: JobActivityState;
   showLintActivity?: boolean;
   onLintApply?: () => Promise<void>;
+  onNavigateToPath?: (path: string) => void;
   embedded?: boolean;
 }
 
@@ -36,6 +36,7 @@ export function InspectorPanel({
   lintActivity,
   showLintActivity = false,
   onLintApply,
+  onNavigateToPath,
   embedded = false,
 }: InspectorPanelProps) {
   const body = (
@@ -62,7 +63,10 @@ export function InspectorPanel({
         <div className="inspector-block">
           <h4>Document</h4>
           <div className="markdown-preview">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{document.content}</ReactMarkdown>
+            <WikilinkMarkdown
+              content={document.content}
+              onNavigate={onNavigateToPath}
+            />
           </div>
         </div>
       )}
