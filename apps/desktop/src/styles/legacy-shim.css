@@ -14,8 +14,7 @@
   --danger: var(--color-danger);
   --success: var(--color-success);
   --warning: var(--color-warning);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-sans: var(--font-mono);
   --radius: var(--radius-md);
   --shadow: var(--shadow-md);
 }
