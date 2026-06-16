@@ -43,3 +43,9 @@ next-env.d.ts
 
 # lint cache (local build artifact, not part of the knowledge graph)
 vaults/**/.lint-cache.json
+
+# rust / tauri / desktop build artifacts
+/target/
+apps/desktop/node_modules/
+apps/desktop/src-tauri/gen/
+*.swp

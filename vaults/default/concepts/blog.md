@@ -5,18 +5,14 @@
 
 ---
 
-## Definition
+## Role in AI Research
+Many AI companies and researchers publish blog posts to announce new models, share technical insights, and engage with the community.
 
-Blogs typically consist of discrete, often informal diary-style text entries or posts. They are used for sharing knowledge, updates, or opinions.
-
-## Example in Context
-
-The source [[sources/qwen-blog-qwen3-6.md]] is an example of a blog post that provides information about Qwen [[entities/qwen.md]].
+## Example
+The source [[sources/qwen-blog-qwen3-6]] is a blog post about Qwen3-6.
 
 ## Importance
-
-Blogs can be valuable sources for up-to-date information, especially in fast-moving fields like technology.
+Blogs are valuable for up-to-date, accessible information in fast-moving fields like AI.
 
 ## Related pages
-
-- [[sources/qwen-blog-qwen3-6.md]]
+- [[concepts/chinese-open-source-llm-landscape-2025.md]]

@@ -2,7 +2,7 @@
 
 **Summary**: The attention mechanism is the core of transformer models, enabling each token to attend to any other. Improvements for efficiency include multi-query attention (Shazeer [[50]]) and FlashAttention-3 (Shah et al. [[47]]).
 
-**Source Context**: turboqaunt.pdf
+**Source Context**: turboquant.pdf
 
 ---
 
@@ -13,4 +13,4 @@ Attention is central to understanding [[concepts/kv-cache-quantization.md]], as 
 ## Related pages
 - [[concepts/kv-cache-quantization.md]]
 - [[entities/gpt-4.md]]
-- [[sources/turboqaunt.md]]
+- [[sources/turboquant-paper.md]]

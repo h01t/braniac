@@ -1,16 +1,15 @@
 # Product Quantization
 
-**Summary**: Product quantization decomposes high-dimensional vectors into subvectors and quantizes each independently, enabling efficient approximate nearest neighbor search and vector compression. It is used as a building block for KV cache quantization.
+**Summary**: Product quantization splits high-dimensional vectors into subspaces, each quantized independently with its own codebook. It is a common baseline for vector compression.
 
-**Source Context**: turboqaunt.pdf
+**Source Context**: turboquant.pdf
 
 ---
 
-Product quantization (PQ) was introduced by Jegou et al. ([[31]]) for nearest neighbor search [31]. It splits a vector into subvectors, each quantized using a separate codebook. Variants include optimized product quantization (OPQ) by Ge et al. ([[24]]) [24] and additive quantization (AQ) by Babenko and Lempitsky ([[9]]) [9].
-
-PQ is applied in retrieval (e.g., [[concepts/kv-cache-quantization.md]]) and has been extended for asymmetric distance computation (see ColBERT [[35]], ColBERTv2 [[46]]). The source also references practical and asymptotically optimal quantization methods for Euclidean space by Gao et al. ([[22]]) [22].
+Product quantization (PQ) is a lossy compression technique that divides a D‑dimensional vector into M subspaces of dimension D/M, learns a separate codebook for each subspace, and encodes the vector as a tuple of codebook indices. TurboQuant compares against PQ variants in its experiments.
 
 ## Related pages
 - [[concepts/vector-quantization.md]]
-- [[concepts/kv-cache-quantization.md]]
-- [[sources/turboqaunt.md]]
+- [[concepts/turboquant-mse.md]]
+- [[concepts/turboquant-prod.md]]
+- [[sources/turboquant-pdf.md]]

@@ -1,14 +1,14 @@
-# Quantized Johnson-Lindenstrauss Transform (QJL)
+# Quantized Johnson‑Lindenstrauss Transform
 
-**Summary**: The Quantized Johnson-Lindenstrauss (QJL) transform is a 1-bit quantization method that provides unbiased estimates of inner products, used as the second stage of TurboQuant's inner product quantizer.
-**Source Context**: turboqaunt.pdf
+**Summary**: A variant of the Johnson‑Lindenstrauss lemma that uses quantization to reduce the storage cost of random projections, often applied to inner‑product estimation.
+
+**Source Context**: turboquant.pdf
 
 ---
 
-QJL is a sketching based technique that quantizes each coordinate of a vector to a single bit. It is data-oblivious and computationally efficient. In TurboQuant, after applying the MSE quantizer (using \(b-1\) bits), the residual vector is quantized with a 1-bit QJL transform. This composition yields an unbiased inner product estimator with low distortion.
+The quantized Johnson‑Lindenstrauss transform (QJL) projects high‑dimensional vectors using a random Gaussian matrix and then quantizes the result to low‑precision (e.g., sign bits). TurboQuant uses QJL in its `prod` variant for unbiased inner‑product estimation. See [[concepts/quasi-johnson-lindenstrauss-qjl.md]] for the specific implementation used.
 
 ## Related pages
-- [[concepts/inner-product-distortion.md]]
-- [[concepts/turboquant.md]]
-- [[concepts/mse-distortion.md]]
-- [[sources/turboquant-paper.md]]
+- [[concepts/quasi-johnson-lindenstrauss-qjl.md]]
+- [[concepts/turboquant-prod.md]]
+- [[sources/turboquant-pdf.md]]
