@@ -13,8 +13,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - run: cargo test --workspace
-      - run: cargo clippy --workspace --all-targets -- -D warnings
+      # Tauri desktop needs GTK/GLib system libs; test core crates only on Linux CI.
+      - run: cargo test -p braniac-core -p braniac-types
+      - run: cargo clippy -p braniac-core -p braniac-types --all-targets -- -D warnings
 
   desktop-frontend:
     runs-on: ubuntu-latest
