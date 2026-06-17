@@ -1,74 +1,43 @@
-# AI Knowledge Compiler Agent Workflow
+# Agent workflow (desktop)
 
-An automated, local-first knowledge base maintained by DeepSeek Reasoner.
-This architecture implements an automated version of Karpathy's LLM Wiki pattern through a Next.js UI, accelerated ingestion tools, and semantic search.
+Braniac compiles sources into a local Git-backed markdown knowledge vault using a Tauri desktop app.
 
-## Purpose
+## Active paths
 
-This system is an automated, interlinked knowledge base for tracking and compiling research.
-DeepSeek ingests inputs through the UI, chunks the data, outputs interlinked Markdown matrices, and generates a cohesive global state, while `qmd` handles live semantic mapping.
+| Area | Location |
+|------|----------|
+| React UI | `apps/desktop/src/` |
+| Tauri commands | `apps/desktop/src-tauri/src/commands.rs` |
+| Core logic | `crates/braniac-core/` |
+| Shared types | `crates/braniac-types/` |
+| Vault markdown | `vaults/<vault-id>/` |
 
-## Folder Structure
+## Ingest flow
+
+1. User submits text, URL, or PDF from `IngestBar` / `SourceDialog`
+2. Frontend calls `job_start_ingest` → `JobManager::run_ingest`
+3. Source is extracted (`extract.rs`), sent to configured AI provider (`ai.rs`)
+4. Provider output is parsed into document patches (`job_parsers.rs`)
+5. Patches are applied in one batch commit (`vault.rs` `apply_batch`)
+6. Index rebuild runs after success; failures surface as warnings
+
+## Lint flow
+
+1. `job_start_lint` → `JobManager::run_lint` builds a corpus from vault scans
+2. Provider returns fix proposals parsed by `parse_lint_output`
+3. User reviews fixes in `MintLintModal`
+4. Approved fixes apply atomically via batch vault write
+
+## Vault layout
 
 ```
-vaults/default/               -- Git-backed markdown pages maintained completely by DeepSeek
-vaults/default/concepts/      -- Concept, topic, or entity pages
-vaults/default/sources/       -- Auto-ingested raw data mapping files
-vaults/default/index.md       -- Table of contents for the entire wiki
-vaults/default/glossary.md    -- Definitions of key terms and concepts
-vaults/default/log.md         -- Append-only record of all operations
+vaults/<id>/
+  concepts/
+  entities/
+  sources/
+  events/
+  papers/
+  index.md
 ```
 
-Note: The `raw/` folder concept is handled natively in memory via High-Performance Rust `grapper` execution. The raw source is passed directly into the reasoning engine and discarded, while its facts are permanently compiled into `sources/`.
-
-## Automated Ingest Workflow
-
-When the user drops a PDF or URL into the Ingest UI:
-
-1. The API natively extracts the data using `grapper`.
-2. The server chunks the document into 3000-word batches and loops over them sequentially.
-3. For **each batch**, DeepSeek evaluates the context and generates/updates files in `concepts/` and `sources/`.
-4. After all batches finish, the API triggers a **Consolidation Pass**. DeepSeek reviews every path it just touched, and dynamically updates `index.md`, `glossary.md`, and `log.md`.
-5. Finally, the system automatically runs `qmd embed` in the background to update the local Apple Metal-accelerated Llama GGUF vector embeddings for semantic search.
-
-## Page Format
-
-Every wiki page emitted by DeepSeek MUST follow this standard Markdown structure:
-
-```markdown
-# Page Title
-
-**Summary**: One to two sentences describing this page.
-
-**Source Context**: URL or Filename this knowledge was extracted from.
-
----
-
-Main content goes here. Use clear headings and short paragraphs.
-
-Link to related concepts using [[concepts/name.md]] syntax throughout the text for visual graph mapping.
-
-## Related pages
-- [[concepts/related-concept.md]]
-```
-
-## Citation Rules
-
-- Every factual claim extracted must link back to its `sources/` origin node.
-- If two sources disagree, note the contradiction explicitly in the concept document.
-
-## Linting via EvalOps
-
-When the user triggers `✨ Mint & Lint Vault` in the sidebar:
-- DeepSeek scans the entire `vaults/default` directory.
-- It identifies contradictions between nodes.
-- It finds orphaned pages (no inbound links from other concepts).
-- It flags outdated claims.
-- It generates a detailed markdown report inside the modal.
-
-## Agent System Rules
-
-- Automatically categorize and output via `<file path="concepts/name.md">` XML tagging.
-- Never write standard conversational text outside of the XML file blocks.
-- Output filenames as lowercase with hyphens (e.g. `machine-learning.md`).
-- Ensure every markdown file has bidirectional [[links]] to map the React Force Graph dynamically.
+See [migration-from-nextjs.md](migration-from-nextjs.md) for the retired Next.js workflow.

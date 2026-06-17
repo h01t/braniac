@@ -1,61 +1,23 @@
 {
-  "name": "ai-knowledge-compiler",
-  "version": "0.1.0",
-  "description": "Braniac is a local-first AI knowledge compiler that turns raw sources into a Git-backed markdown knowledge graph with semantic search, graph exploration, and human-reviewed linting.",
+  "name": "braniac",
+  "version": "0.2.0",
   "private": true,
-  "author": "Ognjen Jovanovic",
-  "license": "MIT",
-  "homepage": "https://github.com/h01t/braniac#readme",
-  "bugs": {
-    "url": "https://github.com/h01t/braniac/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/h01t/braniac.git"
-  },
-  "keywords": [
-    "nextjs",
-    "knowledge-graph",
-    "semantic-search",
-    "local-first",
-    "markdown",
-    "llm"
+  "workspaces": [
+    "apps/*",
+    "packages/*"
   ],
-  "engines": {
-    "node": ">=20.9.0"
-  },
+  "description": "Braniac desktop knowledge IDE (Tauri + Rust + React)",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck"
-  },
-  "dependencies": {
-    "@ai-sdk/deepseek": "^2.0.29",
-    "@ai-sdk/openai": "^3.0.52",
-    "@tobilu/qmd": "^2.1.0",
-    "ai": "^6.0.158",
-    "cheerio": "^1.2.0",
-    "lucide-react": "^1.8.0",
-    "next": "16.2.3",
-    "pdf-parse": "^1.1.1",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-force-graph-2d": "^1.29.1",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
-    "simple-git": "^3.36.0",
-    "zod": "^4.3.6"
+    "desktop:dev": "npm --prefix apps/desktop run tauri:dev",
+    "desktop:build": "npm --prefix apps/desktop run tauri:build",
+    "desktop:check": "npm --prefix apps/desktop run check",
+    "desktop:test": "npm --prefix apps/desktop run test",
+    "rust:test": "cargo test --workspace",
+    "rust:clippy": "cargo clippy --workspace --all-targets -- -D warnings",
+    "check": "npm run rust:clippy && npm run rust:test && npm run desktop:check && npm run desktop:test",
+    "knip": "knip --no-exit-code"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/pdf-parse": "^1.1.5",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.3",
-    "typescript": "^5"
+    "knip": "^5.50.0"
   }
 }

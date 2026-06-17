@@ -43,3 +43,14 @@ next-env.d.ts
 
 # lint cache (local build artifact, not part of the knowledge graph)
 vaults/**/.lint-cache.json
+
+# graphify knowledge graph outputs (generated; see requirements-graphify.txt)
+/graphify-out/
+
+# rust / tauri / desktop build artifacts
+/target/
+apps/desktop/dist/
+apps/desktop/graphify-out/
+apps/desktop/node_modules/
+apps/desktop/src-tauri/gen/
+*.swp

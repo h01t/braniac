@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      # Tauri desktop needs GTK/GLib system libs; test core crates only on Linux CI.
+      - run: cargo test -p braniac-core -p braniac-types
+      - run: cargo clippy -p braniac-core -p braniac-types --all-targets -- -D warnings
+
+  desktop-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run desktop:check
+      - run: npm run desktop:test

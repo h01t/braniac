@@ -1,6 +1,0 @@
-{
-  "ingestProvider": "deepseek",
-  "ingestModel": "deepseek-v4-pro",
-  "lintProvider": "deepseek",
-  "lintModel": "deepseek-v4-flash"
-}

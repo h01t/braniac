@@ -1,0 +1,4 @@
+# Graphify — knowledge graph skill for AI coding assistants
+# https://graphify.net
+# Requires Python 3.10+
+graphifyy==0.8.40

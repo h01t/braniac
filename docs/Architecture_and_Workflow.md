@@ -4,31 +4,29 @@ This document is the technical companion to [project-overview.md](./project-over
 
 ## High-Level Architecture
 
-Braniac uses a local-first architecture built around a Next.js App Router frontend, API routes for orchestration, a file-based markdown vault, and two local command-line tools: `grapper` for extraction and `qmd` for retrieval.
+Braniac uses a local-first **Tauri 2 desktop** architecture: a React UI calls Rust Tauri commands, which orchestrate vault I/O, AI providers, `qmd` indexing, and graph layout in `braniac-core`.
 
 ```mermaid
 flowchart LR
-    U["User"] --> UI["Next.js + React UI"]
-    UI --> API["App Router API Routes"]
-
-    API --> EXT["grapper Extraction"]
-    API --> LLM["Provider-configurable LLM layer"]
-    API --> QMD["qmd Search / Update"]
-    API --> VAULT["Git-backed Markdown Vaults"]
-
-    EXT --> VAULT
-    LLM --> VAULT
+    U["User"] --> UI["React UI"]
+    UI --> CMD["Tauri commands"]
+    CMD --> CORE["braniac-core"]
+    CORE --> EXT["grapper extraction"]
+    CORE --> LLM["Provider-configurable LLM"]
+    CORE --> QMD["qmd index"]
+    CORE --> VAULT["Git-backed markdown vaults"]
     VAULT --> QMD
     QMD --> UI
 ```
 
 ### Core Components
 
-- `src/components/`: graph view, ingest panel, search, vault selector, lint modal, and EvalOps surfaces
-- `src/app/api/`: ingestion, lint, search, metrics, and vault-management routes
-- `src/lib/extractor.ts`: local `grapper` integration for URLs and PDFs
-- `src/lib/vaultManager.ts`: filesystem and Git operations for vault state
-- `src/lib/qmd.ts`: local semantic retrieval and background index refresh
+- `apps/desktop/src/`: React UI (graph, ingest, search, lint modal, settings)
+- `apps/desktop/src-tauri/src/commands.rs`: Tauri command surface
+- `crates/braniac-core/src/vault.rs`: filesystem and Git vault operations
+- `crates/braniac-core/src/jobs.rs`: ingest and lint job orchestration
+- `crates/braniac-core/src/index.rs`: SQLite metadata + `qmd` integration
+- `crates/braniac-core/src/extract.rs`: local `grapper` integration
 
 ## Ingestion Workflow
 
@@ -47,18 +45,14 @@ sequenceDiagram
     participant Index as qmd update
 
     User->>UI: Submit text, URL, or PDF
-    UI->>API: POST payload
-    API->>Extract: Extract source text when needed
-    Extract-->>API: Markdown/text
-    API->>Chunk: Split into section-aware chunks
-    Chunk-->>API: ordered chunks
-    loop per chunk
-      API->>Model: Generate structured files
-      Model-->>API: file blocks
-      API->>Parse: Parse and validate output
-      Parse-->>Vault: write + commit
-    end
-    API->>Index: refresh local qmd index
+    UI->>CMD: job_start_ingest
+    CMD->>Extract: prepare_source (grapper when needed)
+    Extract-->>CMD: text
+    CMD->>Model: INGEST_SYSTEM_PROMPT + source
+    Model-->>CMD: file blocks
+    CMD->>Parse: parse_file_tags
+    Parse-->>Vault: apply_batch (single commit)
+    CMD->>Index: rebuild_with_vaults (warning if failed)
 ```
 
 ## Search and Navigation Workflow
@@ -67,13 +61,13 @@ Graph navigation and semantic search are designed to complement each other rathe
 
 ```mermaid
 flowchart LR
-    Q["Search query"] --> S["/api/search"]
-    S --> QMD["qmd query --json"]
+    Q["Search query"] --> CMD["search_query command"]
+    CMD --> QMD["qmd query"]
     QMD --> R["Ranked snippets"]
     R --> UI["SearchBar / GraphView"]
     UI --> N["Open node or related page"]
-    N --> C["/api/vaults/[vaultId]/content"]
-    C --> M["Markdown panel with wikilink navigation"]
+    N --> CMD2["document_read"]
+    CMD2 --> M["Markdown editor with wikilink navigation"]
 ```
 
 The graph is generated directly from stored markdown files by scanning `[[wikilinks]]`, which means the visualization and the stored knowledge structure stay aligned.

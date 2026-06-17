@@ -1,7 +1,7 @@
 # Beta Distribution
 
 **Summary**: The Beta distribution is the distribution of each coordinate after applying a random rotation to a vector, as used in TurboQuant.
-**Source Context**: turboqaunt.pdf
+**Source Context**: turboquant.pdf
 
 ---
 

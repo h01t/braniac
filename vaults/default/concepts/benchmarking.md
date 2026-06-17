@@ -5,7 +5,18 @@
 
 ---
 
-(This page is a stub. Content needed on AI benchmarking practices, common benchmarks like MMLU, HELM, MLE Bench, and their role in AI development.)
+## Purpose
+Benchmarking allows objective comparison of model capabilities across dimensions like accuracy, speed, safety, and resource efficiency.
+
+## Common Benchmarks
+- **MMLU**: Multitask language understanding.
+- **HELM**: Holistic evaluation across several metrics.
+- **MLE Bench**: Machine learning engineering tasks.
+- **SWE-Bench**: Software engineering agent tasks.
+
+## Challenges
+Benchmarks can become saturated, overfit, or fail to capture real-world performance.
 
 ## Related pages
 - [[concepts/agent-harness.md]]
+- [[concepts/benchmarks.md]]

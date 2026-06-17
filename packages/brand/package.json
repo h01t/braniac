@@ -1,0 +1,17 @@
+{
+  "name": "@signal/brand",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Signal design tokens and shared UI styles",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./tokens.json": "./tokens.json",
+    "./signal-ui.css": "./signal-ui.css"
+  },
+  "files": [
+    "tokens.css",
+    "tokens.json",
+    "signal-ui.css",
+    "brand.md"
+  ]
+}

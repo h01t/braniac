@@ -1,16 +1,16 @@
 # Agentic Intelligence
 
-**Summary**: The capability of AI models to autonomously decompose complex problems into multi-step plans and execute long sequences of interleaved reasoning and actions, often involving tool use. Kimi K2.5 is designed to advance this field.
-**Source Context**: 2602.02276v1.pdf
+**Summary**: The capacity of AI systems to act autonomously, set goals, and make decisions in pursuit of objectives without step-by-step human guidance.
 
----
+## Key Concepts
+Agentic intelligence is a property of [[concepts/autonomous-llm-agents.md]], enabling them to:
+- **Plan**: Break down tasks into subtasks using [[concepts/dppm.md]] or [[concepts/chain-of-thought.md]].
+- **Act**: Call tools, browse the web, or execute code.
+- **Learn**: Adapt behavior through feedback and reflection.
 
-## Definition and Context
-[[concepts/agentic-intelligence.md]] represents an evolution beyond standard Large Language Models (LLMs), where models exhibit the ability to act autonomously to achieve goals. This involves problem decomposition, planning, tool calling, and sequential execution of actions. Recent advances from models like GPT-5.2, Claude Opus 4.5, Gemini 3 Pro, and Kimi K2-Thinking demonstrate substantial progress in these capabilities.
-
-## Challenges and Kimi K2.5's Approach
-A primary challenge for existing agentic systems is their reliance on sequential execution, which leads to linear scaling of inference time and unacceptable latency for complex, heterogeneous tasks. [[entities/kimi-k2-5.md]] addresses this by introducing the [[concepts/agent-swarm.md]] framework, which enables parallel agent orchestration. Furthermore, Kimi K2.5 integrates [[concepts/joint-optimization-text-vision.md]] to create a unified architecture for general-purpose agentic intelligence that works across vision and language.
+## Measurement
+Agentic intelligence is benchmarked through tasks like software engineering ([[concepts/benchmarks.md]]), web navigation, and real-world tool use.
 
 ## Related pages
-- [[entities/kimi-k2-5.md]]
+- [[concepts/agent-frameworks.md]]
 - [[concepts/agent-swarm.md]]

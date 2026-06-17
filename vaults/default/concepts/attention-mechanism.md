@@ -15,8 +15,8 @@ This mechanism enables transformers to capture long-range dependencies and conte
 
 ## Relation to Transformers
 
-The attention mechanism is a core component of the [[concepts/transformer-architecture.md]].
+The attention mechanism is a core component of the transformer architecture.
 
 ## Related pages
-- [[concepts/transformer-architecture.md]]
-- [[sources/fundamentals-of-building-autonomous-llm-agents.md]]
+- [[concepts/chain-of-thought.md]]
+- [[concepts/agentic-intelligence.md]]

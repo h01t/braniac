@@ -16,7 +16,7 @@
 
 ## Abstract
 
-Braniac is a local-first application for transforming raw inputs such as text, URLs, and PDFs into a structured markdown knowledge graph. The system combines a Next.js interface, provider-configurable LLM workflows, a Git-backed vault model, semantic retrieval through `qmd`, and a human-reviewed "Mint & Lint" governance loop. The result is a demo-ready prototype that emphasizes traceability, inspectability, and reproducible repository presentation.
+Braniac is a local-first **Tauri desktop application** for transforming raw inputs such as text, URLs, and PDFs into a structured markdown knowledge graph. The system combines a React UI, Rust core services, provider-configurable LLM workflows, a Git-backed vault model, semantic retrieval through `qmd`, and a human-reviewed "Mint & Lint" governance loop.
 
 The main contribution of the repository is not a novel model on its own, but an end-to-end knowledge compilation workflow: ingest, structure, search, visualize, review, and document. For an academic portfolio, the value lies in showing how model-assisted systems can remain grounded in local files, version history, and explicit human approval rather than opaque automation.
 
@@ -36,8 +36,8 @@ The project answers these questions with a prototype that deliberately keeps the
 
 Braniac consists of four layers:
 
-- a Next.js App Router interface for graph exploration, ingestion, settings, and history review
-- API routes that orchestrate extraction, search, linting, and vault operations
+- a **Tauri + React** desktop shell for graph exploration, ingestion, settings, and history review
+- **Tauri commands** that orchestrate extraction, search, linting, and vault operations
 - a local toolchain built around `grapper`, `qmd`, and Git-backed markdown vaults
 - a provider-configurable LLM layer used for page generation and lint analysis
 
@@ -49,11 +49,11 @@ Braniac consists of four layers:
 
 | Layer | Responsibilities | Main Technologies |
 |---|---|---|
-| Presentation | Graph view, ingest panel, search, settings, EvalOps | Next.js 16, React 19 |
-| Orchestration | Request handling, extraction, lint/apply flows | App Router API routes |
-| Knowledge Storage | Markdown vaults, Git history, file graph | file system, `simple-git` |
-| Retrieval | Local search and snippet lookup | `qmd` |
-| AI Layer | page generation and lint analysis | Vercel AI SDK with DeepSeek/OpenAI |
+| Presentation | Graph view, ingest panel, search, settings | React 19, Vite, Tauri 2 |
+| Orchestration | Tauri commands, job manager, vault resolver | Rust (`braniac-core`) |
+| Knowledge Storage | Markdown vaults, Git history, file graph | filesystem, `git2` |
+| Retrieval | Local search and snippet lookup | `qmd`, SQLite metadata |
+| AI Layer | page generation and lint analysis | configurable providers (DeepSeek/OpenAI) |
 
 ## Architecture and Data Model
 
