@@ -159,6 +159,7 @@ export interface LintResult {
 export interface ApplyLintResult {
   applied: number;
   errors: string[];
+  indexWarning?: string | null;
 }
 
 export interface PaletteResult {
@@ -178,5 +179,6 @@ export type JobEvent =
   | { type: "chunk"; jobId: string; content: string }
   | { type: "patchReady"; jobId: string; patches: DocumentPatch[] }
   | { type: "completed"; jobId: string }
+  | { type: "warning"; jobId: string; message: string }
   | { type: "failed"; jobId: string; error: string }
   | { type: "cancelled"; jobId: string };

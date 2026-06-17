@@ -38,8 +38,28 @@ async fn run_ingest_with_events(
         .map_err(|e| e.to_string())?;
 
     let state = state.clone();
-    let _ = tokio::task::spawn_blocking(move || state.index.rebuild_with_vaults(&state.vaults, &vault_id))
-        .await;
+    let app_for_warning = app.clone();
+    match tokio::task::spawn_blocking(move || {
+        state.index.rebuild_with_vaults(&state.vaults, &vault_id)
+    })
+    .await
+    {
+        Ok(Ok(_)) => {}
+        Ok(Err(e)) => emit_job_event(
+            &app_for_warning,
+            &JobEvent::Warning {
+                job_id,
+                message: format!("Index rebuild failed: {e}"),
+            },
+        ),
+        Err(e) => emit_job_event(
+            &app_for_warning,
+            &JobEvent::Warning {
+                job_id,
+                message: format!("Index rebuild failed: {e}"),
+            },
+        ),
+    }
     Ok(job_id)
 }
 
@@ -294,11 +314,21 @@ pub fn job_lint_apply_selected(
             .jobs
             .apply_lint_fixes_by_ids(&vault, &vault_id, &lint, &fix_ids)
     };
+    let mut index_warning = None;
     if result.applied > 0 {
-        let _ = state.index.rebuild_with_vaults(&state.vaults, &vault_id);
+        match state.index.rebuild_with_vaults(&state.vaults, &vault_id) {
+            Ok(_) => {}
+            Err(e) => {
+                index_warning = Some(format!("Index rebuild failed: {e}"));
+            }
+        }
     }
     state.jobs.clear_job_state(job_id);
-    Ok(result)
+    Ok(ApplyLintResult {
+        applied: result.applied,
+        errors: result.errors,
+        index_warning,
+    })
 }
 
 #[tauri::command]

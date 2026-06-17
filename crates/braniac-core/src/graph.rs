@@ -10,6 +10,7 @@ use crate::vault::VaultResolver;
 use crate::vault_scan::{VaultDocumentScan, VaultRevision};
 
 const LARGE_GRAPH_THRESHOLD: usize = 1500;
+const FORCE_LAYOUT_ITERATION_THRESHOLD: usize = 500;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CachedGraphSnapshot {
@@ -133,10 +134,15 @@ impl GraphEngine {
             .collect();
 
         let mut positions = seeded_positions(n, options.seed);
+        let iterations = if n > FORCE_LAYOUT_ITERATION_THRESHOLD {
+            (5000 / n).max(10).min(options.iterations as usize)
+        } else {
+            options.iterations as usize
+        };
         force_atlas2_layout(
             &mut positions,
             &edges_pairs,
-            options.iterations as usize,
+            iterations,
             options.gravity,
             options.scaling_ratio,
         );

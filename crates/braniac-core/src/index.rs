@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -100,8 +100,9 @@ impl IndexManager {
             }
         }
 
+        let scan_paths: HashSet<&str> = scans.iter().map(|s| s.path.as_str()).collect();
         for path in stored.keys() {
-            if !scans.iter().any(|s| &s.path == path) {
+            if !scan_paths.contains(path.as_str()) {
                 missing_count += 1;
             }
         }
@@ -511,6 +512,58 @@ mod tests {
 
         assert_eq!(qmd.resolve_calls.load(Ordering::SeqCst), 1);
         assert_eq!(qmd.query_calls.load(Ordering::SeqCst), 2);
+    }
+
+    #[test]
+    fn deleted_path_count_uses_hash_set() {
+        use crate::vault_scan::{content_hash, VaultDocumentScan, VaultRevision};
+
+        let dir = tempdir().unwrap();
+        let qmd = MockQmdClient::new();
+        let index = IndexManager::new(dir.path().join("index"), qmd).unwrap();
+        let vault_id = "v";
+        let revision = VaultRevision {
+            head_hash: "abc".into(),
+            worktree_dirty: false,
+        };
+        let scans = vec![
+            VaultDocumentScan {
+                path: "concepts/a.md".into(),
+                title: "A".into(),
+                content_hash: content_hash("# A"),
+                content: None,
+            },
+            VaultDocumentScan {
+                path: "concepts/b.md".into(),
+                title: "B".into(),
+                content_hash: content_hash("# B"),
+                content: None,
+            },
+        ];
+
+        {
+            let db = index.db.lock();
+            db.execute(
+                "INSERT INTO documents (vault_id, path, title, content_hash) VALUES (?1, ?2, ?3, ?4)",
+                params![vault_id, "concepts/a.md", "A", content_hash("# A")],
+            )
+            .unwrap();
+            db.execute(
+                "INSERT INTO documents (vault_id, path, title, content_hash) VALUES (?1, ?2, ?3, ?4)",
+                params![vault_id, "concepts/b.md", "B", content_hash("# B")],
+            )
+            .unwrap();
+            db.execute(
+                "INSERT INTO documents (vault_id, path, title, content_hash) VALUES (?1, ?2, ?3, ?4)",
+                params![vault_id, "concepts/c.md", "C", content_hash("# C")],
+            )
+            .unwrap();
+        }
+
+        let status = index
+            .status_with_scan(vault_id, &revision, &scans)
+            .unwrap();
+        assert_eq!(status.missing_count, 1);
     }
 
     #[test]

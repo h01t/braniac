@@ -5,6 +5,8 @@ pub mod error;
 pub mod extract;
 pub mod graph;
 pub mod index;
+pub mod job_parsers;
+pub mod job_patches;
 pub mod jobs;
 pub mod lint_cache;
 pub mod qmd;

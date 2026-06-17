@@ -22,3 +22,18 @@ export function ingestFromPdf(vaultId: string, filePath: string): IngestRequest 
 export function ingestFromText(vaultId: string, text: string): IngestRequest {
   return { vaultId, sourceUrl: null, text, filePath: null };
 }
+
+export function buildIngestRequest(
+  vaultId: string,
+  text: string,
+  pdfPath: string | null,
+): IngestRequest {
+  if (pdfPath) {
+    return ingestFromPdf(vaultId, pdfPath);
+  }
+  const trimmed = text.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    return ingestFromUrl(vaultId, trimmed);
+  }
+  return ingestFromText(vaultId, trimmed);
+}

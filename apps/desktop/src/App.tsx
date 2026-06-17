@@ -1,23 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { api } from "./api";
-import { CommandPalette, type CommandItem } from "./components/CommandPalette";
+import { CommandPalette } from "./components/CommandPalette";
 import { EmptyVaultPanel } from "./components/EmptyVaultPanel";
 import { GraphCanvas } from "./components/GraphCanvas";
 import { IngestBar } from "./components/IngestBar";
 import { MarkdownEditor } from "./components/MarkdownEditor";
-import { MintLintModal, type MintLintPhase } from "./components/MintLintModal";
+import { MintLintModal } from "./components/MintLintModal";
 import { ResizableInspector, useInspectorLayout } from "./components/ResizableInspector";
 import { SourceDialog } from "./components/SourceDialog";
 import { StatusBar } from "./components/StatusBar";
 import { ToastStack, type Toast } from "./components/ToastStack";
 import { VaultFileTree } from "./components/VaultFileTree";
 import { VaultOverflowMenu } from "./components/VaultOverflowMenu";
-import { BrandGlyphIcon, MonitorIcon, MoonIcon, SearchIcon, SparklesIcon, SunIcon } from "./components/icons";
+import { BrandGlyphIcon, SearchIcon, SparklesIcon } from "./components/icons";
 import { useJobActivity } from "./hooks/useJobActivity";
-import { executePaletteCommand, type PaletteContext } from "./lib/paletteCli";
+import { useMintLint } from "./hooks/useMintLint";
+import { usePaletteCommands } from "./hooks/usePaletteCommands";
+import { useSearch } from "./hooks/useSearch";
+import { useVaultState } from "./hooks/useVaultState";
 import { SearchActivity } from "./components/SearchActivity";
-import { searchResultNavigationEffects } from "./lib/searchNavigation";
 import { normalizeWikilinkTarget } from "./lib/wikilinks";
 import { resolveSearchPhase } from "./lib/searchUi";
 import { formatSearchScore } from "./lib/searchSnippet";
@@ -30,20 +32,10 @@ import {
 } from "./lib/statusBar";
 import { applyThemePreference, themePreferenceLabel } from "./lib/theme";
 import type {
-  ApplyLintResult,
   AppSettings,
   GraphNode,
-  GraphSnapshot,
-  HistoryEntry,
-  IndexStatus,
   JobEvent,
-  KnowledgeDocument,
-  LintResult,
-  SearchMatchContext,
-  SearchResult,
   ThemePreference,
-  VaultManifest,
-  VaultFileEntry,
 } from "./types";
 
 type CenterTab = "editor" | "graph" | "settings" | "plugins";
@@ -80,29 +72,6 @@ async function pickFolder(title: string): Promise<string | null> {
 }
 
 export default function App() {
-  const [vaults, setVaults] = useState<VaultManifest[]>([]);
-  const [vaultId, setVaultId] = useState<string>("");
-  const [vaultsRoot, setVaultsRoot] = useState<string>("");
-  const [files, setFiles] = useState<VaultFileEntry[]>([]);
-  const [activePath, setActivePath] = useState<string>("");
-  const [document, setDocument] = useState<KnowledgeDocument | null>(null);
-  const [editorValue, setEditorValue] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [searchMatch, setSearchMatch] = useState<SearchMatchContext | null>(null);
-  const [searchBusy, setSearchBusy] = useState(false);
-  const [searchStepLabel, setSearchStepLabel] = useState("Querying index…");
-  const [lintBusy, setLintBusy] = useState(false);
-  const [mintLintOpen, setMintLintOpen] = useState(false);
-  const [mintLintPhase, setMintLintPhase] = useState<MintLintPhase>("idle");
-  const [mintLintApplyProgress, setMintLintApplyProgress] = useState({ done: 0, total: 0 });
-  const [mintLintApplyResult, setMintLintApplyResult] = useState<ApplyLintResult | null>(null);
-  const [indexStatus, setIndexStatus] = useState<IndexStatus | null>(null);
-  const [graph, setGraph] = useState<GraphSnapshot | null>(null);
-  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [lintResult, setLintResult] = useState<LintResult | null>(null);
-  const [lintJobId, setLintJobId] = useState<string | null>(null);
   const [centerTab, setCenterTab] = useState<CenterTab>("editor");
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [consoleLines, setConsoleLines] = useState<string[]>([]);
@@ -115,19 +84,13 @@ export default function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [paletteCliMode, setPaletteCliMode] = useState(false);
   const [paletteSession, setPaletteSession] = useState(0);
-
-  const openPalette = useCallback((cliMode = false) => {
-    setPaletteCliMode(cliMode);
-    setPaletteSession((s) => s + 1);
-    setPaletteOpen(true);
-  }, []);
   const [sourceDialogOpen, setSourceDialogOpen] = useState(false);
   const [ingestBusy, setIngestBusy] = useState(false);
   const [indexRebuildBusy, setIndexRebuildBusy] = useState(false);
   const [pluginPath, setPluginPath] = useState("");
-  const [initDone, setInitDone] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(loadSidebarCollapsed);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const inspectorLayout = useInspectorLayout();
 
   const persistSidebarCollapsed = useCallback((collapsed: boolean) => {
@@ -181,79 +144,93 @@ export default function App() {
     }
   }, []);
 
-  const clearSearchResults = useCallback(() => {
-    setSearchText("");
-    setSearchResults([]);
-    setSearchBusy(false);
+  const openPalette = useCallback((cliMode = false) => {
+    setPaletteCliMode(cliMode);
+    setPaletteSession((s) => s + 1);
+    setPaletteOpen(true);
   }, []);
 
-  const clearSearch = useCallback(() => {
-    clearSearchResults();
-    setSearchMatch(null);
-  }, [clearSearchResults]);
+  const {
+    vaults,
+    vaultId,
+    setVaultId,
+    vaultsRoot,
+    files,
+    activePath,
+    setActivePath,
+    document,
+    setDocument,
+    editorValue,
+    setEditorValue,
+    indexStatus,
+    setIndexStatus,
+    graph,
+    history,
+    initDone,
+    setInitDone,
+    loadVaultsRoot,
+    refreshVault,
+    loadVaultList,
+    selectFirstVault,
+    runBootstrap,
+    openDocument,
+    saveDocument,
+  } = useVaultState({
+    onLog: log,
+    changeCenterTab,
+    setSelectedNode,
+    clearSearchMatch: () => {},
+  });
 
-  const loadVaultsRoot = useCallback(async () => {
-    try {
-      const root = await api.vaultsRootGet();
-      setVaultsRoot(root);
-      return root;
-    } catch {
-      return "";
-    }
-  }, []);
+  const {
+    searchText,
+    setSearchText,
+    searchResults,
+    setSearchResults,
+    searchMatch,
+    setSearchMatch,
+    searchBusy,
+    setSearchBusy,
+    searchStepLabel,
+    clearSearch,
+    runSearch,
+    openSearchResult,
+  } = useSearch({
+    vaultId,
+    graph,
+    onLog: log,
+    changeCenterTab,
+    setSelectedNode,
+    openDocument,
+    inspectorLayout,
+  });
 
-  const refreshVault = useCallback(async (id: string) => {
-    await api.vaultOpen(id);
-    const listed = await api.vaultList();
-    setVaults(listed);
-    const manifest = listed.find((v) => v.id === id);
-    if (!manifest) return;
-    setFiles(await api.vaultFiles(id));
-    const status = await api.indexStatus(id);
-    setIndexStatus(status);
-    const hist = await api.historyLog(id);
-    setHistory(hist);
-    const snap = await api.graphSnapshot(id);
-    setGraph(snap);
-  }, []);
+  const {
+    lintBusy,
+    mintLintOpen,
+    mintLintPhase,
+    mintLintApplyProgress,
+    mintLintApplyResult,
+    lintResult,
+    closeMintLintModal,
+    startMintLint,
+    applyApprovedLintFixes,
+    openMintLintReview,
+  } = useMintLint({
+    vaultId,
+    onLog: log,
+    pushToast,
+    refreshVault,
+    resetJobActivity,
+  });
 
-  const loadVaultList = useCallback(async () => {
-    const listed = await api.vaultList();
-    setVaults(listed);
-    return listed;
-  }, []);
-
-  const selectFirstVault = useCallback(
-    async (listed: VaultManifest[]) => {
-      if (listed.length === 0) {
-        setVaultId("");
-        setFiles([]);
-        setActivePath("");
-        setDocument(null);
-        setEditorValue("");
-        return;
-      }
-      const first = listed[0].id;
-      setVaultId(first);
-      await refreshVault(first);
-    },
-    [refreshVault],
-  );
-
-  const runBootstrap = useCallback(async () => {
-    const result = await api.appBootstrap();
-    setVaultsRoot(result.vaultsRoot);
-    log(result.message);
-    if (result.imported.length > 0) {
-      log(`Imported: ${result.imported.join(", ")}`);
-    }
-    const listed = await loadVaultList();
-    await selectFirstVault(listed);
+  const runBootstrapWithSettings = useCallback(async () => {
+    const result = await runBootstrap();
     const s = await api.settingsGet();
     setSettings(s);
     applyThemePreference(resolveThemePreference(s));
     return result;
-  }, [log, loadVaultList, selectFirstVault]);
+  }, [runBootstrap]);
 
   useEffect(() => {
     void (async () => {
@@ -264,7 +241,7 @@ export default function App() {
         applyThemePreference(resolveThemePreference(s));
         let listed = await loadVaultList();
         if (listed.length === 0) {
-          await runBootstrap();
+          await runBootstrapWithSettings();
           listed = await loadVaultList();
         }
         if (listed.length > 0 && !vaultId) {
@@ -307,6 +284,10 @@ export default function App() {
           break;
         case "patchReady":
           log(`Patches ready: ${event.patches.length} files`);
+          break;
+        case "warning":
+          log(event.message);
+          pushToast(event.message, "error");
           break;
         default:
           break;
@@ -352,21 +333,6 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [openPalette, toggleSidebar, toggleStatusBar]);
 
-  const openDocument = useCallback(
-    async (path: string) => {
-      if (!vaultId) return;
-      setSearchMatch(null);
-      const doc = await api.documentRead(vaultId, path);
-      setActivePath(path);
-      setDocument(doc);
-      setEditorValue(doc.content);
-      changeCenterTab("editor");
-      const node = graph?.nodes.find((n) => n.id === path) ?? null;
-      setSelectedNode(node);
-    },
-    [vaultId, graph, changeCenterTab],
-  );
-
   const navigateToLinkedPage = useCallback(
     async (path: string) => {
       if (!vaultId) return;
@@ -386,46 +352,8 @@ export default function App() {
         log(`Could not open ${normalized}: ${String(error)}`);
       }
     },
-    [vaultId, graph, log],
+    [vaultId, graph, log, setActivePath, setDocument, setEditorValue, setSearchMatch],
   );
-
-  const openSearchResult = useCallback(
-    async (result: SearchResult) => {
-      if (!vaultId) return;
-      try {
-        const doc = await api.documentRead(vaultId, result.path);
-        setActivePath(result.path);
-        setDocument(doc);
-        setEditorValue(doc.content);
-        const node = graph?.nodes.find((n) => n.id === result.path) ?? null;
-        setSelectedNode(node);
-        setSearchMatch({
-          query: searchText.trim(),
-          score: result.score,
-          snippet: result.snippet,
-        });
-        const nav = searchResultNavigationEffects();
-        if (nav.expandInspector) {
-          inspectorLayout.setCollapsed(false);
-        }
-        changeCenterTab(nav.centerTab);
-        log(`Focused ${result.path} on graph`);
-      } catch (error) {
-        log(`Could not open ${result.path}: ${String(error)}`);
-      }
-    },
-    [vaultId, graph, changeCenterTab, searchText, inspectorLayout, log],
-  );
-
-  const saveDocument = useCallback(async () => {
-    if (!vaultId || !activePath) return;
-    await api.documentWrite(vaultId, activePath, editorValue, `Update ${activePath}`);
-    log(`Saved ${activePath}`);
-    await refreshVault(vaultId);
-    const doc = await api.documentRead(vaultId, activePath);
-    setDocument(doc);
-    setEditorValue(doc.content);
-  }, [vaultId, activePath, editorValue, log, refreshVault]);
 
   const chooseVaultsFolder = useCallback(async () => {
     const folder = await pickFolder(
@@ -434,9 +362,9 @@ export default function App() {
     if (!folder) return;
     const updated = await api.settingsUpdate({ ...settings, vaultsRoot: folder });
     setSettings(updated);
-    await runBootstrap();
+    await runBootstrapWithSettings();
     log(`Vaults root set to ${folder}`);
-  }, [settings, runBootstrap, log]);
+  }, [settings, runBootstrapWithSettings, log]);
 
   const importVaults = useCallback(async () => {
     const folder = await pickFolder("Select folder to import vaults from");
@@ -473,35 +401,7 @@ export default function App() {
       }
       await openDocument("concepts/welcome.md");
     },
-    [log, loadVaultList, refreshVault, openDocument],
-  );
-
-  const runSearch = useCallback(
-    async (query?: string) => {
-      const q = (query ?? searchText).trim();
-      if (!vaultId || !q || searchBusy) return;
-      setSearchBusy(true);
-      setSearchStepLabel("Querying index…");
-      const stepTimer = window.setTimeout(() => setSearchStepLabel("Ranking results…"), 200);
-      try {
-        const results = await api.searchQuery(vaultId, {
-          text: q,
-          limit: 5,
-          fuzzy: null,
-          field: null,
-        });
-        setSearchResults(results);
-        setSearchText(q);
-        log(`Search returned ${results.length} results`);
-      } catch (error) {
-        log(`Search failed: ${String(error)}`);
-        setSearchResults([]);
-      } finally {
-        window.clearTimeout(stepTimer);
-        setSearchBusy(false);
-      }
-    },
-    [vaultId, searchText, log, searchBusy],
+    [log, loadVaultList, refreshVault, openDocument, setVaultId],
   );
 
   const rebuildIndex = useCallback(async () => {
@@ -517,132 +417,7 @@ export default function App() {
     } finally {
       setIndexRebuildBusy(false);
     }
-  }, [vaultId, log, indexRebuildBusy]);
-
-  const closeMintLintModal = useCallback(() => {
-    setMintLintOpen(false);
-    setMintLintPhase("idle");
-    setMintLintApplyProgress({ done: 0, total: 0 });
-    setMintLintApplyResult(null);
-    setLintJobId(null);
-  }, []);
-
-  const startMintLint = useCallback(async () => {
-    if (!vaultId || lintBusy) return;
-    setMintLintOpen(true);
-    setMintLintPhase("scanning");
-    setMintLintApplyResult(null);
-    setLintBusy(true);
-    resetJobActivity();
-    log("Running lint...");
-    try {
-      const jobId = await api.jobStartLint(vaultId);
-      setLintJobId(jobId);
-      const result = await api.jobLintResult(jobId);
-      setLintResult(result);
-      setMintLintPhase("review");
-      if (result) {
-        log(`${result.fixes.length} proposed fixes`);
-      }
-    } catch (error) {
-      setLintResult({
-        report: `Lint failed: ${String(error)}`,
-        fixes: [],
-      });
-      setMintLintPhase("review");
-      log(`Lint failed: ${String(error)}`);
-    } finally {
-      setLintBusy(false);
-    }
-  }, [vaultId, log, lintBusy, resetJobActivity]);
-
-  const applyApprovedLintFixes = useCallback(
-    async (fixIds: string[]) => {
-      if (!vaultId || !lintJobId || fixIds.length === 0) return;
-      setMintLintPhase("applying");
-      setMintLintApplyProgress({ done: 0, total: fixIds.length });
-      setLintBusy(true);
-      try {
-        const result = await api.jobLintApplySelected(vaultId, lintJobId, fixIds);
-        setMintLintApplyProgress({ done: result.applied, total: fixIds.length });
-        setMintLintApplyResult(result);
-        setMintLintPhase("done");
-        log(`Applied ${result.applied} lint fixes`);
-        pushToast(`Applied ${result.applied} lint fixes`, "success");
-        if (result.errors.length > 0) {
-          log(result.errors.join("; "));
-          pushToast(result.errors[0] ?? "Some fixes failed", "error");
-        }
-        await refreshVault(vaultId);
-        setLintResult(null);
-        setLintJobId(null);
-      } catch (error) {
-        setMintLintApplyResult({ applied: 0, errors: [String(error)] });
-        setMintLintPhase("done");
-        log(`Apply fixes failed: ${String(error)}`);
-        pushToast(`Apply fixes failed: ${String(error)}`, "error");
-      } finally {
-        setLintBusy(false);
-      }
-    },
-    [vaultId, lintJobId, log, refreshVault, pushToast],
-  );
-
-  const openMintLintReview = useCallback(() => {
-    if (lintResult) {
-      setMintLintOpen(true);
-      setMintLintPhase("review");
-      return;
-    }
-    log("No lint results — run Mint & Lint first.");
-  }, [lintResult, log]);
-
-  const paletteContext = useMemo<PaletteContext>(
-    () => ({
-      vaultId,
-      onLog: log,
-      onTab: (tab) => changeCenterTab(tab as CenterTab),
-      onVaultSwitch: async (id) => {
-        setVaultId(id);
-        await refreshVault(id);
-      },
-      onOpenPath: openDocument,
-      onSearchResults: (query, results) => {
-        setSearchBusy(true);
-        setSearchText(query);
-        setSearchResults(results);
-        setSearchBusy(false);
-      },
-      onIndexStatus: setIndexStatus,
-      onRefreshVault: async () => {
-        if (vaultId) await refreshVault(vaultId);
-      },
-    }),
-    [vaultId, log, refreshVault, openDocument, changeCenterTab],
-  );
-
-  const handlePaletteCli = useCallback(
-    async (line: string) => {
-      const isLintRun =
-        line.startsWith("lint") && !line.includes("apply") && line !== "mint";
-      const isLintApply = line === "mint" || line.includes("lint apply");
-      if (isLintRun) {
-        await startMintLint();
-        return;
-      }
-      if (isLintApply) {
-        openMintLintReview();
-        return;
-      }
-      setIngestBusy(true);
-      try {
-        await executePaletteCommand(line, paletteContext);
-      } finally {
-        setIngestBusy(false);
-      }
-    },
-    [paletteContext, startMintLint, openMintLintReview],
-  );
+  }, [vaultId, log, indexRebuildBusy, setIndexStatus]);
 
   const saveSettings = async () => {
     applyThemePreference(resolveThemePreference(settings));
@@ -667,6 +442,27 @@ export default function App() {
     [settings, log],
   );
 
+  const { handlePaletteCli, commands } = usePaletteCommands({
+    vaultId,
+    onLog: log,
+    changeCenterTab,
+    setVaultId,
+    refreshVault,
+    openDocument,
+    setIndexStatus,
+    setSearchBusy,
+    setSearchText,
+    setSearchResults,
+    saveDocument,
+    rebuildIndex,
+    startMintLint,
+    openMintLintReview,
+    toggleStatusBar,
+    persistTheme,
+    setSourceDialogOpen,
+    setIngestBusy,
+  });
+
   const createMissingPage = useCallback(
     async (nodeId: string) => {
       if (!vaultId) return;
@@ -689,81 +485,6 @@ export default function App() {
       }
     },
     [vaultId, log, pushToast, refreshVault, changeCenterTab, openDocument],
-  );
-
-  const commands = useMemo<CommandItem[]>(
-    () => [
-      {
-        id: "new-source",
-        label: "New Source",
-        run: () => setSourceDialogOpen(true),
-      },
-      {
-        id: "palette-search",
-        label: "Focus Search",
-        shortcut: "/",
-        run: () => {
-          const input = window.document.querySelector<HTMLInputElement>(
-            '[aria-label="Search vault"]',
-          );
-          input?.focus();
-        },
-      },
-      {
-        id: "save",
-        label: "Save Document",
-        shortcut: "Cmd+S",
-        run: () => void saveDocument(),
-      },
-      {
-        id: "rebuild-index",
-        label: "Rebuild Index",
-        run: () => void rebuildIndex(),
-      },
-      {
-        id: "lint",
-        label: "Mint & Lint Vault",
-        run: () => void startMintLint(),
-      },
-      {
-        id: "open-graph",
-        label: "Open Graph View",
-        run: () => changeCenterTab("graph"),
-      },
-      {
-        id: "open-settings",
-        label: "Open Settings",
-        run: () => changeCenterTab("settings"),
-      },
-      {
-        id: "theme-dark",
-        label: "Dark",
-        group: "Theme",
-        icon: <MoonIcon size={14} />,
-        run: () => void persistTheme("dark"),
-      },
-      {
-        id: "theme-light",
-        label: "Light",
-        group: "Theme",
-        icon: <SunIcon size={14} />,
-        run: () => void persistTheme("light"),
-      },
-      {
-        id: "theme-system",
-        label: "System",
-        group: "Theme",
-        icon: <MonitorIcon size={14} />,
-        run: () => void persistTheme("system"),
-      },
-      {
-        id: "toggle-status-bar",
-        label: "Toggle Status Bar",
-        shortcut: "Cmd+J",
-        run: () => toggleStatusBar(),
-      },
-    ],
-    [saveDocument, rebuildIndex, startMintLint, toggleStatusBar, changeCenterTab, persistTheme],
   );
 
   const hasVaults = vaults.length > 0;
@@ -869,7 +590,7 @@ export default function App() {
                 onChange={(e) => {
                   const next = e.target.value;
                   setSearchText(next);
-                  if (!next.trim()) clearSearchResults();
+                  if (!next.trim()) clearSearch();
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {

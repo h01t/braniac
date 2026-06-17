@@ -87,4 +87,22 @@ describe("jobActivityReducer", () => {
     expect(state.phase).toBe("error");
     expect(state.error).toBe("boom");
   });
+
+  it("records warning without failing the job", () => {
+    let state = jobActivityReducer(idle, {
+      type: "event",
+      event: { type: "started", jobId: "j1" },
+    });
+    state = jobActivityReducer(state, {
+      type: "event",
+      event: { type: "completed", jobId: "j1" },
+    });
+    state = jobActivityReducer(state, {
+      type: "event",
+      event: { type: "warning", jobId: "j1", message: "Index rebuild failed" },
+    });
+    expect(state.phase).toBe("success");
+    expect(state.warning).toBe("Index rebuild failed");
+    expect(state.steps.some((s) => s.id === "index-warning")).toBe(true);
+  });
 });

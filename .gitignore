@@ -49,6 +49,8 @@ vaults/**/.lint-cache.json
 
 # rust / tauri / desktop build artifacts
 /target/
+apps/desktop/dist/
+apps/desktop/graphify-out/
 apps/desktop/node_modules/
 apps/desktop/src-tauri/gen/
 *.swp

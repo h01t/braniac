@@ -16,6 +16,37 @@ fn qmd_available() -> bool {
         .unwrap_or(false)
 }
 
+fn seed_vault(resolver: &VaultResolver, count: usize) {
+    for i in 0..count {
+        let path = format!("concepts/doc-{i}.md");
+        let body = format!(
+            "# Doc {i}\n\nContent about topic {i} [[concepts/doc-{}]]",
+            (i + 1) % count.max(1)
+        );
+        resolver
+            .write_document("bench", &path, &body, "seed")
+            .expect("write");
+    }
+}
+
+fn bench_index_status(resolver: &VaultResolver, index: &IndexManager, label: &str, docs: usize) {
+    let start = Instant::now();
+    let _ = index.status_for_vault(resolver, "bench").expect("status");
+    println!("status_for_vault_{label}_docs={docs} ms={}", start.elapsed().as_millis());
+}
+
+fn bench_graph_layout(graph: &GraphEngine, resolver: &VaultResolver, nodes: usize) {
+    let snapshot = graph.snapshot(resolver, "bench").expect("snapshot");
+    let start = Instant::now();
+    let _ = graph
+        .layout(&snapshot, &LayoutOptions::default())
+        .expect("layout");
+    println!(
+        "graph_layout_nodes={nodes} elapsed_ms={}",
+        start.elapsed().as_millis()
+    );
+}
+
 fn main() {
     let dir = tempfile::tempdir().expect("tempdir");
     let vault_root = dir.path().join("vaults");
@@ -23,19 +54,17 @@ fn main() {
     let resolver = VaultResolver::new(vault_root.clone());
     resolver.open_vault("bench").expect("open vault");
 
-    for i in 0..1000 {
-        let path = format!("concepts/doc-{i}.md");
-        let body = format!(
-            "# Doc {i}\n\nContent about topic {i} [[concepts/doc-{}]]",
-            (i + 1) % 1000
-        );
-        resolver
-            .write_document("bench", &path, &body, "seed")
-            .expect("write");
-    }
+    seed_vault(&resolver, 1000);
 
     let qmd = Arc::new(ProcessQmdClient);
     let index = IndexManager::new(data_dir.join("index"), qmd).expect("index");
+
+    for &count in &[1000, 5000, 10_000] {
+        if count > 1000 {
+            seed_vault(&resolver, count - 1000);
+        }
+        bench_index_status(&resolver, &index, &format!("{count}"), count);
+    }
 
     if qmd_available() {
         let start = Instant::now();
@@ -61,14 +90,10 @@ fn main() {
     }
 
     let graph = GraphEngine::new(data_dir.join("graph"));
-    let snapshot = graph.snapshot(&resolver, "bench").expect("snapshot");
-    let start = Instant::now();
-    let _ = graph
-        .layout(&snapshot, &LayoutOptions::default())
-        .expect("layout");
-    println!(
-        "graph_layout_ms nodes={} elapsed={}",
-        snapshot.nodes.len(),
-        start.elapsed().as_millis()
-    );
+    for &target in &[500, 1000, 1500] {
+        if target > 1000 {
+            seed_vault(&resolver, target - 1000);
+        }
+        bench_graph_layout(&graph, &resolver, target);
+    }
 }

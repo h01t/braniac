@@ -19,6 +19,7 @@ export type JobActivityState = {
   streamChunks: string[];
   percent: number | null;
   error?: string;
+  warning?: string;
 };
 
 const initialState: JobActivityState = {
@@ -109,6 +110,20 @@ export function jobActivityReducer(state: JobActivityState, action: Action): Job
             phase: "success",
             percent: 100,
             steps: state.steps.map((s) => ({ ...s, status: s.status === "error" ? "error" : "done" })),
+          };
+        case "warning":
+          return {
+            ...state,
+            phase: "success",
+            warning: event.message,
+            steps: [
+              ...markPriorDone(state.steps),
+              {
+                id: "index-warning",
+                label: event.message,
+                status: "done",
+              },
+            ],
           };
         case "failed":
           return {

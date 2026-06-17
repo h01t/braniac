@@ -105,6 +105,7 @@ pub enum JobEvent {
     Chunk { job_id: Uuid, content: String },
     PatchReady { job_id: Uuid, patches: Vec<DocumentPatch> },
     Completed { job_id: Uuid },
+    Warning { job_id: Uuid, message: String },
     Failed { job_id: Uuid, error: String },
     Cancelled { job_id: Uuid },
 }
@@ -238,6 +239,8 @@ pub struct LintResult {
 pub struct ApplyLintResult {
     pub applied: usize,
     pub errors: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index_warning: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

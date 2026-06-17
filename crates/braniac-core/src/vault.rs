@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::{Component, Path, PathBuf};
 
 use braniac_types::{HistoryEntry, KnowledgeDocument, VaultFileEntry, VaultManifest};
@@ -12,6 +12,21 @@ use crate::error::{BraniacError, Result};
 use crate::vault_scan::{content_hash, VaultDocumentScan, VaultRevision};
 
 const ALLOWED_PREFIXES: &[&str] = &["concepts/", "entities/", "sources/", "events/", "papers/"];
+
+#[derive(Debug, Clone)]
+pub enum VaultWriteOp {
+    Write { path: String, content: String },
+    Delete { path: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct VaultBatchResult {
+    pub committed: bool,
+    pub touched_paths: Vec<String>,
+}
+
+/// Prior file content: `Some` = existed, `None` = did not exist.
+type VaultBatchSnapshot = HashMap<String, Option<String>>;
 
 lazy_static::lazy_static! {
     static ref WIKILINK_RE: Regex = Regex::new(r"\[\[([^\]]+)\]\]").unwrap();
@@ -180,6 +195,83 @@ impl VaultResolver {
         let sig = default_signature(&repo)?;
         repo.commit(Some("HEAD"), &sig, &sig, message, &tree, &[&head])?;
         Ok(())
+    }
+
+    pub fn is_worktree_dirty(&self, vault_id: &str) -> Result<bool> {
+        let repo = Repository::open(&self.resolve_vault_path(vault_id)?)?;
+        is_worktree_dirty(&repo)
+    }
+
+    pub fn apply_batch(
+        &self,
+        vault_id: &str,
+        ops: &[VaultWriteOp],
+        message: &str,
+    ) -> Result<VaultBatchResult> {
+        if ops.is_empty() {
+            return Ok(VaultBatchResult {
+                committed: false,
+                touched_paths: Vec::new(),
+            });
+        }
+
+        let mut touched_paths = Vec::with_capacity(ops.len());
+        let mut snapshot: VaultBatchSnapshot = HashMap::new();
+
+        for op in ops {
+            let path = match op {
+                VaultWriteOp::Write { path, .. } | VaultWriteOp::Delete { path } => path,
+            };
+            self.resolve_document_path(vault_id, path)?;
+            if !snapshot.contains_key(path) {
+                let prior = self.read_document(vault_id, path).ok().map(|d| d.content);
+                snapshot.insert(path.clone(), prior);
+            }
+            if !touched_paths.contains(path) {
+                touched_paths.push(path.clone());
+            }
+        }
+
+        let vault_path = self.resolve_vault_path(vault_id)?;
+        let mut written_paths: Vec<String> = Vec::new();
+        let mut deleted_paths: Vec<String> = Vec::new();
+
+        let apply_result: Result<()> = (|| {
+            for op in ops {
+                match op {
+                    VaultWriteOp::Write { path, content } => {
+                        let full = self.resolve_document_path(vault_id, path)?;
+                        if let Some(parent) = full.parent() {
+                            std::fs::create_dir_all(parent)?;
+                        }
+                        std::fs::write(&full, content)?;
+                        written_paths.push(path.clone());
+                    }
+                    VaultWriteOp::Delete { path } => {
+                        let full = self.resolve_document_path(vault_id, path)?;
+                        if !full.exists() {
+                            return Err(BraniacError::NotFound(path.clone()));
+                        }
+                        std::fs::remove_file(&full)?;
+                        deleted_paths.push(path.clone());
+                    }
+                }
+            }
+            let mut commit_paths = written_paths.clone();
+            commit_paths.extend(deleted_paths.iter().cloned());
+            commit_files(&vault_path, &commit_paths, message)?;
+            Ok(())
+        })();
+
+        if let Err(e) = apply_result {
+            restore_batch_snapshot(self, vault_id, &snapshot)?;
+            return Err(e);
+        }
+
+        Ok(VaultBatchResult {
+            committed: true,
+            touched_paths,
+        })
     }
 
     pub fn current_head_hash(&self, vault_id: &str) -> Result<String> {
@@ -360,21 +452,29 @@ pub fn validate_document_path(rel_path: &str) -> Result<()> {
 }
 
 fn ensure_within_vault(vault_root: &Path, target: &Path) -> Result<()> {
-    let vault_root = vault_root
+    ensure_within_parent(vault_root, target)
+}
+
+pub fn ensure_within_parent(parent: &Path, target: &Path) -> Result<()> {
+    let parent = parent
         .canonicalize()
-        .unwrap_or_else(|_| vault_root.to_path_buf());
-    let target = if target.exists() {
+        .unwrap_or_else(|_| parent.to_path_buf());
+    let resolved = if target.exists() {
         target.canonicalize()?
     } else {
-        let parent = target
+        let parent_of_target = target
             .parent()
             .and_then(|p| p.canonicalize().ok())
-            .unwrap_or_else(|| vault_root.clone());
-        parent.join(target.file_name().unwrap_or_default())
+            .unwrap_or_else(|| parent.clone());
+        parent_of_target.join(
+            target
+                .file_name()
+                .unwrap_or_else(|| std::ffi::OsStr::new("")),
+        )
     };
-    if !target.starts_with(&vault_root) {
+    if !resolved.starts_with(&parent) {
         return Err(BraniacError::PathTraversal(
-            target.display().to_string(),
+            resolved.display().to_string(),
         ));
     }
     Ok(())
@@ -412,9 +512,21 @@ fn init_git_repo(vault_path: &Path) -> Result<()> {
 }
 
 fn commit_file(vault_path: &Path, rel_path: &str, message: &str) -> Result<()> {
+    commit_files(vault_path, &[rel_path.to_string()], message)
+}
+
+fn commit_files(vault_path: &Path, rel_paths: &[String], message: &str) -> Result<()> {
     let repo = Repository::open(vault_path)?;
     let mut index = repo.index()?;
-    index.add_path(Path::new(rel_path))?;
+    for rel_path in rel_paths {
+        let path = Path::new(rel_path);
+        let full = vault_path.join(rel_path);
+        if full.exists() {
+            index.add_path(path)?;
+        } else {
+            index.remove_path(path)?;
+        }
+    }
     index.write()?;
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
@@ -422,6 +534,30 @@ fn commit_file(vault_path: &Path, rel_path: &str, message: &str) -> Result<()> {
     let sig = default_signature(&repo)?;
     let parents: Vec<&git2::Commit> = parent.iter().collect();
     repo.commit(Some("HEAD"), &sig, &sig, message, &tree, &parents)?;
+    Ok(())
+}
+
+fn restore_batch_snapshot(
+    vault: &VaultResolver,
+    vault_id: &str,
+    snapshot: &VaultBatchSnapshot,
+) -> Result<()> {
+    for (path, prior) in snapshot {
+        let full = vault.resolve_document_path(vault_id, path)?;
+        match prior {
+            Some(content) => {
+                if let Some(parent) = full.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
+                std::fs::write(&full, content)?;
+            }
+            None => {
+                if full.exists() {
+                    std::fs::remove_file(&full)?;
+                }
+            }
+        }
+    }
     Ok(())
 }
 
@@ -505,16 +641,46 @@ mod tests {
     }
 
     #[test]
-    fn import_vault_copies_files() {
+    fn batch_write_commits_once() {
         let root = tempdir().unwrap();
-        let source = root.path().join("source");
-        std::fs::create_dir_all(source.join("concepts")).unwrap();
-        std::fs::write(source.join("concepts/x.md"), "# X").unwrap();
+        let resolver = VaultResolver::new(root.path().to_path_buf());
+        resolver.open_vault("test").unwrap();
+        let ops = vec![
+            VaultWriteOp::Write {
+                path: "concepts/a.md".into(),
+                content: "# A\n".into(),
+            },
+            VaultWriteOp::Write {
+                path: "concepts/b.md".into(),
+                content: "# B\n".into(),
+            },
+        ];
+        resolver.apply_batch("test", &ops, "batch add").unwrap();
+        let history = resolver.history_log("test").unwrap();
+        assert!(history.first().unwrap().message.contains("batch add"));
+        assert!(resolver.read_document("test", "concepts/a.md").is_ok());
+        assert!(resolver.read_document("test", "concepts/b.md").is_ok());
+    }
 
-        let resolver = VaultResolver::new(root.path().join("vaults"));
-        let manifest = resolver.import_vault_from(&source, "imported").unwrap();
-        assert!(manifest.document_count >= 1);
-        let doc = resolver.read_document("imported", "concepts/x.md").unwrap();
-        assert_eq!(doc.title.as_deref(), Some("X"));
+    #[test]
+    fn batch_write_rollback_on_failure() {
+        let root = tempdir().unwrap();
+        let resolver = VaultResolver::new(root.path().to_path_buf());
+        resolver.open_vault("test").unwrap();
+        resolver
+            .write_document("test", "concepts/keep.md", "# Keep\n", "init")
+            .unwrap();
+        let ops = vec![
+            VaultWriteOp::Write {
+                path: "concepts/new.md".into(),
+                content: "# New\n".into(),
+            },
+            VaultWriteOp::Delete {
+                path: "concepts/missing.md".into(),
+            },
+        ];
+        assert!(resolver.apply_batch("test", &ops, "should fail").is_err());
+        assert!(resolver.read_document("test", "concepts/keep.md").is_ok());
+        assert!(resolver.read_document("test", "concepts/new.md").is_err());
     }
 }

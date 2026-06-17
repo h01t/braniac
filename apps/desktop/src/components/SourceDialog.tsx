@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { ingestFromPdf, ingestFromText, ingestFromUrl, startIngest } from "../lib/ingest";
+import { buildIngestRequest, startIngest } from "../lib/ingest";
 import { BusyButton } from "./BusyButton";
 
 interface SourceDialogProps {
@@ -30,15 +30,7 @@ export function SourceDialog({
   const handleCompile = async () => {
     if (!vaultId || !canCompile) return;
     try {
-      let request;
-      if (pdfPath) {
-        request = ingestFromPdf(vaultId, pdfPath);
-      } else if (/^https?:\/\//i.test(text.trim())) {
-        request = ingestFromUrl(vaultId, text.trim());
-      } else {
-        request = ingestFromText(vaultId, text.trim());
-      }
-      await startIngest(request, onLog);
+      await startIngest(buildIngestRequest(vaultId, text, pdfPath), onLog);
       setText("");
       setPdfPath(null);
       await onComplete();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { ingestFromPdf, ingestFromText, ingestFromUrl, startIngest } from "../lib/ingest";
+import { buildIngestRequest, startIngest } from "../lib/ingest";
 import type { JobActivityState } from "../hooks/useJobActivity";
 import { BusyButton } from "./BusyButton";
 import { JobActivityFeed } from "./JobActivityFeed";
@@ -47,13 +47,7 @@ export function IngestBar({
     onActivityReset();
     onBusyChange(true);
     try {
-      if (pdfPath) {
-        await startIngest(ingestFromPdf(vaultId, pdfPath), onLog);
-      } else if (/^https?:\/\//i.test(text.trim())) {
-        await startIngest(ingestFromUrl(vaultId, text.trim()), onLog);
-      } else {
-        await startIngest(ingestFromText(vaultId, text.trim()), onLog);
-      }
+      await startIngest(buildIngestRequest(vaultId, text, pdfPath), onLog);
       setText("");
       setPdfPath(null);
       await onComplete();
